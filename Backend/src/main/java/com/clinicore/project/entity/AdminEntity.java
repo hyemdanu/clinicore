@@ -1,4 +1,4 @@
-package entities;
+package com.clinicore.project.entity;
 
 // imports
 import jakarta.persistence.*;
