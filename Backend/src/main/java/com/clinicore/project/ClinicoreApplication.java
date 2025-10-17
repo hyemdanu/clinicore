@@ -8,6 +8,8 @@ public class ClinicoreApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ClinicoreApplication.class, args);
+
+        System.out.println("Database is connected");
     }
 
 }
