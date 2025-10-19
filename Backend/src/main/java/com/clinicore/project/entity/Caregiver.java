@@ -13,8 +13,7 @@ import lombok.NoArgsConstructor;
 @Setter
 @NoArgsConstructor
 
-
-public class CareGiverEntity {
+public class Caregiver {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "documents")
+@Table(name = "document")
 
-public class DocumentEntity {
+public class Document {
 
     @Id
     @Column(name = "id")
