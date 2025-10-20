@@ -15,7 +15,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @Table(name = "communication_portal")
 
-public class CommunicationPortalEntity {
+public class CommunicationPortal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
