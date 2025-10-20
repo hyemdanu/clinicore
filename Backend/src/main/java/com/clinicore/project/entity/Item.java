@@ -24,7 +24,7 @@ public class Item {
     @Column(name = "category") // e.g., medication, supply, device
     private String category;
 
-    @Column(name = "description")
+    @Column(name = "description") // e.g. explanation of item
     private String description;
 
     @Column(name = "sku")
