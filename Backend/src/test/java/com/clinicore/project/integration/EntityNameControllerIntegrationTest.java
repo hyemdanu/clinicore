@@ -77,7 +77,7 @@ class ResidentControllerIntegrationTest {  // REPLACE: Change "Resident" to your
 
     @Autowired
     private MockMvc mockMvc;  // This object simulates HTTP requests to your API
-                              // Think of it as a fake web browser for testing
+    // Think of it as a fake web browser for testing
 
     @Autowired
     private ResidentGeneralRepository residentRepository;  // REPLACE: Your repository
@@ -135,7 +135,7 @@ class ResidentControllerIntegrationTest {  // REPLACE: Change "Resident" to your
         residentRepository.save(resident);  // REPLACE: Change repository
 
         System.out.println("✓ Test data created (UserProfile ID: " + testUserProfileId +
-                         ", Resident ID: " + testResidentId + ")");
+                ", Resident ID: " + testResidentId + ")");
     }
 
     // ============================================================================
@@ -152,35 +152,35 @@ class ResidentControllerIntegrationTest {  // REPLACE: Change "Resident" to your
         // Make HTTP GET request to your API endpoint
         // -----------------------------------------------------------------------
         mockMvc.perform(
-                // Build a GET request to your API endpoint
-                // REPLACE: Change "/api/resident/{userProfileId}/general" to YOUR endpoint
-                get("/api/resident/{userProfileId}/general", testUserProfileId)
-                        .contentType(MediaType.APPLICATION_JSON)  // Tell API we're working with JSON
-        )
-        // -----------------------------------------------------------------------
-        // VERIFY: Check the HTTP response
-        // -----------------------------------------------------------------------
-        .andExpect(status().isOk())  // Expect HTTP 200 OK status code
+                        // Build a GET request to your API endpoint
+                        // REPLACE: Change "/api/resident/{userProfileId}/general" to YOUR endpoint
+                        get("/api/resident/{userProfileId}/general", testUserProfileId)
+                                .contentType(MediaType.APPLICATION_JSON)  // Tell API we're working with JSON
+                )
+                // -----------------------------------------------------------------------
+                // VERIFY: Check the HTTP response
+                // -----------------------------------------------------------------------
+                .andExpect(status().isOk())  // Expect HTTP 200 OK status code
 
-        // -----------------------------------------------------------------------
-        // VERIFY: Check the JSON response body
-        // -----------------------------------------------------------------------
-        // jsonPath checks specific fields in the JSON response
-        // Syntax: "$.fieldName" means "find field called 'fieldName' in the JSON"
-        // REPLACE ALL BELOW: Update jsonPath checks to match YOUR API's JSON structure
+                // -----------------------------------------------------------------------
+                // VERIFY: Check the JSON response body
+                // -----------------------------------------------------------------------
+                // jsonPath checks specific fields in the JSON response
+                // Syntax: "$.fieldName" means "find field called 'fieldName' in the JSON"
+                // REPLACE ALL BELOW: Update jsonPath checks to match YOUR API's JSON structure
 
-        .andExpect(jsonPath("$.userProfileId").value(testUserProfileId))
-        // This checks: {"userProfileId": 888888, ...}
+                .andExpect(jsonPath("$.userProfileId").value(testUserProfileId))
+                // This checks: {"userProfileId": 888888, ...}
 
-        .andExpect(jsonPath("$.username").value(containsString("janesmith_test")))
-        // containsString() does partial matching (useful for generated usernames with timestamps)
+                .andExpect(jsonPath("$.username").value(containsString("janesmith_test")))
+                // containsString() does partial matching (useful for generated usernames with timestamps)
 
-        .andExpect(jsonPath("$.gender").value("Female"))
-        .andExpect(jsonPath("$.birthday").value("1960-03-20"))
-        .andExpect(jsonPath("$.contactNumber").value("555-1234"))
-        .andExpect(jsonPath("$.emergencyContactName").value("John Smith"))
-        .andExpect(jsonPath("$.emergencyContactNumber").value("555-5678"))
-        .andExpect(jsonPath("$.notes").value("Controller test resident"));
+                .andExpect(jsonPath("$.gender").value("Female"))
+                .andExpect(jsonPath("$.birthday").value("1960-03-20"))
+                .andExpect(jsonPath("$.contactNumber").value("555-1234"))
+                .andExpect(jsonPath("$.emergencyContactName").value("John Smith"))
+                .andExpect(jsonPath("$.emergencyContactNumber").value("555-5678"))
+                .andExpect(jsonPath("$.notes").value("Controller test resident"));
 
         System.out.println("✓ GET request successful - returned correct resident data");
     }
@@ -202,20 +202,20 @@ class ResidentControllerIntegrationTest {  // REPLACE: Change "Resident" to your
         // Make HTTP GET request with non-existent ID
         // -----------------------------------------------------------------------
         mockMvc.perform(
-                get("/api/resident/{userProfileId}/general", nonExistentId)  // REPLACE: Update endpoint
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
-        // -----------------------------------------------------------------------
-        // VERIFY: Check for HTTP 404 Not Found
-        // -----------------------------------------------------------------------
-        .andExpect(status().isNotFound())  // Expect HTTP 404 status code
+                        get("/api/resident/{userProfileId}/general", nonExistentId)  // REPLACE: Update endpoint
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                // -----------------------------------------------------------------------
+                // VERIFY: Check for HTTP 404 Not Found
+                // -----------------------------------------------------------------------
+                .andExpect(status().isNotFound())  // Expect HTTP 404 status code
 
-        // -----------------------------------------------------------------------
-        // VERIFY: Check error message in JSON response
-        // -----------------------------------------------------------------------
-        // REPLACE BELOW: Update to match YOUR controller's error response format
-        .andExpect(jsonPath("$.message").value("UserProfile not found"))
-        .andExpect(jsonPath("$.userProfileId").value(nonExistentId));
+                // -----------------------------------------------------------------------
+                // VERIFY: Check error message in JSON response
+                // -----------------------------------------------------------------------
+                // REPLACE BELOW: Update to match YOUR controller's error response format
+                .andExpect(jsonPath("$.message").value("UserProfile not found"))
+                .andExpect(jsonPath("$.userProfileId").value(nonExistentId));
 
         System.out.println("✓ Correctly returns 404 for non-existent user");
     }
@@ -251,14 +251,14 @@ class ResidentControllerIntegrationTest {  // REPLACE: Change "Resident" to your
         // Make HTTP GET request for UserProfile without Entity
         // -----------------------------------------------------------------------
         mockMvc.perform(
-                get("/api/resident/{userProfileId}/general", orphanUserId)  // REPLACE: Update endpoint
-                        .contentType(MediaType.APPLICATION_JSON)
-        )
-        .andExpect(status().isNotFound())  // Expect 404
+                        get("/api/resident/{userProfileId}/general", orphanUserId)  // REPLACE: Update endpoint
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isNotFound())  // Expect 404
 
-        // REPLACE BELOW: Update to match YOUR controller's error response
-        .andExpect(jsonPath("$.message").value("Resident not found for userProfileId"))
-        .andExpect(jsonPath("$.userProfileId").value(orphanUserId));
+                // REPLACE BELOW: Update to match YOUR controller's error response
+                .andExpect(jsonPath("$.message").value("Resident not found for userProfileId"))
+                .andExpect(jsonPath("$.userProfileId").value(orphanUserId));
 
         // Cleanup orphan user
         userProfileRepository.deleteById(orphanUserId);
