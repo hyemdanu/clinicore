@@ -1,5 +1,7 @@
 // Edison Ho
-// Resident General Controller
+// Resident General Controller (Uses both UserProfileRepository and ResidentGeneralRepository
+// ResidentGeneral and UserProfile is connected since ResidentGeneral just extends UserProfile
+
 package com.clinicore.project.controller;
 
 // imports
