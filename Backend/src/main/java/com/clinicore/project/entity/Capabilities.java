@@ -1,3 +1,5 @@
+package com.clinicore.project.entity;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -29,6 +31,7 @@ public class Capabilities {
         this.selfMedicines = selfMedicines;
         this.incontinenceStatus = incontinenceStatus;
         this.mobilityCapability = mobilityCapability;
+        //add more fields here if needed for client
     }
 
     // ---- Getters and Setters ----
@@ -45,4 +48,17 @@ public class Capabilities {
 
     public MobilityCapability getMobilityCapability() { return mobilityCapability; }
     public void setMobilityCapability(MobilityCapability mobilityCapability) { this.mobilityCapability = mobilityCapability; }
+
+    // ---- Inner Enums ----
+    public enum AnswerOption {
+        YES, NO, OTHER
+    }
+
+    public enum IncontinenceStatus {
+        NONE, OCCASIONAL, FREQUENT, OTHER
+    }
+
+    public enum MobilityCapability {
+        INDEPENDENT, NEEDS_ASSISTANCE, BEDRIDDEN, OTHER
+    }
 }
