@@ -27,8 +27,6 @@ public class Medication {
 
     @Column
     private String notes;
-
-
 }
 
 

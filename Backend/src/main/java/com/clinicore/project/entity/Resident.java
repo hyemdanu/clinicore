@@ -4,6 +4,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import jakarta.persistence.Table;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.CascadeType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -25,9 +27,10 @@ public class Resident {
     @Column(name = "emergency_contact_number", nullable = false)
     private String emergencyContactNumber;
 
-    @Column(name = "medical_profile_id", nullable = false)
-    private Long medicalProfileId;
-
     @Column
     private String notes;
+
+    //
+    @OneToOne(mappedBy = "resident", cascade = CascadeType.ALL, orphanRemoval = true)
+    private MedicalProfile medicalProfile;
 }
