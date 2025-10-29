@@ -14,39 +14,45 @@ public interface MessagesRepository extends JpaRepository<CommunicationPortal, L
     /**
      * Get all communications for a specific sender
      */
-    List<CommunicationPortal> findBySenderId(Long senderId);
+    List<CommunicationPortal> findBySender_id(Long senderId);
 
     /**
      * Get all communications sent to a specific recipient
      */
-    List<CommunicationPortal> findByRecipientId(Long recipientId);
+    List<CommunicationPortal> findByRecipient_id(Long recipientId);
 
     /**
      * Get communications sent by users with specific role
      */
-    List<CommunicationPortal> findBySenderRole(String senderRole);
+    List<CommunicationPortal> findBySender_role(CommunicationPortal.UserRole senderRole);
 
     /**
      * Get communications between a specific sender and recipient
      */
-    List<CommunicationPortal> findBySenderIdAndRecipientId(Long senderId, Long recipientId);
+    List<CommunicationPortal> findBySender_idAndRecipient_id(Long senderId, Long recipientId);
 
     /**
      * Get communications for a recipient with a specific role
      */
-    List<CommunicationPortal> findByRecipientIdAndRecipientRole(Long recipientId, String recipientRole);
-
-    /**
-     * Query to get full conversation between two users in order
-     */
-    @Query("SELECT cp FROM CommunicationPortal cp WHERE " +
-            "(cp.sender_id = :user1Id AND cp.recipient_id = :user2Id) OR " +
-            "(cp.sender_id = :user2Id AND cp.recipient_id = :user1Id) " +
-            "ORDER BY cp.sent_date ASC, cp.sent_time ASC")
+    List<CommunicationPortal> findByRecipient_idAndRecipient_role(Long recipientId, CommunicationPortal.UserRole recipientRole);
 
     /**
      * Get full conversation between two users in order
      */
+    @Query("SELECT cp FROM CommunicationPortal cp WHERE " +
+            "(cp.sender_id = :user1Id AND cp.recipient_id = :user2Id) OR " +
+            "(cp.sender_id = :user2Id AND cp.recipient_id = :user1Id) " +
+            "ORDER BY cp.sent_at ASC")
     List<CommunicationPortal> findConversation(@Param("user1Id") Long user1Id,
                                                @Param("user2Id") Long user2Id);
+
+    /**
+     * Get unread messages for a specific recipient
+     */
+    List<CommunicationPortal> findByRecipient_idAndIs_read(Long recipientId, Boolean isRead);
+
+    /**
+     * Get unread messages ordered by sent date
+     */
+    List<CommunicationPortal> findByRecipient_idAndIs_readOrderBySent_atDesc(Long recipientId, Boolean isRead);
 }

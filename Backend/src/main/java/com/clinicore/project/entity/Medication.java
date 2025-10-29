@@ -1,18 +1,15 @@
 package com.clinicore.project.entity;
 
-//imports
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import java.time.LocalDateTime;
 
-//annotations
 @Entity
 @Table(name = "medication")
 @Getter
 @Setter
 @NoArgsConstructor
-
+@AllArgsConstructor
 public class Medication {
 
     @Id
@@ -20,13 +17,53 @@ public class Medication {
     private Long id;
 
     @Column
-    private double dosage;
+    private Long medical_profile_id;
 
     @Column
-    private boolean intake_status;
+    private Long medication_inventory_id;
+
+    @Column(name = "medication_name")
+    private String medicationName;
 
     @Column
+    private String dosage;
+
+    @Column
+    private String frequency;
+
+    @Enumerated(EnumType.STRING)
+    private IntakeStatus intake_status;
+
+    private LocalDateTime last_administered_at;
+
+    @Column(columnDefinition = "TEXT")
     private String notes;
+
+    @Column(updatable = false)
+    private LocalDateTime created_at;
+
+    private LocalDateTime updated_at;
+
+    @Transient
+    public boolean isTrackedInInventory() {
+        return medication_inventory_id != null;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        created_at = LocalDateTime.now();
+        updated_at = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updated_at = LocalDateTime.now();
+    }
+
+    public enum IntakeStatus {
+        ADMINISTERED,
+        WITHHELD,
+        MISSED,
+        PENDING
+    }
 }
-
-

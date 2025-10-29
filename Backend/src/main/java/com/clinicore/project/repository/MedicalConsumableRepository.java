@@ -1,35 +1,24 @@
 package com.clinicore.project.repository;
 
-import java.util.List;
-
+import com.clinicore.project.entity.MedicalConsumable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.clinicore.project.entity.MedicalConsumable;
+import java.util.List;
 
 @Repository
 public interface MedicalConsumableRepository extends JpaRepository<MedicalConsumable, Long> {
-    
-    /**
-     * Find medical consumables by name (case-insensitive)
-     * Spring Data JPA automatically implements this method!
+
+    /** 
+     * Join with item table to get name and quantity.
+     * Since MedicalConsumable only has id, we need to join with Item.
      */
-    List<MedicalConsumable> findByNameContainingIgnoreCase(String name);
-    
-    /**
-     * Find medical consumables with low quantity (below specified threshold)
-     * Useful for inventory alerts
-     */
-    List<MedicalConsumable> findByQuantityLessThan(Integer quantity);
-    
-    /**
-     * Find medical consumables by exact name match
-     */
-    List<MedicalConsumable> findByName(String name);
-    
-    /**
-     * Check if a medical consumable with the given name exists
-     * Useful for validation when creating new items
-     */
-    boolean existsByName(String name);
+    @Query("""
+           SELECT mc FROM MedicalConsumable mc
+           JOIN Item i ON mc.id = i.id
+           ORDER BY i.name ASC
+           """)
+    List<MedicalConsumable> findAllOrderedByName();
+
 }

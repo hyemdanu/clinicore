@@ -2,21 +2,20 @@ package com.clinicore.project.entity;
 
 // imports
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-// annotations
 @Entity
-@Table(name = "admin")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-
+@AllArgsConstructor
+@Table(name = "admin")
 public class Admin {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    private UserProfile userProfile;
 }

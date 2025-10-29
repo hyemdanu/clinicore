@@ -5,26 +5,24 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "medical_services")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MedicalServices {
+@Table(name = "capability")
+public class Capability {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String hospice_agency;
-    private String preferred_hospital;
-    private String preferred_pharmacy;
-    private String home_health_agency;
-    private String mortuary;
-    private String dnr_polst;
-    private Boolean hospice;
-    private Boolean home_health;
-    private String notes;
+    private Boolean verbal;
+    private Boolean self_medicates;
+    
+    @Enumerated(EnumType.STRING)
+    private IncontinenceStatus incontinence_status;
+    
+    @Enumerated(EnumType.STRING)
+    private MobilityStatus mobility_status;
     
     @Column(updatable = false)
     private LocalDateTime created_at;
@@ -40,5 +38,21 @@ public class MedicalServices {
     @PreUpdate
     protected void onUpdate() {
         updated_at = LocalDateTime.now();
+    }
+
+    // Enums
+
+    public enum IncontinenceStatus {
+        CONTINENT,
+        INCONTINENT_URINE,
+        INCONTINENT_BOWELS,
+        INCONTINENT_BOTH
+    }
+
+    public enum MobilityStatus {
+        WALKS_WITHOUT_ASSISTANCE,
+        WALKS_WITH_ASSISTANCE,
+        WHEELCHAIR,
+        BEDRIDDEN
     }
 }

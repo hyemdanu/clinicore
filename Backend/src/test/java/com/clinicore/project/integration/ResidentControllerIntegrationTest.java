@@ -14,20 +14,21 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Integration test for ResidentGeneralController
- * Tests the actual REST API endpoints
+ * Tests: Create resident → Get resident details → List all residents → Delete resident
  */
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)  // Disable security for tests
+@AutoConfigureMockMvc(addFilters = false)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ResidentControllerIntegrationTest {
 
     @Autowired
-    private MockMvc mockMvc;  // Simulates HTTP requests
+    private MockMvc mockMvc;
 
     @Autowired
     private ResidentGeneralRepository residentRepository;
@@ -35,75 +36,93 @@ class ResidentControllerIntegrationTest {
     @Autowired
     private UserProfileRepository userProfileRepository;
 
-    private static Long testUserProfileId = 888888L;
-    private static Long testResidentId = 888888L;
+    private static Long testUserId;
 
     @Test
     @Order(1)
-    @DisplayName("Setup - Create test data")
-    void setupTestData() {
-        // Create UserProfile
-        UserProfile userProfile = new UserProfile();
-        userProfile.setId(testUserProfileId);
-        userProfile.setFirstName("Jane");
-        userProfile.setLastName("Smith");
-        userProfile.setGender("Female");
-        userProfile.setBirthday(LocalDate.of(1960, 3, 20));
-        userProfile.setContactNumber("555-1234");
-        userProfile.setUsername("janesmith_test_" + System.currentTimeMillis());
-        userProfile.setPasswordHash("hashed_password_456");
-        userProfileRepository.save(userProfile);
+    @DisplayName("1. CREATE - Make new resident in database")
+    void createResident() {
+        System.out.println("\n=== TEST 1: Creating Resident ===");
 
-        // Create Resident
+        // Create UserProfile (don't set ID - let it be auto-generated)
+        UserProfile user = new UserProfile();
+        user.setFirstName("John");
+        user.setLastName("Doe");
+        user.setGender("Male");
+        user.setBirthday(LocalDate.of(1950, 5, 15));
+        user.setContactNumber("555-1234");
+        user.setUsername("johndoe_test_" + System.currentTimeMillis());
+        user.setPasswordHash("hashed_password");
+        
+        // Save and capture the generated ID
+        UserProfile savedUser = userProfileRepository.save(user);
+        testUserId = savedUser.getId();
+
+        // Verify UserProfile ID was generated
+        assertNotNull(testUserId, "User ID should be generated");
+        assertTrue(testUserId > 0, "User ID should be positive");
+
+        // Create Resident with the same ID as UserProfile
         Resident resident = new Resident();
-        resident.setId(testResidentId);
-        resident.setEmergencyContactName("John Smith");
+        resident.setId(testUserId);
+        resident.setEmergencyContactName("Jane Doe");
         resident.setEmergencyContactNumber("555-5678");
         resident.setMedicalProfileId(null);
-        resident.setNotes("Controller test resident");
+        resident.setNotes("Test resident");
         residentRepository.save(resident);
 
-        System.out.println("✓ Test data created");
+        System.out.println("✓ Created resident with auto-generated ID: " + testUserId);
     }
 
     @Test
     @Order(2)
-    @DisplayName("GET /api/resident/{id}/general - Success")
-    void testGetResidentGeneral_Success() throws Exception {
-        mockMvc.perform(get("/api/resident/{userProfileId}/general", testUserProfileId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())  // Expect 200 OK
-                .andExpect(jsonPath("$.userProfileId").value(testUserProfileId))
-                .andExpect(jsonPath("$.username").value(containsString("janesmith_test")))
-                .andExpect(jsonPath("$.gender").value("Female"))
-                .andExpect(jsonPath("$.emergencyContactName").value("John Smith"))
-                .andExpect(jsonPath("$.emergencyContactNumber").value("555-5678"))
-                .andExpect(jsonPath("$.notes").value("Controller test resident"));
+    @DisplayName("2. GET - Grab resident information via endpoint")
+    void getResidentInformation() throws Exception {
+        System.out.println("\n=== TEST 2: Getting Resident Information ===");
 
-        System.out.println("✓ GET request successful - returned correct resident data");
+        mockMvc.perform(get("/api/resident/{id}/general", testUserId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userProfileId").value(testUserId))
+                .andExpect(jsonPath("$.firstName").value("John"))
+                .andExpect(jsonPath("$.lastName").value("Doe"))
+                .andExpect(jsonPath("$.gender").value("Male"))
+                .andExpect(jsonPath("$.emergencyContactName").value("Jane Doe"))
+                .andExpect(jsonPath("$.emergencyContactNumber").value("555-5678"))
+                .andExpect(jsonPath("$.notes").value("Test resident"));
+
+        System.out.println("✓ Retrieved resident information successfully with ID: " + testUserId);
     }
 
     @Test
     @Order(3)
-    @DisplayName("GET /api/resident/{id}/general - User Not Found")
-    void testGetResidentGeneral_UserNotFound() throws Exception {
-        Long nonExistentId = 999999999L;
+    @DisplayName("3. GET LIST - List all residents via endpoint")
+    void listAllResidents() throws Exception {
+        System.out.println("\n=== TEST 3: Listing All Residents ===");
 
-        mockMvc.perform(get("/api/resident/{userProfileId}/general", nonExistentId)
+        mockMvc.perform(get("/api/resident/list")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())  // Expect 404 Not Found
-                .andExpect(jsonPath("$.message").value("UserProfile not found"))
-                .andExpect(jsonPath("$.userProfileId").value(nonExistentId));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", isA(java.util.List.class)))
+                .andExpect(jsonPath("$[?(@.id == " + testUserId + ")].firstName").value(hasItem("John")))
+                .andExpect(jsonPath("$[?(@.id == " + testUserId + ")].lastName").value(hasItem("Doe")));
 
-        System.out.println("✓ Correctly returns 404 for non-existent user");
+        System.out.println("✓ Listed all residents successfully");
     }
 
     @Test
     @Order(4)
-    @DisplayName("Cleanup - Remove test data")
-    void cleanupTestData() {
-        residentRepository.deleteById(testResidentId);
-        userProfileRepository.deleteById(testUserProfileId);
-        System.out.println("✓ Test data cleaned up");
+    @DisplayName("4. DELETE - Delete resident from database")
+    void deleteResident() {
+        System.out.println("\n=== TEST 4: Deleting Resident ===");
+
+        residentRepository.deleteById(testUserId);
+        userProfileRepository.deleteById(testUserId);
+        
+        // Verify deletion
+        assertFalse(residentRepository.existsById(testUserId), "Resident should be deleted");
+        assertFalse(userProfileRepository.existsById(testUserId), "UserProfile should be deleted");
+
+        System.out.println("✓ Deleted resident with ID: " + testUserId);
     }
 }

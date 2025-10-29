@@ -1,10 +1,8 @@
 package com.clinicore.project.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import java.util.List;
+import lombok.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -14,11 +12,9 @@ import java.util.List;
 public class MedicalProfile {
 
     @Id
-    @OneToOne
-    @JoinColumn(name = "resident_id", nullable = false, unique = true) // Foreign key to Resident
-    private Resident resident; // Primary Key
+    private Long resident_id;
 
-    @Column // Allow null; Possible to have no insurance?
+    @Column
     private String insurance;
 
     @Column(name = "medical_services_id", nullable = false)
@@ -27,11 +23,22 @@ public class MedicalProfile {
     @Column(name = "capabilities_id", nullable = false)
     private Long capabilitiesId;
 
+
     private String notes;
+    
+    @Column(updatable = false)
+    private LocalDateTime created_at;
+    
+    private LocalDateTime updated_at;
 
-    @OneToOne(mappedBy = "medicalProfile", cascade = CascadeType.ALL, orphanRemoval = true)
-    private MedicalRecord medicalRecord;
+    @PrePersist
+    protected void onCreate() {
+        created_at = LocalDateTime.now();
+        updated_at = LocalDateTime.now();
+    }
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) // Unidirectional relationship to medication
-    private List<Medication> medications; // List of medications associated with the resident
+    @PreUpdate
+    protected void onUpdate() {
+        updated_at = LocalDateTime.now();
+    }
 }

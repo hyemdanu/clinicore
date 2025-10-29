@@ -109,7 +109,7 @@ public class ResidentGeneralController {
         // additional resident-specific information
         residentsResult.put("emergencyContactName", res.getEmergencyContactName());
         residentsResult.put("emergencyContactNumber", res.getEmergencyContactNumber());
-        residentsResult.put("medicalProfileId", res.getMedicalProfileId());
+        //residentsResult.put("medicalProfileId", res.getMedicalProfileId());
         residentsResult.put("notes", res.getNotes());
 
         // return the hashmapped result

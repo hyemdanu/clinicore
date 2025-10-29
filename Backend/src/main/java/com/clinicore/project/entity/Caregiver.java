@@ -1,26 +1,22 @@
 package com.clinicore.project.entity;
 
-//imports
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-
-//annotations
+import lombok.*;
 @Entity
-@Table(name = "caregiver")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-
+@AllArgsConstructor
+@Table(name = "caregiver")
 public class Caregiver {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column
     private String notes;
 
+    // Parent relationship required (caregiver IS a user)
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    private UserProfile userProfile;
 }

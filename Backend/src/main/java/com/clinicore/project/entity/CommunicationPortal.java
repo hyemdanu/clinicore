@@ -1,48 +1,58 @@
 package com.clinicore.project.entity;
 
-// imports
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import lombok.*;
+import java.time.LocalDateTime;
 
-//annotations
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "communication_portal")
-
 public class CommunicationPortal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long portal_id;
+    private Long id;
 
-    @Column(name = "sender_id", nullable = false)
     private Long sender_id;
-
-    @Column
-    private String sender_role;
-
-    @Column(name = "recipient_id ", nullable = false)
+    
+    @Enumerated(EnumType.STRING)
+    private UserRole sender_role;
+    
     private Long recipient_id;
-
-    @Column
-    private String recipient_role;
-
-    @Column
+    
+    @Enumerated(EnumType.STRING)
+    private UserRole recipient_role;
+    
     private String subject;
-
-    @Column
+    
+    @Column(columnDefinition = "TEXT")
     private String message;
+    
+    @Column(updatable = false)
+    private LocalDateTime sent_at;
+    
+    private LocalDateTime read_at;
+    private Boolean is_read = false;
 
-    @Column
-    private LocalDate sent_date;
+    public void markAsRead() {
+        this.is_read = true;
+        this.read_at = LocalDateTime.now();
+    }
 
-    @Column
-    private LocalTime sent_time;
+    @PrePersist
+    protected void onCreate() {
+        sent_at = LocalDateTime.now();
+        if (is_read == null) {
+            is_read = false;
+        }
+    }
 
+    public enum UserRole {
+        ADMIN,
+        CAREGIVER,
+        RESIDENT
+    }
 }
