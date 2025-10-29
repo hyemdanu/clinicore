@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/accountCredential")
 public class AccountCredentialController {
@@ -21,8 +24,11 @@ public class AccountCredentialController {
     public ResponseEntity<?> login(@RequestBody UserProfile loginDetails) {
         UserProfile userProfile = accountCredentialRepository.findByUsernameAndPassword(loginDetails.getUsername(), loginDetails.getPasswordHash());
         if (userProfile != null) {
-            return ResponseEntity.ok(userProfile.getUsername());
-
+            // Return the ID so frontend can access user/resident data
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("id", userProfile.getId());
+            response.put("username", userProfile.getUsername());
+            return ResponseEntity.ok(response);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Credentials");
     }
