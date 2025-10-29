@@ -22,10 +22,9 @@ public class Resident {
     @Column(name = "emergency_contact_number", nullable = false)
     private String emergencyContactNumber;
 
+    @Column(name = "medical_profile_id", nullable = false)
+    private Long medicalProfileId;
+
     @Column
     private String notes;
-
-    //
-    @OneToOne(mappedBy = "resident", cascade = CascadeType.ALL, orphanRemoval = true)
-    private MedicalProfile medicalProfile;
 }
