@@ -6,5 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AccountCredentialRepository extends JpaRepository<UserProfile, Long> {
-    UserProfile findByUsernameAndPassword(String username, String passwordHash);
+    UserProfile findByUsernameAndPasswordHash(String username, String passwordHash);
+
+    UserProfile findByUsername(String username);
 }

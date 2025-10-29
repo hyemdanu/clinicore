@@ -16,11 +16,12 @@ public class Medication {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private Long medical_profile_id;
 
-    @Column
-    private Long medication_inventory_id;
+    @Column(name = "medical_profile_id")
+    private Long medicalProfileId;
+
+    @Column(name = "medication_inventory_id")
+    private Long medicationInventoryId;
 
     @Column(name = "medication_name")
     private String medicationName;
@@ -32,32 +33,35 @@ public class Medication {
     private String frequency;
 
     @Enumerated(EnumType.STRING)
-    private IntakeStatus intake_status;
+    @Column(name = "intake_status")
+    private IntakeStatus intakeStatus;
 
-    private LocalDateTime last_administered_at;
+    @Column(name = "last_administered_at")
+    private LocalDateTime lastAdministeredAt;
 
     @Column(columnDefinition = "TEXT")
     private String notes;
 
-    @Column(updatable = false)
-    private LocalDateTime created_at;
+    @Column(updatable = false, name = "created_at")
+    private LocalDateTime createdAt;
 
-    private LocalDateTime updated_at;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @Transient
     public boolean isTrackedInInventory() {
-        return medication_inventory_id != null;
+        return medicationInventoryId != null;
     }
 
     @PrePersist
     protected void onCreate() {
-        created_at = LocalDateTime.now();
-        updated_at = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updated_at = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     public enum IntakeStatus {

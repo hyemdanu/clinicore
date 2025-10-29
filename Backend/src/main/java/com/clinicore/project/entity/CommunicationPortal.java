@@ -16,37 +16,44 @@ public class CommunicationPortal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long sender_id;
+    @Column(name = "sender_id")
+    private Long senderId;
     
     @Enumerated(EnumType.STRING)
-    private UserRole sender_role;
+    @Column(name = "sender_role")
+    private UserRole senderRole;
     
-    private Long recipient_id;
+    @Column(name = "recipient_id")
+    private Long recipientId;
     
     @Enumerated(EnumType.STRING)
-    private UserRole recipient_role;
+    @Column(name = "recipient_role")
+    private UserRole recipientRole;
     
     private String subject;
     
     @Column(columnDefinition = "TEXT")
     private String message;
     
-    @Column(updatable = false)
-    private LocalDateTime sent_at;
+    @Column(updatable = false, name = "sent_at")
+    private LocalDateTime sentAt;
     
-    private LocalDateTime read_at;
-    private Boolean is_read = false;
+    @Column(name = "read_at")
+    private LocalDateTime readAt;
+    
+    @Column(name = "is_read")
+    private Boolean isRead = false;
 
     public void markAsRead() {
-        this.is_read = true;
-        this.read_at = LocalDateTime.now();
+        this.isRead = true;
+        this.readAt = LocalDateTime.now();
     }
 
     @PrePersist
     protected void onCreate() {
-        sent_at = LocalDateTime.now();
-        if (is_read == null) {
-            is_read = false;
+        sentAt = LocalDateTime.now();
+        if (isRead == null) {
+            isRead = false;
         }
     }
 

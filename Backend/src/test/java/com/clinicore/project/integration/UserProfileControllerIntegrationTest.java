@@ -1,7 +1,5 @@
 package com.clinicore.project.integration;
 
-import com.clinicore.project.entity.UserProfile;
-import com.clinicore.project.repository.UserProfileRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -9,15 +7,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDate;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Integration test for UserProfileController
- * Tests: Create user → Get user profile → Delete user
+ * Tests: Read user profiles from pre-populated database
  */
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
@@ -27,67 +23,72 @@ class UserProfileControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private UserProfileRepository userProfileRepository;
-
-    private static Long testUserId;
+    private static final Long ADMIN_ID = 1L;
+    private static final Long RESIDENT_ID = 4L;
 
     @Test
     @Order(1)
-    @DisplayName("1. CREATE - Make new user in database")
-    void createUser() {
-        System.out.println("\n=== TEST 1: Creating User ===");
+    @DisplayName("1. READ - Get admin user profile")
+    void getAdminProfile() throws Exception {
+        System.out.println("\n=== TEST 1: Reading Admin Profile ===");
 
-        UserProfile user = new UserProfile();
-        user.setFirstName("Alice");
-        user.setLastName("Smith");
-        user.setGender("Female");
-        user.setBirthday(LocalDate.of(1985, 3, 20));
-        user.setContactNumber("555-9999");
-        user.setUsername("alicesmith_test_" + System.currentTimeMillis());
-        user.setPasswordHash("hashed_password");
-        
-        // Save and capture the generated ID
-        UserProfile savedUser = userProfileRepository.save(user);
-        testUserId = savedUser.getId();
+        mockMvc.perform(get("/api/user/{userProfileId}/profile", ADMIN_ID)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userProfileId").value(ADMIN_ID.intValue()))
+                .andExpect(jsonPath("$.firstName").value("Alice"))
+                .andExpect(jsonPath("$.lastName").value("Administrator"))
+                .andExpect(jsonPath("$.username").value("admin_user"));
 
-        // Verify ID was generated
-        assertNotNull(testUserId, "User ID should be generated");
-        assertTrue(testUserId > 0, "User ID should be positive");
-
-        System.out.println("✓ Created user with auto-generated ID: " + testUserId);
+        System.out.println("✓ Successfully retrieved admin profile");
     }
 
     @Test
     @Order(2)
-    @DisplayName("2. GET - Grab user information via endpoint")
-    void getUserProfile() throws Exception {
-        System.out.println("\n=== TEST 2: Getting User Profile ===");
+    @DisplayName("2. READ - Get resident user profile")
+    void getResidentProfile() throws Exception {
+        System.out.println("\n=== TEST 2: Reading Resident Profile ===");
 
-        mockMvc.perform(get("/api/user/{id}/profile", testUserId)
+        mockMvc.perform(get("/api/user/{userProfileId}/profile", RESIDENT_ID)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userProfileId").value(testUserId))
-                .andExpect(jsonPath("$.firstName").value("Alice"))
-                .andExpect(jsonPath("$.lastName").value("Smith"))
-                .andExpect(jsonPath("$.gender").value("Female"))
-                .andExpect(jsonPath("$.birthday").value("1985-03-20"))
-                .andExpect(jsonPath("$.contactNumber").value("555-9999"));
+                .andExpect(jsonPath("$.userProfileId").value(RESIDENT_ID.intValue()))
+                .andExpect(jsonPath("$.firstName").value("John"))
+                .andExpect(jsonPath("$.lastName").value("Doe"))
+                .andExpect(jsonPath("$.gender").value("Male"));
 
-        System.out.println("✓ Retrieved user profile successfully with ID: " + testUserId);
+        System.out.println("✓ Successfully retrieved resident profile");
     }
 
     @Test
     @Order(3)
-    @DisplayName("3. DELETE - Delete user from database")
-    void deleteUser() {
-        System.out.println("\n=== TEST 3: Deleting User ===");
+    @DisplayName("3. READ - Get caregiver profile")
+    void getCaregiverProfile() throws Exception {
+        System.out.println("\n=== TEST 3: Reading Caregiver Profile ===");
 
-        userProfileRepository.deleteById(testUserId);
-        
-        // Verify deletion
-        assertFalse(userProfileRepository.existsById(testUserId), "User should be deleted");
+        mockMvc.perform(get("/api/user/{userProfileId}/profile", 2L)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName").value("Bob"))
+                .andExpect(jsonPath("$.lastName").value("Caregiver"))
+                .andExpect(jsonPath("$.username").value("caregiver_bob"));
 
-        System.out.println("✓ Deleted user with ID: " + testUserId);
+        System.out.println("✓ Successfully retrieved caregiver profile");
+    }
+
+    @Test
+    @Order(4)
+    @DisplayName("4. READ - Get non-existent user (error handling)")
+    void getUserNotFound() throws Exception {
+        System.out.println("\n=== TEST 4: Reading Non-Existent User ===");
+
+        Long nonExistentId = 99999L;
+
+        mockMvc.perform(get("/api/user/{userProfileId}/profile", nonExistentId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Userprofile not found"));
+
+        System.out.println("✓ Correctly returned 404 for non-existent user");
     }
 }

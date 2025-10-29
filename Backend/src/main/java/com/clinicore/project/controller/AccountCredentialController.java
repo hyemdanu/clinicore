@@ -22,7 +22,7 @@ public class AccountCredentialController {
     // Login credentials
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserProfile loginDetails) {
-        UserProfile userProfile = accountCredentialRepository.findByUsernameAndPassword(loginDetails.getUsername(), loginDetails.getPasswordHash());
+        UserProfile userProfile = accountCredentialRepository.findByUsernameAndPasswordHash(loginDetails.getUsername(), loginDetails.getPasswordHash());
         if (userProfile != null) {
             // Return the ID so frontend can access user/resident data
             Map<String, Object> response = new LinkedHashMap<>();

@@ -12,16 +12,31 @@ import lombok.*;
 public class MedicalServices {
 
     @Id
-    private Long resident_id;
+    @Column(name = "resident_id")
+    private Long residentId;
 
-    private String hospice_agency;
-    private String preferred_hospital;
-    private String preferred_pharmacy;
-    private String home_health_agency;
+    @Column(name = "hospice_agency")
+    private String hospiceAgency;
+    
+    @Column(name = "preferred_hospital")
+    private String preferredHospital;
+    
+    @Column(name = "preferred_pharmacy")
+    private String preferredPharmacy;
+    
+    @Column(name = "home_health_agency")
+    private String homeHealthAgency;
+    
     private String mortuary;
-    private String dnr_polst;
+    
+    @Column(name = "dnr_polst")
+    private String dnrPolst;
+    
     private Boolean hospice;
-    private Boolean home_health;
+    
+    @Column(name = "home_health")
+    private Boolean homeHealth;
+    
     private String notes;
 
     // Owned side - relationship to MedicalProfile

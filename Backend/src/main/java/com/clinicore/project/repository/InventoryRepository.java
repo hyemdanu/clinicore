@@ -2,7 +2,6 @@ package com.clinicore.project.repository;
 
 import com.clinicore.project.entity.Item;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,6 +16,6 @@ public interface InventoryRepository extends JpaRepository<Item, Long> {
     List<Item> findByQuantityLessThanEqual(Integer quantity);
 
     /** Get all items from a specific supplier. */
-    List<Item> findBySupplier_id(Long supplierId);
+    List<Item> findBySupplierId(Long supplierId);
 
 }

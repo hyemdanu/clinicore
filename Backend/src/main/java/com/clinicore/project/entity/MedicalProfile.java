@@ -12,17 +12,19 @@ import java.time.LocalDateTime;
 public class MedicalProfile {
 
     @Id
-    private Long resident_id;
+    @Column(name = "resident_id")
+    private Long residentId;
 
     @Column
     private String insurance;
 
     private String notes;
     
-    @Column(updatable = false)
-    private LocalDateTime created_at;
+    @Column(updatable = false, name = "created_at")
+    private LocalDateTime createdAt;
     
-    private LocalDateTime updated_at;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     // 1:1 relationships - owned by related entities
     @OneToOne(mappedBy = "medicalProfile", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -30,15 +32,18 @@ public class MedicalProfile {
 
     @OneToOne(mappedBy = "medicalProfile", cascade = CascadeType.ALL, orphanRemoval = true)
     private MedicalServices medicalServices;
+    
+    @OneToOne(mappedBy = "medicalProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private MedicalRecord medicalRecord;
 
     @PrePersist
     protected void onCreate() {
-        created_at = LocalDateTime.now();
-        updated_at = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updated_at = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 }

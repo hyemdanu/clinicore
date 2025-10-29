@@ -13,8 +13,9 @@ public class MedicationInventory {
     @Id
     private Long id;
 
-    @Column(length = 100)
-    private String dosage_per_serving;
+
+    @Column(name = "dosage_per_serving", length = 100)
+    private String dosagePerServing;
 
     @Column(columnDefinition = "TEXT")
     private String notes;
