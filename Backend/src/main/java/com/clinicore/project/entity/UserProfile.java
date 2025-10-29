@@ -37,6 +37,10 @@ public class UserProfile {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
@@ -64,4 +68,12 @@ public class UserProfile {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    public enum Role {
+        ADMIN,
+        CAREGIVER,
+        RESIDENT
+    }
+
+
 }

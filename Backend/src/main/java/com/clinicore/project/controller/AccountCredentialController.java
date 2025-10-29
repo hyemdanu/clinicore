@@ -19,29 +19,55 @@ public class AccountCredentialController {
     @Autowired
     private AccountCredentialRepository accountCredentialRepository;
 
-    // Login credentials
+    /**
+     * Login endpoint
+     * Returns user ID, username, and role
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserProfile loginDetails) {
-        UserProfile userProfile = accountCredentialRepository.findByUsernameAndPasswordHash(loginDetails.getUsername(), loginDetails.getPasswordHash());
+        UserProfile userProfile = accountCredentialRepository.findByUsernameAndPasswordHash(
+                loginDetails.getUsername(), 
+                loginDetails.getPasswordHash());
+        
         if (userProfile != null) {
-            // Return the ID so frontend can access user/resident data
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("id", userProfile.getId());
             response.put("username", userProfile.getUsername());
+            response.put("role", userProfile.getRole().toString());  // include role
             return ResponseEntity.ok(response);
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Credentials");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body("Invalid Credentials");
     }
 
-    // Registering a new user
+    /**
+     * Register endpoint
+     * Creates a new user with the specified role
+     * If no role provided, defaults to RESIDENT
+     */
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserProfile newUser) {
-        try{
+        try {
+            // Set role if not provided
+            if (newUser.getRole() == null) {
+                newUser.setRole(UserProfile.Role.RESIDENT);  // Default role
+            }
+            
+            // Validate role is one of the allowed values
             accountCredentialRepository.save(newUser);
-            return ResponseEntity.ok("Account Created");
+            
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("id", newUser.getId());
+            response.put("message", "Account Created");
+            response.put("role", newUser.getRole().toString());
+            
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Invalid role provided"));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to Register User");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Failed to Register User: " + e.getMessage()));
         }
     }
-
 }
