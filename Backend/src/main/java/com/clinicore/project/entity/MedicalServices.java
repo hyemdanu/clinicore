@@ -2,7 +2,6 @@ package com.clinicore.project.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "medical_services")
@@ -13,8 +12,7 @@ import java.time.LocalDateTime;
 public class MedicalServices {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long resident_id;
 
     private String hospice_agency;
     private String preferred_hospital;
@@ -25,20 +23,10 @@ public class MedicalServices {
     private Boolean hospice;
     private Boolean home_health;
     private String notes;
-    
-    @Column(updatable = false)
-    private LocalDateTime created_at;
-    
-    private LocalDateTime updated_at;
 
-    @PrePersist
-    protected void onCreate() {
-        created_at = LocalDateTime.now();
-        updated_at = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updated_at = LocalDateTime.now();
-    }
+    // Owned side - relationship to MedicalProfile
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "resident_id")
+    private MedicalProfile medicalProfile;
 }

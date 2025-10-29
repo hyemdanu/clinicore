@@ -17,19 +17,19 @@ public class MedicalProfile {
     @Column
     private String insurance;
 
-    @Column(name = "medical_services_id", nullable = false)
-    private Long medicalServicesId;
-
-    @Column(name = "capabilities_id", nullable = false)
-    private Long capabilitiesId;
-
-
     private String notes;
     
     @Column(updatable = false)
     private LocalDateTime created_at;
     
     private LocalDateTime updated_at;
+
+    // 1:1 relationships - owned by related entities
+    @OneToOne(mappedBy = "medicalProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Capability capability;
+
+    @OneToOne(mappedBy = "medicalProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private MedicalServices medicalServices;
 
     @PrePersist
     protected void onCreate() {
