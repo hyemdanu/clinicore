@@ -18,14 +18,16 @@ public class CommunicationPortal {
 
     @Column(name = "sender_id")
     private Long senderId;
-    
+
+    // if admin/caregiver/resident is sending the message
     @Enumerated(EnumType.STRING)
     @Column(name = "sender_role")
     private UserRole senderRole;
     
     @Column(name = "recipient_id")
     private Long recipientId;
-    
+
+    // if admin/caregiver/resident is receiving the message
     @Enumerated(EnumType.STRING)
     @Column(name = "recipient_role")
     private UserRole recipientRole;
@@ -44,6 +46,7 @@ public class CommunicationPortal {
     @Column(name = "is_read")
     private Boolean isRead = false;
 
+    // Mark message as read with timestamp
     public void markAsRead() {
         this.isRead = true;
         this.readAt = LocalDateTime.now();

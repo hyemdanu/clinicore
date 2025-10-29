@@ -33,14 +33,12 @@ public class MedicalRecord {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Owned side - relationship to MedicalProfile
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "resident_id")
+    // Relationship is owned by MedicalProfile (the owning side is the medical record property in MedicalProfile)
+    // MedicalProfile controls the FK via @JoinColumn
+    @OneToOne(mappedBy = "medicalRecord")
     private MedicalProfile medicalProfile;
 
-    // Helper Methods for Multiple Allergies
-
+    // Helper Methods for Allergies since these are lists of strings
     @Transient
     public List<String> getAllergyList() {
         if (allergy == null || allergy.trim().isEmpty()) {
@@ -54,17 +52,14 @@ public class MedicalRecord {
 
     @Transient
     public void setAllergyList(List<String> allergies) {
-        if (allergies == null || allergies.isEmpty()) {
-            this.allergy = null;
-        } else {
-            this.allergy = String.join(", ", allergies);
-        }
+        this.allergy = allergies == null || allergies.isEmpty() 
+            ? null 
+            : String.join(", ", allergies);
     }
 
     @Transient
     public void addAllergy(String allergyItem) {
-        List<String> allergies = getAllergyList().stream()
-                .collect(Collectors.toList());
+        List<String> allergies = new java.util.ArrayList<>(getAllergyList());
         if (!allergies.contains(allergyItem)) {
             allergies.add(allergyItem);
             setAllergyList(allergies);
@@ -73,11 +68,49 @@ public class MedicalRecord {
 
     @Transient
     public void removeAllergy(String allergyItem) {
-        List<String> allergies = getAllergyList().stream()
-                .collect(Collectors.toList());
+        List<String> allergies = new java.util.ArrayList<>(getAllergyList());
         allergies.remove(allergyItem);
         setAllergyList(allergies);
     }
+
+
+    // Helper Methods for Diagnosis since these are lists of strings
+    @Transient
+    public List<String> getDiagnosisList() {
+        if (diagnosis == null || diagnosis.trim().isEmpty()) {
+            return List.of();
+        }
+        return Arrays.stream(diagnosis.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+    }
+
+    @Transient
+    public void setDiagnosisList(List<String> diagnosisList) {
+        this.diagnosis = diagnosisList == null || diagnosisList.isEmpty()
+                ? null
+                : String.join(", ", diagnosisList);
+    }
+
+    @Transient
+    public void addDiagnosis(String diagnosisItem) {
+        List<String> diagnosisList = new java.util.ArrayList<>(getDiagnosisList());
+        if (!diagnosisList.contains(diagnosisItem)) {
+            diagnosisList.add(diagnosisItem);
+            setDiagnosisList(diagnosisList);  
+        }
+    }
+
+    @Transient
+    public void removeDiagnosis(String diagnosisItem) {
+        List<String> diagnosisList = new java.util.ArrayList<>(getDiagnosisList());
+        diagnosisList.remove(diagnosisItem);
+        setDiagnosisList(diagnosisList);
+    }
+
+    
+
 
     @PrePersist
     protected void onCreate() {

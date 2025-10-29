@@ -28,7 +28,9 @@ public class Resident {
     
     private LocalDateTime updated_at;
 
-    // Parent relationship required (resident IS a user)
+    // Relationship to user profile (resident is the owning side of the relationship)
+    // resident --> 1:1 -> UserProfile, joined by column id
+    // @MapsId uses the FK as the PK, so no separate ID column is created (resident.id = userProfile.id)
     @OneToOne
     @MapsId
     @JoinColumn(name = "id")

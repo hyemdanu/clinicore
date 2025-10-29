@@ -39,9 +39,8 @@ public class MedicalServices {
     
     private String notes;
 
-    // Owned side - relationship to MedicalProfile
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "resident_id")
+    // Relationship is owned by MedicalProfile (the owning side is the medical services property in MedicalProfile)
+    // MedicalProfile controls the FK via @JoinColumn
+    @OneToOne(mappedBy = "medicalServices")
     private MedicalProfile medicalProfile;
 }

@@ -14,7 +14,9 @@ public class Caregiver {
 
     private String notes;
 
-    // Parent relationship required (caregiver IS a user)
+    // Relationship to user profile (caregiver is the owning side of the relationship)
+    // Caregiver --> 1:1 -> UserProfile, joined by column id
+    // @MapsId uses the FK as the PK, so no separate ID column is created (caregiver.id = userProfile.id)
     @OneToOne
     @MapsId
     @JoinColumn(name = "id")

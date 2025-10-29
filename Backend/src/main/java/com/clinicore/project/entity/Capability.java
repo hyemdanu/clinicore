@@ -11,18 +11,28 @@ import lombok.*;
 public class Capability {
 
     @Id
-    private Long resident_id;
+    @Column(name = "resident_id")
+    private Long residentId;
 
+    @Column
     private Boolean verbal;
-    private Boolean self_medicates;
-    
-    @Enumerated(EnumType.STRING)
-    private IncontinenceStatus incontinence_status;
-    
-    @Enumerated(EnumType.STRING)
-    private MobilityStatus mobility_status;
 
-    // Enums
+    @Column(name = "self_medicates")
+    private Boolean selfMedicates;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "incontinence_status")
+    private IncontinenceStatus incontinenceStatus;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "mobility_status")
+    private MobilityStatus mobilityStatus;
+
+    // Relationship is owned by MedicalProfile (the owning side is the capability property in MedicalProfile)
+    // MedicalProfile controls the FK via @JoinColumn
+    @OneToOne(mappedBy = "capability")
+    private MedicalProfile medicalProfile; // allows accesss to related MedicalProfile from this capability object
+
     public enum IncontinenceStatus {
         CONTINENT,
         INCONTINENT_URINE,
@@ -36,10 +46,4 @@ public class Capability {
         WHEELCHAIR,
         BEDRIDDEN
     }
-
-    // Owned side - relationship to MedicalProfile
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "resident_id")
-    private MedicalProfile medicalProfile;
 }

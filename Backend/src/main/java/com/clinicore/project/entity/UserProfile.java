@@ -31,25 +31,37 @@ public class UserProfile {
     @Column(name = "contact_number", nullable = false)
     private String contactNumber;
     
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(name = "password_hash", nullable = false, unique = true)
+    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
-    
+
     @Column(updatable = false)
-    private LocalDateTime created_at;
-    
-    private LocalDateTime updated_at;
+    private LocalDateTime createdAt;
+
+    @Column
+    private LocalDateTime updatedAt;
+
+    // child entities (admin/caregiver/resident) own these relationships via @MapsId
+    // Lazy loading is used to avoid fetching unnecessary data
+    @OneToOne(mappedBy = "userProfile", fetch = FetchType.LAZY)
+    private Admin admin;
+
+    @OneToOne(mappedBy = "userProfile", fetch = FetchType.LAZY)
+    private Caregiver caregiver;
+
+    @OneToOne(mappedBy = "userProfile", fetch = FetchType.LAZY)
+    private Resident resident;
 
     @PrePersist
     protected void onCreate() {
-        created_at = LocalDateTime.now();
-        updated_at = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updated_at = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
     }
 }

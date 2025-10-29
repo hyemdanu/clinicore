@@ -3,6 +3,8 @@ package com.clinicore.project.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -18,23 +20,36 @@ public class MedicalProfile {
     @Column
     private String insurance;
 
+    @Column
     private String notes;
-    
-    @Column(updatable = false, name = "created_at")
+
+    @Column(updatable = false)
     private LocalDateTime createdAt;
-    
-    @Column(name = "updated_at")
+
+    @Column
     private LocalDateTime updatedAt;
 
-    // 1:1 relationships - owned by related entities
-    @OneToOne(mappedBy = "medicalProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    // 1:1 relationship with resident (1 resident : 1 medical profile), thus join by resID
+    // MedicalProfile owns the relationship to Capability, MedicalServices, MedicalRecord, and Medications
+    // When a medical profile is deleted, all related child entities delete
+    // Capability, MedicalServices, and MedicalRecord are joined (or connected by) ResID
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "resident_id", referencedColumnName = "resident_id")
     private Capability capability;
 
-    @OneToOne(mappedBy = "medicalProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "resident_id", referencedColumnName = "resident_id")
     private MedicalServices medicalServices;
-    
-    @OneToOne(mappedBy = "medicalProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "resident_id", referencedColumnName = "resident_id")
     private MedicalRecord medicalRecord;
+
+    // 1:N relationship - child entities reference MedicalProfile
+    // MedicalProfile owns the relationship to Medication
+    // When a medical profile is deleted, all related child entities delete
+    @OneToMany(mappedBy = "medicalProfile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Medication> medications = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
