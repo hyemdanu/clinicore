@@ -13,8 +13,9 @@ import lombok.AllArgsConstructor;
 public class MedicalRecord {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @OneToOne
+    @JoinColumn(name = "resident_id", nullable = false) // Foreign key to MedicalProfile
+    private Resident resident;
 
     @Column // Allow null, possible no allergy
     private String allergy;
@@ -23,4 +24,6 @@ public class MedicalRecord {
     private String diagnosis;
 
     private String notes;
+
+    
 }

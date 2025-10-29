@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import java.util.List;
 
 @Entity
 @Data
@@ -13,10 +14,11 @@ import lombok.AllArgsConstructor;
 public class MedicalProfile {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @OneToOne
+    @JoinColumn(name = "resident_id", nullable = false, unique = true) // Foreign key to Resident
+    private Resident resident; // Primary Key
 
-    @Column // Allow null, Possible to have no insurance?
+    @Column // Allow null; Possible to have no insurance?
     private String insurance;
 
     @Column(name = "medical_services_id", nullable = false)
@@ -25,12 +27,11 @@ public class MedicalProfile {
     @Column(name = "capabilities_id", nullable = false)
     private Long capabilitiesId;
 
-    @Column(name = "medication_id") // Allow null, Patient may not need any medication
-    private Long medicationId;
+    private String notes;
 
-    @Column(name = "medical_record_id", nullable = false)
-    private Long medicalRecordId;
+    @OneToOne(mappedBy = "medicalProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private MedicalRecord medicalRecord;
 
-    @Column
-    private String notes; 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) // Unidirectional relationship to medication
+    private List<Medication> medications; // List of medications associated with the resident
 }

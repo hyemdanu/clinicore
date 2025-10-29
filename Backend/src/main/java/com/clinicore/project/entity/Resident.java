@@ -13,7 +13,7 @@ import lombok.AllArgsConstructor;
 public class Resident {
 
     @Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "emergency_contact_name", nullable = false)
@@ -22,9 +22,10 @@ public class Resident {
     @Column(name = "emergency_contact_number", nullable = false)
     private String emergencyContactNumber;
 
-    @Column(name = "medical_profile_id") // Allow null, Patient may not have a medical profile; just for testing
-    private Long medicalProfileId;
-
     @Column
     private String notes;
+
+    //
+    @OneToOne(mappedBy = "resident", cascade = CascadeType.ALL, orphanRemoval = true)
+    private MedicalProfile medicalProfile;
 }
