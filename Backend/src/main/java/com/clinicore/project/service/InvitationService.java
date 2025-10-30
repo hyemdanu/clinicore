@@ -1,3 +1,13 @@
+/**
+ * Olei Amelie Ngan
+ *
+ * Service layer for new user signup invites
+ * This service layer uses the invitation repository to create and accept invitations
+ *
+ * Functions/Purposes:
+ * - Create and send invitations
+ * - Accept invitation to create user account, and save new user in database
+ */
 package com.clinicore.project.service;
 
 import com.clinicore.project.entity.Invitation;

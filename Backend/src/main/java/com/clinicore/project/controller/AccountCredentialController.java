@@ -72,7 +72,7 @@ public class AccountCredentialController {
             String email = (String) request.get("email");
             String roleString = (String) request.get("role");
 
-            // validate invitation request (service layer will validate email and role is provided)
+            // validate email and role is provided
             accountCredentialService.validateInvitationRequest(email, roleString);
 
             // validate role (service layer will validate role exists)
