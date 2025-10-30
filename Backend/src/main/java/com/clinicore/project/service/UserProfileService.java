@@ -1,4 +1,13 @@
-
+/**
+ * Olei Amelie Ngan & Edison Ho
+ *
+ * Service layer for user profiles (Caregiver, Resident, Admin)
+ * This service layer uses the user profile repository to retrieve user information
+ *
+ * Functions/Purposes:
+ * - Get user profile with authorization
+ *
+ */
 package com.clinicore.project.service;
 
 import com.clinicore.project.entity.*;
@@ -9,12 +18,13 @@ import java.util.*;
 @Service
 public class UserProfileService {
 
+    // variables
     private final UserProfileRepository userProfileRepository;
     private final CaregiverRepository caregiverRepository;
     private final ResidentGeneralRepository residentRepository;
     private final AdminRepository adminRepository;
 
-    // Constructor injection
+    // construct the service layer with all repositories
     public UserProfileService(UserProfileRepository userProfileRepository,
                               CaregiverRepository caregiverRepository,
                               ResidentGeneralRepository residentRepository,
@@ -25,58 +35,93 @@ public class UserProfileService {
         this.adminRepository = adminRepository;
     }
 
-    /**
-     * Get all residents (only for authorized users)
-     */
+    // get list of residents for caregivers/admins only
     public List<Map<String, Object>> getAllResidents(Long currentUserId) {
         UserProfile currentUser = getUserById(currentUserId);
 
-        // Authorization check
+        // check if caregiver or admin
         if (currentUser.getRole() != UserProfile.Role.CAREGIVER && currentUser.getRole() != UserProfile.Role.ADMIN) {
-            throw new IllegalArgumentException("You do not have permission to view residents");
+            throw new IllegalArgumentException("You do not have permission to view residents"); // if not, gtfo
         }
 
-        // Fetch all residents
+        // grab all residents
         List<UserProfile> residents = userProfileRepository.findByRole(UserProfile.Role.RESIDENT);
 
-        // Transform to response format
-        return transformResidentsToResponse(residents);
+        // list to hold resident information map (a list of lists)
+        // example: {{"id": 1, "firstName": "John", "lastName": "Doe"}, {"id": 2, "firstName": "Jane", "lastName": "Doe"}}
+        List<Map<String, Object>> residentList = new ArrayList<>();
+
+        // for each resident, add to list
+        for (UserProfile resident : residents) {
+
+            // build resident information
+            Map<String, Object> residentInfo = new LinkedHashMap<>();
+            residentInfo.put("id", resident.getId());
+            residentInfo.put("firstName", resident.getFirstName());
+            residentInfo.put("lastName", resident.getLastName());
+
+            // add resident information to list
+            residentList.add(residentInfo);
+        }
+
+        return residentList; // JSON FORMAT
+
     }
 
-    /**
-     * Get user profile with authorization
-     */
+    // role-based access to user information
+    // residents can only view their own profile, caregivers can view residents, admins can view everyone, etc...
     public Map<String, Object> getUserProfile(Long currentUserId, Long targetUserId) {
+
+        // check if current user and target user exist via getUserbyId
+        // if it does, store into currentUser and targetUser variables
         UserProfile currentUser = getUserById(currentUserId);
         UserProfile targetUser = getUserById(targetUserId);
 
-        // Authorization check
+        // check if current user is authorized to view target user
         if (!isAuthorized(currentUserId, targetUserId, currentUser.getRole(), targetUser.getRole())) {
             throw new IllegalArgumentException("You do not have permission to view this profile");
         }
 
-        // Build and return profile response
-        return buildProfileResponse(targetUser);
+        // map to store response
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        // basic target user information (information to return)
+        response.put("userProfileId", targetUser.getId());
+        response.put("username", targetUser.getUsername());
+        response.put("firstName", targetUser.getFirstName());
+        response.put("lastName", targetUser.getLastName());
+        response.put("gender", targetUser.getGender());
+        response.put("birthday", targetUser.getBirthday());
+        response.put("contactNumber", targetUser.getContactNumber());
+        response.put("role", targetUser.getRole().toString());
+
+        // add role specific data
+        switch (targetUser.getRole()) {
+            case CAREGIVER -> addCaregiverData(response, targetUser.getId()); // add caregiver data
+            case RESIDENT -> addResidentData(response, targetUser.getId()); // add resident data
+            case ADMIN -> {}  // no additional data for admins, so nothin todo here...
+        }
+
+        return response;
+
     }
 
-    /**
-     * Get user by ID
-     */
+    // validate user existence by ID (own method for reusability and scaling...)
     public UserProfile getUserById(Long userId) {
         return userProfileRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
     }
 
-    /**
-     * Check if current user is authorized to view target user
-     */
-    private boolean isAuthorized(Long currentUserId, Long targetUserId,
-                                 UserProfile.Role currentRole, UserProfile.Role targetRole) {
-        // Allow viewing own profile
+    // to check if current user is authorized to view target user
+    // it grabs current user id and role + target user id and role
+    private boolean isAuthorized(Long currentUserId, Long targetUserId, UserProfile.Role currentRole, UserProfile.Role targetRole) {
+
+        // allow own profile view
         if (currentUserId.equals(targetUserId)) {
             return true;
         }
 
+        // role-based access
         return switch (currentRole) {
             case RESIDENT -> false;  // Residents can't view others
             case CAREGIVER -> targetRole == UserProfile.Role.RESIDENT;  // Caregivers can only view residents
@@ -84,44 +129,14 @@ public class UserProfileService {
         };
     }
 
-    /**
-     * Build profile response with role-specific data
-     */
-    private Map<String, Object> buildProfileResponse(UserProfile user) {
-        Map<String, Object> response = new LinkedHashMap<>();
-
-        // Basic user information
-        response.put("userProfileId", user.getId());
-        response.put("username", user.getUsername());
-        response.put("firstName", user.getFirstName());
-        response.put("lastName", user.getLastName());
-        response.put("gender", user.getGender());
-        response.put("birthday", user.getBirthday());
-        response.put("contactNumber", user.getContactNumber());
-        response.put("role", user.getRole().toString());
-
-        // Add role-specific data
-        switch (user.getRole()) {
-            case CAREGIVER -> addCaregiverData(response, user.getId());
-            case RESIDENT -> addResidentData(response, user.getId());
-            case ADMIN -> {}  // No additional data for admins
-        }
-
-        return response;
-    }
-
-    /**
-     * Add caregiver-specific data to response
-     */
+    // add caregiver data to response
     private void addCaregiverData(Map<String, Object> response, Long userId) {
         caregiverRepository.findById(userId).ifPresent(caregiver ->
                 response.put("caregiverNotes", caregiver.getNotes())
         );
     }
 
-    /**
-     * Add resident-specific data to response
-     */
+    // add resident data to response
     private void addResidentData(Map<String, Object> response, Long userId) {
         residentRepository.findById(userId).ifPresent(resident -> {
             response.put("emergencyContactName", resident.getEmergencyContactName());
@@ -130,20 +145,5 @@ public class UserProfileService {
         });
     }
 
-    /**
-     * Transform residents to response format
-     */
-    private List<Map<String, Object>> transformResidentsToResponse(List<UserProfile> residents) {
-        List<Map<String, Object>> residentList = new ArrayList<>();
 
-        for (UserProfile resident : residents) {
-            Map<String, Object> residentInfo = new LinkedHashMap<>();
-            residentInfo.put("id", resident.getId());
-            residentInfo.put("firstName", resident.getFirstName());
-            residentInfo.put("lastName", resident.getLastName());
-            residentList.add(residentInfo);
-        }
-
-        return residentList;
-    }
 }

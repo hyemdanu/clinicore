@@ -1,3 +1,13 @@
+/**
+ * Minh Nguyen
+ *
+ * Controller for users log-in and new user account registration
+ * It uses the account credential service layer to authenticate users and create new user accounts
+ *
+ * Functions/Purposes:
+ * - Only admins can create new user accounts for residents, admins, and caregivers
+ */
+
 package com.clinicore.project.controller;
 
 import com.clinicore.project.entity.UserProfile;
@@ -12,56 +22,69 @@ import java.util.*;
 @RequestMapping("/api/accountCredential")
 public class AccountCredentialController {
 
+    // service layers to be injected
     private final AccountCredentialService accountCredentialService;
     private final InvitationService invitationService;
 
-    // Inject service layers
+    // inject service layers (service layers hold business logic - controller just forwards requests to service layers)
     public AccountCredentialController(AccountCredentialService accountCredentialService,
                                       InvitationService invitationService) {
         this.accountCredentialService = accountCredentialService;
         this.invitationService = invitationService;
     }
 
-    /**
-     * Login endpoint
-     */
+    // login endpoint
+    // this will grab login details from the frontend and call the account credential service layer to authenticate the user
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserProfile loginDetails) {
+
+        // this will call the account credential service layer to authenticate the user
         try {
             Map<String, Object> response = accountCredentialService.authenticateUser(
+
+                    // we pass the username and password to the service layer to authenticate the user
                     loginDetails.getUsername(),
                     loginDetails.getPasswordHash()
             );
+
+            // if the user is authenticated, we return OK response with the user profile data
             return ResponseEntity.ok(response);
+
+
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", e.getMessage()));
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Login failed: " + e.getMessage()));
         }
     }
 
-    /**
-     * Create invitation (ADMIN ONLY)
-     */
+    // endpoint for admins to create and send user registration invitations
+    // this will grab request details from the frontend and call the account credential service layer to create and send the invitation
     @PostMapping("/invite")
     public ResponseEntity<?> createInvitation(@RequestBody Map<String, Object> request) {
         try {
+
+            // grab body requests and store into variables
             Long adminId = ((Number) request.get("adminId")).longValue();
             String email = (String) request.get("email");
             String roleString = (String) request.get("role");
 
-            // Validate invitation request
+            // validate invitation request (service layer will validate email and role is provided)
             accountCredentialService.validateInvitationRequest(email, roleString);
 
-            // Validate and convert role
+            // validate role (service layer will validate role exists)
+            // if validated, it will save the role as a role enum type from userProfile entity
             UserProfile.Role role = accountCredentialService.validateRole(roleString);
 
-            // Create and send invitation (business logic in service)
+            // create and send invitation (business logic in service)
+            // need to pass adminId of whos sending the invitation + email and role of invited user
+            // this returns an invitation object with token, email, role, and expiration date
             var invitation = invitationService.createAndSendInvitation(adminId, email, role);
 
-            // Build response
+            // on invitation send success, build response from invitation object
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("message", "Invitation created successfully");
             response.put("token", invitation.getToken());
@@ -69,22 +92,26 @@ public class AccountCredentialController {
             response.put("role", invitation.getRole().toString());
             response.put("expiresAt", invitation.getExpiresAt());
 
+            // return invitation object response
             return ResponseEntity.ok(response);
+
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", e.getMessage()));
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to create invitation: " + e.getMessage()));
         }
     }
 
-    /**
-     * Register user with invitation token
-     */
+    // endpoint to register new users
+    // it will grab user details from the frontend and call the account credential service layer to create and save the user account
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<?> registerUser(@RequestBody Map<String, Object> request) { // request contains user details
         try {
+
+            // save request details into variables
             String token = (String) request.get("token");
             String firstName = (String) request.get("firstName");
             String lastName = (String) request.get("lastName");
@@ -94,12 +121,14 @@ public class AccountCredentialController {
             String birthday = (String) request.get("birthday");
             String contactNumber = (String) request.get("contactNumber");
 
-            // Accept invitation and create account (business logic in service)
+            // create account (business logic in invitation service layer) so send details to that
+            // will return a new user object with all details filled in (new user account saved in db)
             var newUser = invitationService.acceptInvitation(
                     token, firstName, lastName, username, password, gender, birthday, contactNumber
             );
 
-            // Build response
+            // on success, build response from new user object
+            // to display in frontend...
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("id", newUser.getId());
             response.put("message", "Account created successfully");
@@ -107,6 +136,7 @@ public class AccountCredentialController {
             response.put("role", newUser.getRole().toString());
 
             return ResponseEntity.ok(response);
+
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Map.of("error", e.getMessage()));
