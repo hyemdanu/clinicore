@@ -24,7 +24,7 @@ public interface MessagesRepository extends JpaRepository<CommunicationPortal, L
     /**
      * Get communications sent by users with specific role
      */
-    List<CommunicationPortal> findBySenderRole(String senderRole);
+    List<CommunicationPortal> findBySenderRole(CommunicationPortal.UserRole senderRole);
 
     /**
      * Get communications between a specific sender and recipient
@@ -34,19 +34,25 @@ public interface MessagesRepository extends JpaRepository<CommunicationPortal, L
     /**
      * Get communications for a recipient with a specific role
      */
-    List<CommunicationPortal> findByRecipientIdAndRecipientRole(Long recipientId, String recipientRole);
-
-    /**
-     * Query to get full conversation between two users in order
-     */
-    @Query("SELECT cp FROM CommunicationPortal cp WHERE " +
-            "(cp.sender_id = :user1Id AND cp.recipient_id = :user2Id) OR " +
-            "(cp.sender_id = :user2Id AND cp.recipient_id = :user1Id) " +
-            "ORDER BY cp.sent_date ASC, cp.sent_time ASC")
+    List<CommunicationPortal> findByRecipientIdAndRecipientRole(Long recipientId, CommunicationPortal.UserRole recipientRole);
 
     /**
      * Get full conversation between two users in order
      */
+    @Query("SELECT cp FROM CommunicationPortal cp WHERE " +
+            "(cp.senderId = :user1Id AND cp.recipientId = :user2Id) OR " +
+            "(cp.senderId = :user2Id AND cp.recipientId = :user1Id) " +
+            "ORDER BY cp.sentAt ASC")
     List<CommunicationPortal> findConversation(@Param("user1Id") Long user1Id,
                                                @Param("user2Id") Long user2Id);
+
+    /**
+     * Get unread messages for a specific recipient
+     */
+    List<CommunicationPortal> findByRecipientIdAndIsRead(Long recipientId, Boolean isRead);
+
+    /**
+     * Get unread messages ordered by sent date
+     */
+    List<CommunicationPortal> findByRecipientIdAndIsReadOrderBySentAtDesc(Long recipientId, Boolean isRead);
 }

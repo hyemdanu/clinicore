@@ -1,37 +1,37 @@
 package com.clinicore.project.entity;
 
-// imports
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import java.time.LocalDateTime;
 
-//annotations
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "document")
-
+@AllArgsConstructor
+@Table(name = "documents")
 public class Document {
 
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
     private String title;
 
     @Column(name = "resident_id", nullable = false)
-    private Long resident_Id;
+    private Long residentId;
 
-    @Column
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
     private byte[] document;
 
-    @Column
     private String type;
 
+    @Column(updatable = false)
+    private LocalDateTime uploaded_at;
+
+    @PrePersist
+    protected void onCreate() {
+        uploaded_at = LocalDateTime.now();
+    }
 }
-
-

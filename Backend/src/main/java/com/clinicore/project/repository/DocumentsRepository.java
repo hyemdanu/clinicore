@@ -3,6 +3,7 @@ import java.util.List;
 import com.clinicore.project.entity.Document;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface DocumentsRepository extends JpaRepository<Document, Long> {
@@ -20,6 +21,7 @@ public interface DocumentsRepository extends JpaRepository<Document, Long> {
     /**
      * Delete all documents for a specific resident (e.g., if they are discharged)
      */
+    @Transactional
     void deleteByResidentId(Long residentId);
 
     /**

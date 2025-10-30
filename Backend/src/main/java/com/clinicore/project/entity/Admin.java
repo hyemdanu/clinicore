@@ -2,21 +2,23 @@ package com.clinicore.project.entity;
 
 // imports
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-// annotations
 @Entity
-@Table(name = "admin")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-
+@AllArgsConstructor
+@Table(name = "admin")
 public class Admin {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Relationship to user profile (admin is the owning side of the relationship)
+    // Admin --> 1:1 -> UserProfile, joined by column id
+    // @MapsId uses the FK as the PK, so no separate ID column is created (admin.id = userProfile.id)
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    private UserProfile userProfile;
 }

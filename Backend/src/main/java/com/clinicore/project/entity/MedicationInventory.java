@@ -1,33 +1,32 @@
 package com.clinicore.project.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "medication_inventory")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class MedicationInventory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    private Item item;
 
-    private int quantity;
+    @Column(name = "dosage_per_serving", length = 100)
+    private String dosagePerServing;
 
-    // Constructors
-    public MedicationInventory() {}
+    @Column(columnDefinition = "TEXT")
+    private String notes;
 
-    public MedicationInventory(String name, int quantity) {
-        this.name = name;
-        this.quantity = quantity;
-    }
-
-    // Getters & Setters
-    public Long getId() { return id; }
-
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
+    // Inverse side - medications that reference this inventory item
+    @OneToMany(mappedBy = "medicationInventory", fetch = FetchType.LAZY)
+    private List<Medication> medications = new ArrayList<>();
 }

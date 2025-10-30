@@ -1,48 +1,46 @@
 package com.clinicore.project.entity;
 
-//imports
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-//annotations
 @Entity
 @Table(name = "medical_services")
 @Getter
 @Setter
 @NoArgsConstructor
-
+@AllArgsConstructor
 public class MedicalServices {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "resident_id")
+    private Long residentId;
 
-    @Column
-    private String hospice_agency;
-
-    @Column
-    private String preferred_hospital;
-
-    @Column
-    private String preferred_pharmacy;
-
-    @Column
-    private String home_health_agency;
-
-    @Column
+    @Column(name = "hospice_agency")
+    private String hospiceAgency;
+    
+    @Column(name = "preferred_hospital")
+    private String preferredHospital;
+    
+    @Column(name = "preferred_pharmacy")
+    private String preferredPharmacy;
+    
+    @Column(name = "home_health_agency")
+    private String homeHealthAgency;
+    
     private String mortuary;
-
-    @Column
-    private String dnr_polst;
-
-    @Column
+    
+    @Column(name = "dnr_polst")
+    private String dnrPolst;
+    
     private Boolean hospice;
-
-    @Column
-    private Boolean home_health;
-
-    @Column
+    
+    @Column(name = "home_health")
+    private Boolean homeHealth;
+    
     private String notes;
+
+    // Relationship is owned by MedicalProfile (the owning side is the medical services property in MedicalProfile)
+    // MedicalProfile controls the FK via @JoinColumn
+    @OneToOne(mappedBy = "medicalServices")
+    private MedicalProfile medicalProfile;
 }

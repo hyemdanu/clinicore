@@ -1,15 +1,9 @@
 package com.clinicore.project.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.*;
 import java.time.LocalDate;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -36,10 +30,50 @@ public class UserProfile {
 
     @Column(name = "contact_number", nullable = false)
     private String contactNumber;
-
-    @Column(nullable = false, unique = true)
+    
+    @Column(unique = true, nullable = false)
     private String username;
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column
+    private LocalDateTime updatedAt;
+
+    // child entities (admin/caregiver/resident) own these relationships via @MapsId
+    // Lazy loading is used to avoid fetching unnecessary data
+    @OneToOne(mappedBy = "userProfile", fetch = FetchType.LAZY)
+    private Admin admin;
+
+    @OneToOne(mappedBy = "userProfile", fetch = FetchType.LAZY)
+    private Caregiver caregiver;
+
+    @OneToOne(mappedBy = "userProfile", fetch = FetchType.LAZY)
+    private Resident resident;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    public enum Role {
+        ADMIN,
+        CAREGIVER,
+        RESIDENT
+    }
+
+
 }

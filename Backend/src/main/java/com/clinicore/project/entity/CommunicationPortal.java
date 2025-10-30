@@ -1,48 +1,68 @@
 package com.clinicore.project.entity;
 
-// imports
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import lombok.*;
+import java.time.LocalDateTime;
 
-//annotations
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "communication_portal")
-
 public class CommunicationPortal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long portal_id;
+    private Long id;
 
-    @Column(name = "sender_id", nullable = false)
-    private Long sender_id;
+    @Column(name = "sender_id")
+    private Long senderId;
 
-    @Column
-    private String sender_role;
+    // if admin/caregiver/resident is sending the message
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sender_role")
+    private UserRole senderRole;
+    
+    @Column(name = "recipient_id")
+    private Long recipientId;
 
-    @Column(name = "recipient_id ", nullable = false)
-    private Long recipient_id;
-
-    @Column
-    private String recipient_role;
-
-    @Column
+    // if admin/caregiver/resident is receiving the message
+    @Enumerated(EnumType.STRING)
+    @Column(name = "recipient_role")
+    private UserRole recipientRole;
+    
     private String subject;
-
-    @Column
+    
+    @Column(columnDefinition = "TEXT")
     private String message;
+    
+    @Column(updatable = false, name = "sent_at")
+    private LocalDateTime sentAt;
+    
+    @Column(name = "read_at")
+    private LocalDateTime readAt;
+    
+    @Column(name = "is_read")
+    private Boolean isRead = false;
 
-    @Column
-    private LocalDate sent_date;
+    // Mark message as read with timestamp
+    public void markAsRead() {
+        this.isRead = true;
+        this.readAt = LocalDateTime.now();
+    }
 
-    @Column
-    private LocalTime sent_time;
+    @PrePersist
+    protected void onCreate() {
+        sentAt = LocalDateTime.now();
+        if (isRead == null) {
+            isRead = false;
+        }
+    }
 
+    public enum UserRole {
+        ADMIN,
+        CAREGIVER,
+        RESIDENT
+    }
 }
