@@ -12,9 +12,11 @@ import java.time.LocalDateTime;
 @Service
 public class InvitationService {
 
+    // variables
     private final InvitationRepository invitationRepository;
     private final UserProfileRepository userProfileRepository;
 
+    // constructor that injects all repositories so the service can access user and invitation data
     public InvitationService(
             InvitationRepository invitationRepository,
             UserProfileRepository userProfileRepository) {
@@ -22,58 +24,34 @@ public class InvitationService {
         this.userProfileRepository = userProfileRepository;
     }
 
-    /**
-     * Admin creates invitation
-     * TODO: Email will be sent here in production
-     */
+    // admin creates invitation, invoked from account credential controller
+    // needs to receieve admin sending invite, email and role of invited user
     @Transactional
-    public Invitation createAndSendInvitation(
-            Long adminId,
-            String email,
-            UserProfile.Role role) {
+    public Invitation createAndSendInvitation(Long adminId, String email, UserProfile.Role role) {
         
-        // Verify admin exists and has ADMIN role
+        // verify admin id exists and has admin
         UserProfile admin = userProfileRepository.findById(adminId)
-                .orElseThrow(() -> new IllegalArgumentException("Admin not found"));
-        
-        if (admin.getRole() != UserProfile.Role.ADMIN) {
-            throw new IllegalArgumentException("Only admins can create invitations");
-        }
+                .filter(user -> user.getRole() == UserProfile.Role.ADMIN) // is they admin?
+                .orElseThrow(() -> new IllegalArgumentException("Only admins can create invitations")); // if not, gtfo
 
-        // Check if email already has account
-        if (userProfileRepository.findByUsername(email).isPresent()) {
-            throw new IllegalArgumentException("Email already has an account");
-        }
-
-        // Check if invitation already pending
-        invitationRepository.findByEmail(email).ifPresent(invite -> {
-            if (invite.getStatus() == Invitation.Status.PENDING && !invite.isExpired()) {
-                throw new IllegalArgumentException("Invitation already sent to this email");
-            }
-        });
-
-        // Create invitation
+        // create invitation (token auto-generated in db (check entity))
         Invitation invitation = new Invitation();
         invitation.setEmail(email);
         invitation.setRole(role);
         invitation.setStatus(Invitation.Status.PENDING);
-        invitation.setCreatedByAdmin(admin);  // ← Sets the relationship (stores admin ID)
-        invitation.setCreatedByAdminName(admin.getFirstName() + " " + admin.getLastName());  // ← Sets the name
-        
-        Invitation savedInvitation = invitationRepository.save(invitation);
+        invitation.setCreatedByAdmin(admin);  // admin id who created invitation
+        invitation.setCreatedByAdminName(admin.getFirstName() + " " + admin.getLastName());  // admin name who created invitation
 
-        // TODO: Send email here in production
-        System.out.println("📧 [TEST MODE] Invitation created for: " + email);
-        System.out.println("   Token: " + savedInvitation.getToken());
-        System.out.println("   Role: " + role);
-        System.out.println("   Acceptance link: /accept-invitation/" + savedInvitation.getToken());
+        // save invitation to db
+        // will need to set-up email invitations in the future...
+        Invitation savedInvitation = invitationRepository.save(invitation);
 
         return savedInvitation;
     }
 
-    /**
-     * User accepts invitation and creates account
-     */
+    // user accepts invitation, invoked from account credential controller
+    // when users clicks on invitation link in email (register endpoint in the account credential controller)
+    // needs to receieve param information (will need to integrate in frontend later...)
     @Transactional
     public UserProfile acceptInvitation(
             String token,
@@ -85,42 +63,31 @@ public class InvitationService {
             String birthday,
             String contactNumber) {
         
-        // Find invitation by token
+        // find invitation by token
         Invitation invitation = invitationRepository.findByToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid invitation token"));
 
-        // Check if invitation is expired
-        if (invitation.isExpired()) {
-            invitation.setStatus(Invitation.Status.EXPIRED);
-            invitationRepository.save(invitation);
-            throw new IllegalArgumentException("Invitation has expired");
-        }
 
-        // Check if already accepted
-        if (invitation.getStatus() == Invitation.Status.ACCEPTED) {
-            throw new IllegalArgumentException("Invitation already used");
-        }
-
-        // Create new user
+        // Create new user for that token
         UserProfile newUser = new UserProfile();
         newUser.setFirstName(firstName);
         newUser.setLastName(lastName);
         newUser.setUsername(username);
-        newUser.setPasswordHash(password);  //TODO: Use BCrypt in production
+        newUser.setPasswordHash(password);
         newUser.setGender(gender);
         newUser.setBirthday(LocalDate.parse(birthday));
         newUser.setContactNumber(contactNumber);
         newUser.setRole(invitation.getRole());
 
+        // save new user to db
         UserProfile savedUser = userProfileRepository.save(newUser);
 
-        // Mark invitation as accepted
+        // mark invitation as accepted
         invitation.setStatus(Invitation.Status.ACCEPTED);
         invitation.setAcceptedAt(LocalDateTime.now());
         invitationRepository.save(invitation);
 
-        System.out.println("✅ Account created for: " + username + " with role: " + invitation.getRole());
-
+        // return new user profile
         return savedUser;
     }
 
@@ -131,13 +98,5 @@ public class InvitationService {
         return invitationRepository.findByCreatedByAdminId(adminId);
     }
 
-    /**
-     * Check if invitation exists and is valid
-     */
-    public boolean isInvitationValid(String token) {
-        return invitationRepository.findByToken(token)
-                .map(invitation -> !invitation.isExpired() && 
-                     invitation.getStatus() == Invitation.Status.PENDING)
-                .orElse(false);
-    }
+
 }

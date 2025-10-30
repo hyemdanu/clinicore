@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class ResidentControllerIntegrationTest {
+class UserControllerIntegrationTest {
 
     // this is to simulate the HTTP request/response cycle
     @Autowired
