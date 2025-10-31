@@ -33,17 +33,31 @@ class MessagesControllerIntegrationTest {
             }
             """;
 
-        // Create message
+        /**
+         * Create message
+         */
         mockMvc.perform(post("/api/messages")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(messageJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Integration test message"))
-                .andExpect(jsonPath("$.subject").value("Test Subject"));
+                .andExpect(jsonPath("$.subject").value("Test Subject"))
+                .andExpect(jsonPath("$.isRead").value(false))
+                .andExpect(jsonPath("$.readAt").doesNotExist());
 
-        // Get all messages
+        /**
+         * Get all messages
+         */
         mockMvc.perform(get("/api/messages"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
+
+        /**
+         * Mark message as read and read_at is set
+         */
+        mockMvc.perform(patch("/api/messages/1/read"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isRead").value(true))
+                .andExpect(jsonPath("$.readAt").exists());
     }
 }
