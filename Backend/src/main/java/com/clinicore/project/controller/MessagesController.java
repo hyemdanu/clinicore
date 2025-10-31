@@ -6,12 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/messages")
-@CrossOrigin(origins = "*") // Adjust based on your frontend URL
+@CrossOrigin(origins = "*") // Adjust based on frontend URL
 public class MessagesController {
 
     @Autowired
@@ -68,14 +69,24 @@ public class MessagesController {
             if (optionalMessage.isPresent()) {
                 CommunicationPortal message = optionalMessage.get();
 
-                // Update fields as needed
-                if (messageDetails.getContent() != null) {
-                    message.setContent(messageDetails.getContent());
+                if (messageDetails.getMessage() != null) {
+                    message.setMessage(messageDetails.getMessage());
+                }
+                if (messageDetails.getSubject() != null) {
+                    message.setSubject(messageDetails.getSubject());
                 }
                 if (messageDetails.getIsRead() != null) {
                     message.setIsRead(messageDetails.getIsRead());
+                    if (messageDetails.getIsRead()) {
+                        message.setReadAt(LocalDateTime.now());
+                    }
                 }
-                // Add other fields as necessary
+                if (messageDetails.getSenderRole() != null) {
+                    message.setSenderRole(messageDetails.getSenderRole());
+                }
+                if (messageDetails.getRecipientRole() != null) {
+                    message.setRecipientRole(messageDetails.getRecipientRole());
+                }
 
                 CommunicationPortal updatedMessage = messagesRepository.save(message);
                 return ResponseEntity.ok(updatedMessage);
@@ -219,6 +230,7 @@ public class MessagesController {
             if (optionalMessage.isPresent()) {
                 CommunicationPortal message = optionalMessage.get();
                 message.setIsRead(true);
+                message.setReadAt(LocalDateTime.now());
                 CommunicationPortal updatedMessage = messagesRepository.save(message);
                 return ResponseEntity.ok(updatedMessage);
             }
@@ -239,6 +251,7 @@ public class MessagesController {
                 if (optionalMessage.isPresent()) {
                     CommunicationPortal message = optionalMessage.get();
                     message.setIsRead(true);
+                    message.setReadAt(LocalDateTime.now());
                     messagesRepository.save(message);
                 }
             }
