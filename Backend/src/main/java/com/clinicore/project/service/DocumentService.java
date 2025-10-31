@@ -45,6 +45,7 @@ public class DocumentService {
     }
 
     //Get ALL documents (if caregiver/admin) Get OWN documents (residents)
+    public List<Map<String, Object>> getDocuments(Long currentUserId) {
     UserProfile currentUser = getUserById(currentUserId);
     List<Document> documents;
 
@@ -87,8 +88,37 @@ public class DocumentService {
         if (currentUser.getRole() == UserProfile.Role.ADMIN ||
                 currentUser.getRole() == UserProfile.Role.CAREGIVER ||
                 (currentUser.getRole() == UserProfile.Role.RESIDENT &&
-                        document.getResidentId().equals(currentUser.getId())))
+                        document.getResidentId().equals(currentUser.getId()))) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("id", document.getId());
+            map.put("title", document.getTitle());
+            map.put("type", document.getType());
+            map.put("residentId", document.getResidentId());
+            map.put("uploaded_at", document.getUploaded_at());
+            map.put("content", Base64.getEncoder().encodeToString(document.getDocument()));
 
-
-
+            return map;
+        } else {
+            throw new IllegalArgumentException("You do not have permission to view this document");
+        }
     }
+
+    //Delete Documents (only for caregiver/admin)
+    public Map<String, Object> deleteDocumentsByResident(Long currentUserId, Long residentId) {
+        UserProfile currentUser = getUserById(currentUserId);
+
+        if (currentUser.getRole() != UserProfile.Role.ADMIN &&
+                currentUser.getRole() != UserProfile.Role.CAREGIVER) {
+            throw new IllegalArgumentException("You do not have permission to delete documents");
+        }
+
+        documentsRepository.deleteByResidentId(residentId);
+        return Map.of("message", "All documents deleted for resident " + residentId);
+    }
+
+    //Helpers
+    private UserProfile getUserById(Long userId) {
+        return userProfileRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+    }
+}
