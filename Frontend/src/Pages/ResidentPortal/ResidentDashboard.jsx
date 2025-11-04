@@ -1,0 +1,11 @@
+import "./css/ResidentDashboard.css";
+
+// Resident Dashboard Page
+export default function ResidentDashboard() {
+    return (
+        <div className="container">
+            <h1>Resident Dashboard</h1>
+            <p>Welcome to your Dashboard</p>
+        </div>
+    );
+}

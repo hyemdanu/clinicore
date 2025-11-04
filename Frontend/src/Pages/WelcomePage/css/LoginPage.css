@@ -1,0 +1,151 @@
+/* container layout */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #fafafa;
+    font-family: "Poppins", sans-serif;
+    padding: 20px;
+}
+
+/* header */
+.title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 50px;
+    color: #000;
+}
+
+.core {
+    color: #369df7;
+}
+
+/* container box */
+.container-box {
+    background-color: #fff;
+    border: 2px solid #b9d8ff;
+    border-radius: 25px;
+    padding: 50px 60px;
+    width: 100%;
+    max-width: 500px;
+    text-align: left;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+/* form for inputs */
+.container-box form {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.container-box h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 40px;
+    color: #000;
+    font-weight: 600;
+}
+
+/* labels */
+label {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: #000;
+}
+
+/* input wrapper for icons */
+.input-wrapper {
+    position: relative;
+    margin-bottom: 12px;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 18px;
+}
+
+/* inputs */
+input {
+    width: 100%;
+    padding: 14px 14px 14px 45px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: 0.2s;
+    box-sizing: border-box;
+    background-color: #fafafa;
+}
+
+input::placeholder {
+    color: #aaa;
+}
+
+input:focus {
+    outline: none;
+    border-color: #369df7;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.1);
+}
+
+/* links */
+.link {
+    display: inline-block;
+    font-size: 0.9rem;
+    color: #000;
+    margin-bottom: 25px;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.link:hover {
+    color: #369df7;
+}
+
+/* buttons */
+.login-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 35px;
+    background: linear-gradient(135deg, #6eb3f7 0%, #89c5ff 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 15px rgba(54, 157, 247, 0.25);
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(54, 157, 247, 0.35);
+}
+
+.create-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 15px;
+    border: 2.5px solid #000;
+    border-radius: 35px;
+    background: transparent;
+    color: #000;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 1.05rem;
+}
+
+.create-btn:hover {
+    background-color: #f9f9f9;
+}
