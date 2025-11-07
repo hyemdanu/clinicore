@@ -65,19 +65,12 @@ label {
     margin-bottom: 12px;
 }
 
-.input-icon {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #999;
-    font-size: 18px;
-}
+
 
 /* inputs */
 input {
     width: 100%;
-    padding: 14px 14px 14px 45px;
+    padding: 14px 14px 14px 14px;
     border: 1px solid #ddd;
     border-radius: 10px;
     font-size: 15px;
@@ -86,9 +79,7 @@ input {
     background-color: #fafafa;
 }
 
-input::placeholder {
-    color: #aaa;
-}
+
 
 input:focus {
     outline: none;
@@ -148,4 +139,19 @@ input:focus {
 
 .create-btn:hover {
     background-color: #f9f9f9;
+}
+
+.spinner {
+    border: 3px solid #eee;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
