@@ -75,6 +75,7 @@ public class UserProfileService {
         // check if current user and target user exist via getUserbyId
         // if it does, store into currentUser and targetUser variables
         UserProfile currentUser = getUserById(currentUserId);
+
         UserProfile targetUser = getUserById(targetUserId);
 
         // check if current user is authorized to view target user
@@ -102,7 +103,7 @@ public class UserProfileService {
             case ADMIN -> {}  // no additional data for admins, so nothin todo here...
         }
 
-        return response;
+        return response; // JSON FORMAT
 
     }
 
