@@ -1,32 +1,54 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { post } from "../../services/api";     // ✅ correct import path
+import { post } from "../../services/api";
 import "./css/LoginPage.css";
 
 export default function LoginPage() {
     const navigate = useNavigate();
 
+    // state variables for username and password
+    // syntax: const [stateVariable, setStateFunction] = useState(initialState);
+    // react updates when state functions are called
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
     const handleLogin = async (e) => {
+        // this prevents the default form submission behavior
+        // necessary for react to handle ui rather than browser
         e.preventDefault();
+
+        // reset stuff
         setError("");
+
+        // set loading to true to show spinner
+        // ui friendly so user dont keep clicking and fuck it up
         setLoading(true);
 
         try {
-            // ✅ No hashing – backend expects raw stored string ("hash_01", "hash_02", etc.)
+
+            // send post request to backend
+            // these params are the same as the ones in the backend
             const data = await post("/accountCredential/login", {
                 username,
                 passwordHash: password
             });
 
-            // ✅ Save authenticated user session
-            localStorage.setItem("clinicoreUser", JSON.stringify(data));
 
-            navigate("/home");// this navigates to perspective dashboard depending on log in
+            // Redirect by role
+            switch (data.role) {
+                case "ADMIN":
+                    navigate("/admin"); // go to admin page
+                    break;
+                case "CAREGIVER":
+                    navigate("/caregiver"); // go to caregiver page
+                    break;
+                case "RESIDENT":
+                    navigate("/resident");  // go to resident page
+                    break;
+            }
+
         } catch (err) {
             console.error("Login error:", err);
             setError("Invalid username or password.");
@@ -45,13 +67,12 @@ export default function LoginPage() {
                 <h2>Log in</h2>
 
                 <form onSubmit={handleLogin}>
-                    <label htmlFor="username">User ID</label>
+
+                    <label htmlFor="username">Username</label>
                     <div className="input-wrapper">
-                        <span className="input-icon">👤</span>
                         <input
                             id="username"
                             type="text"
-                            placeholder="Name"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required
@@ -62,11 +83,9 @@ export default function LoginPage() {
 
                     <label htmlFor="password">Password</label>
                     <div className="input-wrapper">
-                        <span className="input-icon">🔒</span>
                         <input
                             id="password"
                             type="password"
-                            placeholder="Password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
@@ -84,7 +103,7 @@ export default function LoginPage() {
                         className="login-btn"
                         disabled={loading}
                     >
-                        {loading ? "Signing in..." : "Log in"}
+                        {loading ? <span className="spinner"></span> : "Log in"}
                     </button>
 
                     <button
