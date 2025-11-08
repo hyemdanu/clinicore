@@ -1,7 +1,7 @@
 package com.clinicore.project.controller;
 
-//import com.clinicore.project.service.MedicalInformationService;
-import com.clinicore.project.entity.Capability;
+import com.clinicore.project.dto.CapabilityDTO;
+import com.clinicore.project.service.ResidentMedicalInformationService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,29 +14,26 @@ import java.util.*;
 @RequestMapping("/api/medicalInformation")
 public class ResidentMedicalInformationController {
 
+    private final ResidentMedicalInformationService residentMedicalInformationService;
+
+    public ResidentMedicalInformationController(ResidentMedicalInformationService residentMedicalInformationService) {
+        this.residentMedicalInformationService = residentMedicalInformationService;
+    }
+
     private ResponseEntity<?> createErrorResponse(HttpStatus status, String message, Long userId) {
         return ResponseEntity.status(status)
                 .body(Map.of("message", message, "userId", userId));
     }
-    
-    /*
-    private final ResidentMedicalInformationService residentMedicalInformationService;
-
-    public ResidentMedicalInformationController(ResidentMedicalInformation residentMedicalInformationService) {
-        this.residentMedicalInformationService = residentMedicalInformationService;
-    }
-
-     */
 
     /*
      * Medical Profile Information 
      */
     @GetMapping("/resident/insurance")
-    public ResponseEntity<?> getResidentInsurance(@RequestParam Long currentUserId) {
+    public ResponseEntity<?> getResidentInsurance(@RequestParam Long currentUserId, @RequestParam Long residentId) {
         try {
 
-            String insurance;// = residentMedicalInformationService.getInsurance(currentUserId);
-            
+            String insurance = residentMedicalInformationService.getInsurance(currentUserId, residentId);
+
             return ResponseEntity.ok(insurance);
 
         } catch (IllegalArgumentException e) {
@@ -49,11 +46,11 @@ public class ResidentMedicalInformationController {
     }
 
     @GetMapping("/resident/medicalprofilenotes")
-    public ResponseEntity<?> getResidentMedicalProfileNotes(@RequestParam Long currentUserId) {
+    public ResponseEntity<?> getResidentMedicalProfileNotes(@RequestParam Long currentUserId, @RequestParam Long residentId) {
         try {
 
-            String notes;// = residentMedicalInformationService.getMedicalProfileNotes(currentUserId);
-            
+            String notes = residentMedicalInformationService.getMedicalProfileNotes(currentUserId, residentId);
+
             return ResponseEntity.ok(notes);
 
         } catch (IllegalArgumentException e) {
@@ -66,18 +63,18 @@ public class ResidentMedicalInformationController {
     }
 
     @GetMapping("/resident/capability")
-    public ResponseEntity<?> getResidentCapability(@RequestParam Long currentUserId) {
+    public ResponseEntity<?> getResidentCapability(@RequestParam Long currentUserId, @RequestParam Long residentId) {
         try {
 
-            Capability capability;// = residentMedicalInformationService.getCapability(currentUserId);
-            
+            CapabilityDTO capability = residentMedicalInformationService.getCapability(currentUserId, residentId);
+
             return ResponseEntity.ok(capability);
 
         } catch (IllegalArgumentException e) {
             return createErrorResponse(HttpStatus.FORBIDDEN, e.getMessage(), currentUserId);
 
         } catch (Exception e) {
-            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, 
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Error retrieving resident's capability: " + e.getMessage(), currentUserId);
         }
     }
@@ -87,10 +84,10 @@ public class ResidentMedicalInformationController {
      */
 
      @GetMapping("/resident/allergy")
-    public ResponseEntity<?> getResidentAllergy(@RequestParam Long currentUserId) {
+    public ResponseEntity<?> getResidentAllergy(@RequestParam Long currentUserId, @RequestParam Long residentId) {
         try {
 
-            List<Map<String, Object>> allergies; //= residentMedicalInformationService.getAllAllergies(currentUserId);
+            List<Map<String, Object>> allergies = residentMedicalInformationService.getAllAllergies(currentUserId, residentId);
             return ResponseEntity.ok(allergies);
 
         } catch (IllegalArgumentException e) {
@@ -102,11 +99,11 @@ public class ResidentMedicalInformationController {
         }
     }
 
-     @GetMapping("/resident/allergy")
-    public ResponseEntity<?> getResidentDiagnoses(@RequestParam Long currentUserId) {
+     @GetMapping("/resident/diagnosis")
+    public ResponseEntity<?> getResidentDiagnoses(@RequestParam Long currentUserId, @RequestParam Long residentId) {
         try {
 
-            List<Map<String, Object>> diagnoses; //= residentMedicalInformationService.getAllDiagnoses(currentUserId);
+            List<Map<String, Object>> diagnoses = residentMedicalInformationService.getAllDiagnoses(currentUserId, residentId);
             return ResponseEntity.ok(diagnoses);
 
         } catch (IllegalArgumentException e) {
@@ -119,11 +116,11 @@ public class ResidentMedicalInformationController {
     }
     
     @GetMapping("/resident/medicalrecordnotes")
-    public ResponseEntity<?> getResidentMedicalRecordNotes(@RequestParam Long currentUserId) {
+    public ResponseEntity<?> getResidentMedicalRecordNotes(@RequestParam Long currentUserId, @RequestParam Long residentId) {
         try {
 
-            String notes;// = residentMedicalInformationService.getMedicalRecordNotes(currentUserId);
-            
+            String notes = residentMedicalInformationService.getMedicalRecordNotes(currentUserId, residentId);
+
             return ResponseEntity.ok(notes);
 
         } catch (IllegalArgumentException e) {
@@ -140,11 +137,11 @@ public class ResidentMedicalInformationController {
      */
 
     @GetMapping("/resident/hospiceagency")
-    public ResponseEntity<?> getResidentHospiceAgency(@RequestParam Long currentUserId) {
+    public ResponseEntity<?> getResidentHospiceAgency(@RequestParam Long currentUserId, @RequestParam Long residentId) {
         try {
 
-            String hospiceAgency;// = residentMedicalInformationService.getHospiceAgency(currentUserId);
-            
+            String hospiceAgency = residentMedicalInformationService.getHospiceAgency(currentUserId, residentId);
+
             return ResponseEntity.ok(hospiceAgency);
 
         } catch (IllegalArgumentException e) {
@@ -157,11 +154,11 @@ public class ResidentMedicalInformationController {
     }
 
     @GetMapping("/resident/preferredhospital")
-    public ResponseEntity<?> getResidentPreferredHospital(@RequestParam Long currentUserId) {
+    public ResponseEntity<?> getResidentPreferredHospital(@RequestParam Long currentUserId, @RequestParam Long residentId) {
         try {
 
-            String preferredHospital;// = residentMedicalInformationService.getPreferredHospital(currentUserId);
-            
+            String preferredHospital = residentMedicalInformationService.getPreferredHospital(currentUserId, residentId);
+
             return ResponseEntity.ok(preferredHospital);
 
         } catch (IllegalArgumentException e) {
@@ -174,11 +171,11 @@ public class ResidentMedicalInformationController {
     }
 
     @GetMapping("/resident/preferredpharmacy")
-    public ResponseEntity<?> getResidentPreferredPharmacy(@RequestParam Long currentUserId) {
+    public ResponseEntity<?> getResidentPreferredPharmacy(@RequestParam Long currentUserId, @RequestParam Long residentId) {
         try {
 
-            String preferredPharmacy;// = residentMedicalInformationService.getPreferredPharmacy(currentUserId);
-            
+            String preferredPharmacy = residentMedicalInformationService.getPreferredPharmacy(currentUserId, residentId);
+
             return ResponseEntity.ok(preferredPharmacy);
 
         } catch (IllegalArgumentException e) {
@@ -191,11 +188,11 @@ public class ResidentMedicalInformationController {
     }
 
     @GetMapping("/resident/homehealthagency")
-    public ResponseEntity<?> getResidentHomeHealthAgency(@RequestParam Long currentUserId) {
+    public ResponseEntity<?> getResidentHomeHealthAgency(@RequestParam Long currentUserId, @RequestParam Long residentId) {
         try {
 
-            String homeHealthAgency;// = residentMedicalInformationService.getPreferredHomeHealthAgency(currentUserId);
-            
+            String homeHealthAgency = residentMedicalInformationService.getPreferredHomeHealthAgency(currentUserId, residentId);
+
             return ResponseEntity.ok(homeHealthAgency);
 
         } catch (IllegalArgumentException e) {
@@ -208,11 +205,11 @@ public class ResidentMedicalInformationController {
     }
 
     @GetMapping("/resident/mortuary")
-    public ResponseEntity<?> getResidentMortuary(@RequestParam Long currentUserId) {
+    public ResponseEntity<?> getResidentMortuary(@RequestParam Long currentUserId, @RequestParam Long residentId) {
         try {
 
-            String mortuary;// = residentMedicalInformationService.getMortuary(currentUserId);
-            
+            String mortuary = residentMedicalInformationService.getMortuary(currentUserId, residentId);
+
             return ResponseEntity.ok(mortuary);
 
         } catch (IllegalArgumentException e) {
@@ -225,11 +222,11 @@ public class ResidentMedicalInformationController {
     }
 
     @GetMapping("/resident/dnrPolst")
-    public ResponseEntity<?> getResidentDNRPolst(@RequestParam Long currentUserId) {
+    public ResponseEntity<?> getResidentDNRPolst(@RequestParam Long currentUserId, @RequestParam Long residentId) {
         try {
 
-            String dnrPolst;// = residentMedicalInformationService.getDNRPolst(currentUserId);
-            
+            String dnrPolst = residentMedicalInformationService.getDNRPolst(currentUserId, residentId);
+
             return ResponseEntity.ok(dnrPolst);
 
         } catch (IllegalArgumentException e) {
@@ -242,11 +239,11 @@ public class ResidentMedicalInformationController {
     }
 
     @GetMapping("/resident/hospice")
-    public ResponseEntity<?> getResidentHospice(@RequestParam Long currentUserId) {
+    public ResponseEntity<?> getResidentHospice(@RequestParam Long currentUserId, @RequestParam Long residentId) {
         try {
 
-            Boolean hospice;// = residentMedicalInformationService.getHospice(currentUserId);
-            
+            Boolean hospice = residentMedicalInformationService.getHospice(currentUserId, residentId);
+
             return ResponseEntity.ok(hospice);
 
         } catch (IllegalArgumentException e) {
@@ -259,11 +256,11 @@ public class ResidentMedicalInformationController {
     }
 
     @GetMapping("/resident/homehealth")
-    public ResponseEntity<?> getResidentHomeHealth(@RequestParam Long currentUserId) {
+    public ResponseEntity<?> getResidentHomeHealth(@RequestParam Long currentUserId, @RequestParam Long residentId) {
         try {
 
-            Boolean homeHealth;// = residentMedicalInformationService.getHomeHealth(currentUserId);
-            
+            Boolean homeHealth = residentMedicalInformationService.getHomeHealth(currentUserId, residentId);
+
             return ResponseEntity.ok(homeHealth);
 
         } catch (IllegalArgumentException e) {
@@ -276,11 +273,11 @@ public class ResidentMedicalInformationController {
     }
 
     @GetMapping("/resident/medicalservicenotes")
-    public ResponseEntity<?> getResidentMedicalServicesNotes(@RequestParam Long currentUserId) {
+    public ResponseEntity<?> getResidentMedicalServicesNotes(@RequestParam Long currentUserId, @RequestParam Long residentId) {
         try {
 
-            String notes;// = residentMedicalInformationService.getMedicalServiceNotes(currentUserId);
-            
+            String notes = residentMedicalInformationService.getMedicalServiceNotes(currentUserId, residentId);
+
             return ResponseEntity.ok(notes);
 
         } catch (IllegalArgumentException e) {

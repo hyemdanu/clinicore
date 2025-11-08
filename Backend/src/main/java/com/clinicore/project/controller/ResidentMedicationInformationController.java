@@ -1,6 +1,7 @@
 package com.clinicore.project.controller;
 
-//import com.clinicore.project.service.ResidentMedicationInformationService;
+import com.clinicore.project.dto.MedicationDTO;
+import com.clinicore.project.service.ResidentMedicationInformationService;
 import com.clinicore.project.entity.Medication;
 import com.clinicore.project.entity.Medication.IntakeStatus;
 
@@ -17,19 +18,17 @@ import java.time.LocalDateTime;
 @CrossOrigin
 public class ResidentMedicationInformationController {
 
-    /*
     private final ResidentMedicationInformationService residentMedicationInformationService;
 
     public ResidentMedicationInformationController(ResidentMedicationInformationService residentMedicationInformationService) {
         this.residentMedicationInformationService = residentMedicationInformationService;
     }
-     */
     
     @GetMapping("/residents/medication/list")
-    public ResponseEntity<?> getResidentMedication(@RequestParam Long currentUserId) {
+    public ResponseEntity<?> getResidentMedication(@RequestParam Long currentUserId, @RequestParam Long residentId) {
         try {
 
-            List<Medication> medication; // = residentMedicationInformationService.getAllMedication(currentUserId);
+            List<MedicationDTO> medication = residentMedicationInformationService.getAllMedication(currentUserId, residentId);
 
             return ResponseEntity.ok(medication);
 
@@ -37,7 +36,7 @@ public class ResidentMedicationInformationController {
             return createErrorResponse(HttpStatus.FORBIDDEN, e.getMessage(), currentUserId);
 
         } catch (Exception e) {
-            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, 
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Error retrieving resident's medication: " + e.getMessage(), currentUserId);
         }
     }
@@ -46,7 +45,7 @@ public class ResidentMedicationInformationController {
     public ResponseEntity<?> getResidentMedicationName(@RequestParam Long currentUserId, @RequestParam Long medicationId) {
         try {
 
-            String medicationName; // = residentMedicationInformationService.getName(currentUserId);
+            String medicationName = residentMedicationInformationService.getName(currentUserId, medicationId);
 
             return ResponseEntity.ok(medicationName);
 
@@ -60,10 +59,10 @@ public class ResidentMedicationInformationController {
     }
 
     @GetMapping("/resident/medication/dosage")
-    public ResponseEntity<?> getResidentMedicationDosage(@RequestParam Long currentUserId, @RequestParam Long residentId, @RequestParam Long medicationId) {
+    public ResponseEntity<?> getResidentMedicationDosage(@RequestParam Long currentUserId, @RequestParam Long medicationId) {
         try {
 
-            String medicationDosage; // = residentMedicationInformationService.getName(currentUserId);
+            String medicationDosage = residentMedicationInformationService.getDosage(currentUserId, medicationId);
 
             return ResponseEntity.ok(medicationDosage);
 
@@ -76,11 +75,11 @@ public class ResidentMedicationInformationController {
         }
     }
 
-    @GetMapping("/resident/medication/dosage")
-    public ResponseEntity<?> getResidentMedicationFrequency(@RequestParam Long currentUserId, @RequestParam Long residentId, @RequestParam Long medicationId) {
+    @GetMapping("/resident/medication/frequency")
+    public ResponseEntity<?> getResidentMedicationFrequency(@RequestParam Long currentUserId, @RequestParam Long medicationId) {
         try {
 
-            String medicationFrequency; // = residentMedicationInformationService.getName(currentUserId);
+            String medicationFrequency = residentMedicationInformationService.getFrequency(currentUserId, medicationId);
 
             return ResponseEntity.ok(medicationFrequency);
 
@@ -94,10 +93,10 @@ public class ResidentMedicationInformationController {
     }
 
     @GetMapping("/resident/medication/intakestatus")
-    public ResponseEntity<?> getResidentMedicationIntakeStatus(@RequestParam Long currentUserId, @RequestParam Long residentId, @RequestParam Long medicationId) {
+    public ResponseEntity<?> getResidentMedicationIntakeStatus(@RequestParam Long currentUserId, @RequestParam Long medicationId) {
         try {
 
-            IntakeStatus medicationIntakeStatus; // = residentMedicationInformationService.getName(currentUserId);
+            IntakeStatus medicationIntakeStatus = residentMedicationInformationService.getIntakeStatus(currentUserId, medicationId);
 
             return ResponseEntity.ok(medicationIntakeStatus);
 
@@ -111,10 +110,10 @@ public class ResidentMedicationInformationController {
     }
 
     @GetMapping("/resident/medication/lastadministered")
-    public ResponseEntity<?> getResidentMedicationLastAdministered(@RequestParam Long currentUserId, @RequestParam Long residentId, @RequestParam Long medicationId) {
+    public ResponseEntity<?> getResidentMedicationLastAdministered(@RequestParam Long currentUserId, @RequestParam Long medicationId) {
         try {
 
-            LocalDateTime medicationLastAdministered; // = residentMedicationInformationService.getName(currentUserId);
+            LocalDateTime medicationLastAdministered = residentMedicationInformationService.getLastAdministered(currentUserId, medicationId);
 
             return ResponseEntity.ok(medicationLastAdministered);
 
@@ -128,10 +127,10 @@ public class ResidentMedicationInformationController {
     }
 
     @GetMapping("/resident/medication/notes")
-    public ResponseEntity<?> getResidentMedicationNotes(@RequestParam Long currentUserId, @RequestParam Long residentId, @RequestParam Long medicationId) {
+    public ResponseEntity<?> getResidentMedicationNotes(@RequestParam Long currentUserId, @RequestParam Long medicationId) {
         try {
 
-            String notes; // = residentMedicationInformationService.getName(currentUserId);
+            String notes = residentMedicationInformationService.getNotes(currentUserId, medicationId);
 
             return ResponseEntity.ok(notes);
 

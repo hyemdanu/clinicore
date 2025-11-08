@@ -10,11 +10,11 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/documents")
 @CrossOrigin
-public class DocumentController {
+public class DocumentsController {
 
     private final DocumentService documentService;
 
-    public DocumentController(DocumentService documentService) {
+    public DocumentsController(DocumentService documentService) {
         this.documentService = documentService;
     }
 
