@@ -5,6 +5,8 @@ import CaregiverDashboard from "./Pages/CaregiverPortal/CaregiverDashboard";
 import AdminDashboard from "./Pages/AdminPortal/AdminDashboard";
 import ForgotUserIdPage from "./Pages/WelcomePage/ForgotUserIdPage";
 import ForgotPasswordPage from "./Pages/WelcomePage/ForgotPasswordPage";
+import CreateAccountPage from "./Pages/WelcomePage/CreateAccountPage";
+import RequestSentPage from "./Pages/WelcomePage/RequestSentPage";
 
 export default function App() {
     return (
@@ -16,6 +18,8 @@ export default function App() {
                 <Route path="/admin" element={<AdminDashboard/>} />
                 <Route path="/forgot-userid" element={<ForgotUserIdPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/create-account" element={<CreateAccountPage />} />
+                <Route path="/request-sent" element={<RequestSentPage />} />
             </Routes>
         </BrowserRouter>
     );
