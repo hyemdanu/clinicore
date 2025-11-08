@@ -79,7 +79,7 @@ export default function LoginPage() {
                         />
                     </div>
 
-                    <a className="link" href="#">Forgot User ID</a>
+                    <a className="link" href="/forgot-userid">Forgot User ID</a>
 
                     <label htmlFor="password">Password</label>
                     <div className="input-wrapper">
@@ -92,7 +92,7 @@ export default function LoginPage() {
                         />
                     </div>
 
-                    <a className="link" href="#">Forget password?</a>
+                    <a className="link" href="/forgot-password">Forget password?</a>
 
                     {error && (
                         <p style={{ color: "red", marginTop: 10 }}>{error}</p>
