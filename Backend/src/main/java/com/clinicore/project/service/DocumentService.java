@@ -35,7 +35,6 @@ public class DocumentService {
         document.setTitle(title);
         document.setType(type);
         document.setDocument(file.getBytes());
-        document.setUploaded_at(new Date());
         documentsRepository.save(document);
 
         return Map.of(
