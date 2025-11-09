@@ -22,12 +22,14 @@ public class AccountCredentialService {
     // variables
     private final AccountCredentialRepository accountCredentialRepository;
     private final InvitationService invitationService;
-
+    private final UserProfileRepository userProfileRepository;
     // constructor that injects all repositories so the service can access user and invitation data
     public AccountCredentialService(AccountCredentialRepository accountCredentialRepository,
-                                   InvitationService invitationService) {
+                                   InvitationService invitationService,
+                                    UserProfileRepository userProfileRepository) {
         this.accountCredentialRepository = accountCredentialRepository;
         this.invitationService = invitationService;
+        this.userProfileRepository = userProfileRepository;
     }
 
     // authenticate user with username and password
@@ -82,6 +84,6 @@ public class AccountCredentialService {
         }
 
         // use your new email column
-        return UserProfileRepository.findByEmail(email).isPresent();
+        return userProfileRepository.findByEmail(email).isPresent();
     }
 }
