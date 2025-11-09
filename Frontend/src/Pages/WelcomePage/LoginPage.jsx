@@ -35,6 +35,12 @@ export default function LoginPage() {
                 passwordHash: password
             });
 
+            // Store user data in localStorage for session management
+            localStorage.setItem('currentUser', JSON.stringify({
+                id: data.id,
+                username: data.username,
+                role: data.role
+            }));
 
             // Redirect by role
             switch (data.role) {

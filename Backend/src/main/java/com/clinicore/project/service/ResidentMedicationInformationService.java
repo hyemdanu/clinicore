@@ -8,9 +8,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Resident Medication Information Service
+ * handles all resident medication data like dosage, frequency, intake status, etc
+ */
 @Service
 public class ResidentMedicationInformationService {
 
+    // repositories for db access
     private final MedicationRepository medicationRepository;
     private final UserProfileRepository userProfileRepository;
 
@@ -20,7 +25,7 @@ public class ResidentMedicationInformationService {
         this.userProfileRepository = userProfileRepository;
     }
 
-    // Get all medications for a resident
+    // get all medications for a resident
     public List<MedicationDTO> getAllMedication(Long currentUserId, Long residentId) {
         UserProfile currentUser = getUserById(currentUserId);
         validatePermissions(currentUser, residentId);
@@ -31,19 +36,18 @@ public class ResidentMedicationInformationService {
                 .collect(Collectors.toList());
     }
 
-    // Get medication name by medication ID
+    // get medication name by ID
     public String getName(Long currentUserId, Long medicationId) {
         UserProfile currentUser = getUserById(currentUserId);
         Medication medication = getMedicationById(medicationId);
 
-        // Validate that the current user has permission to access this medication
         Long residentId = medication.getMedicalProfile().getResidentId();
         validatePermissions(currentUser, residentId);
 
         return medication.getMedicationName();
     }
 
-    // Get medication dosage
+    // get medication dosage
     public String getDosage(Long currentUserId, Long medicationId) {
         UserProfile currentUser = getUserById(currentUserId);
         Medication medication = getMedicationById(medicationId);
@@ -54,7 +58,7 @@ public class ResidentMedicationInformationService {
         return medication.getDosage();
     }
 
-    // Get medication frequency
+    // get medication frequency
     public String getFrequency(Long currentUserId, Long medicationId) {
         UserProfile currentUser = getUserById(currentUserId);
         Medication medication = getMedicationById(medicationId);
@@ -65,7 +69,7 @@ public class ResidentMedicationInformationService {
         return medication.getFrequency();
     }
 
-    // Get medication intake status
+    // get medication intake status
     public Medication.IntakeStatus getIntakeStatus(Long currentUserId, Long medicationId) {
         UserProfile currentUser = getUserById(currentUserId);
         Medication medication = getMedicationById(medicationId);
@@ -76,7 +80,7 @@ public class ResidentMedicationInformationService {
         return medication.getIntakeStatus();
     }
 
-    // Get medication last administered time
+    // get when medication was last administered
     public LocalDateTime getLastAdministered(Long currentUserId, Long medicationId) {
         UserProfile currentUser = getUserById(currentUserId);
         Medication medication = getMedicationById(medicationId);
@@ -87,7 +91,7 @@ public class ResidentMedicationInformationService {
         return medication.getLastAdministeredAt();
     }
 
-    // Get medication notes
+    // get medication notes
     public String getNotes(Long currentUserId, Long medicationId) {
         UserProfile currentUser = getUserById(currentUserId);
         Medication medication = getMedicationById(medicationId);
@@ -98,26 +102,27 @@ public class ResidentMedicationInformationService {
         return medication.getNotes();
     }
 
-    // Helper Methods
-
+    // find user by ID
     private UserProfile getUserById(Long userId) {
         return userProfileRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
     }
 
+    // find medication by ID
     private Medication getMedicationById(Long medicationId) {
         return medicationRepository.findById(medicationId)
                 .orElseThrow(() -> new IllegalArgumentException("Medication not found with ID: " + medicationId));
     }
 
+    // check permissions - admin/caregiver can see all, residents only see their own
     private void validatePermissions(UserProfile currentUser, Long residentId) {
-        // Admin and caregiver can access any resident's medication information
+        // admin and caregiver can access any resident's medication info
         if (currentUser.getRole() == UserProfile.Role.ADMIN ||
             currentUser.getRole() == UserProfile.Role.CAREGIVER) {
             return;
         }
 
-        // Residents can only access their own medication information
+        // residents can only see their own stuff
         if (currentUser.getRole() == UserProfile.Role.RESIDENT &&
             currentUser.getId().equals(residentId)) {
             return;
