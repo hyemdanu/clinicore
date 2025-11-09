@@ -120,6 +120,7 @@ public class AccountCredentialController {
             String gender = (String) request.get("gender");
             String birthday = (String) request.get("birthday");
             String contactNumber = (String) request.get("contactNumber");
+            String email = (String) request.get("email");
 
             // create account (business logic in invitation service layer) so send details to that
             // will return a new user object with all details filled in (new user account saved in db)
