@@ -1,0 +1,62 @@
+/* css for admin sidebar */
+.admin-sidebar {
+  position: fixed;
+  left: 0;
+  top: 56px;
+  height: calc(100vh - 56px);
+  background-color: #f5f5f5;
+  transition: width 0.3s ease;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.admin-sidebar-open {
+  width: 280px;
+}
+
+.admin-sidebar-closed {
+  width: 0;
+}
+
+.admin-sidebar-nav {
+  padding-top: 20px;
+}
+
+.admin-sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.admin-sidebar-item:hover {
+  background-color: #e0e0e0;
+}
+
+.admin-sidebar-item-active {
+  background-color: #d6ebf5;
+  border-radius: 0 25px 25px 0;
+  margin-right: 20px;
+}
+
+.admin-sidebar-icon {
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-sidebar-icon img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.admin-sidebar-label {
+  margin-left: 16px;
+  font-size: 16px;
+  font-weight: 400;
+  color: #333;
+}
