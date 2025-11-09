@@ -145,4 +145,51 @@ public class AccountCredentialController {
                     .body(Map.of("error", "Failed to register user: " + e.getMessage()));
         }
     }
+
+    @PostMapping("/forgot-userid")
+    public ResponseEntity<?> forgotUserId(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            if (email == null || email.isBlank()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "Email is required."));
+            }
+
+            boolean exists = accountCredentialService.checkIfUserExistsByEmail(email);
+            if (exists) {
+                return ResponseEntity.ok(Map.of("message", "Email verified successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Email not found in system."));
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to verify email: " + e.getMessage()));
+        }
+    }
+
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            if (email == null || email.isBlank()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "Email is required."));
+            }
+
+            boolean exists = accountCredentialService.checkIfUserExistsByEmail(email);
+            if (exists) {
+                return ResponseEntity.ok(Map.of("message", "Email verified successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Email not found in system."));
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to verify email: " + e.getMessage()));
+        }
+    }
 }

@@ -16,6 +16,12 @@ public class UserProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /*  Uncomment this when the email column is added to database
+    @Column(name = "email")
+    private String email;
+
+     */
+
     @Column(name = "first_name", nullable = false)
     private String firstName;
 

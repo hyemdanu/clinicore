@@ -26,4 +26,6 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
      * Used for statistics
      */
     long countByRole(UserProfile.Role role);
+
+    Optional<UserProfile> findByEmail(String email);  //Used to verify if user's email exists for Forgot Pwd/UserID pages
 }
