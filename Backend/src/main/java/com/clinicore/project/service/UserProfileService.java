@@ -94,6 +94,7 @@ public class UserProfileService {
         response.put("gender", targetUser.getGender());
         response.put("birthday", targetUser.getBirthday());
         response.put("contactNumber", targetUser.getContactNumber());
+        response.put("email", targetUser.getEmail());
         response.put("role", targetUser.getRole().toString());
 
         // add role specific data
