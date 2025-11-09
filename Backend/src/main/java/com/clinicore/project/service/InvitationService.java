@@ -87,6 +87,7 @@ public class InvitationService {
         newUser.setGender(gender);
         newUser.setBirthday(LocalDate.parse(birthday));
         newUser.setContactNumber(contactNumber);
+        newUser.setEmail(invitation.getEmail());
         newUser.setRole(invitation.getRole());
 
         // save new user to db
