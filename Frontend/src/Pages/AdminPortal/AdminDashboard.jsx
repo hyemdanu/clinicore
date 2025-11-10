@@ -111,6 +111,14 @@ export default function AdminDashboard() {
     const sortedMedications = sortData(medicationInventory, medicationSort);
     const sortedConsumables = sortData(consumablesInventory, consumablesSort);
 
+    // compute low-stock items for alert banner (quantity <= 10)
+    const lowStockItems = [
+        ...medicationInventory.map(item => ({ ...item, category: 'Medication' })),
+        ...consumablesInventory.map(item => ({ ...item, category: 'Consumable' }))
+    ].filter(item => Number(item.quantity) <= 10);
+
+    const lowStockCount = lowStockItems.length;
+
     // shows a warning icon and red text if stock is low (≤ 10)
     const quantityTemplate = (rowData) => {
         const isLowStock = rowData.quantity <= 10; // threshold is 10
@@ -141,6 +149,32 @@ export default function AdminDashboard() {
                 <div className="alert-section">
                     <h2 className="dashboard-title">Inventory Dashboard</h2>
                 </div>
+
+                {/* Low stock alert banner shown above the tables when any item is low */}
+                {lowStockCount > 0 && (
+                    <div
+                        className="low-stock-alert"
+                        role="alert"
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            backgroundColor: '#fff6f6',
+                            border: '1px solid #ffcccc',
+                            color: '#a94442',
+                            padding: '0.75rem 1rem',
+                            borderRadius: 4,
+                            marginBottom: '1rem'
+                        }}
+                    >
+                        <i className="pi pi-exclamation-triangle" style={{ fontSize: '1.2rem', marginRight: '0.5rem' }}></i>
+                        <div style={{ flex: 1 }}>
+                            <strong>{lowStockCount} low stock item{lowStockCount > 1 ? 's' : ''}</strong>
+                            <div style={{ fontSize: '0.9rem', opacity: 0.9 }}>
+                                {lowStockItems.slice(0, 3).map(i => i.name).join(', ')}{lowStockItems.length > 3 ? ` and ${lowStockItems.length - 3} more` : ''}
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {error && (
                     <div className="error-message">
