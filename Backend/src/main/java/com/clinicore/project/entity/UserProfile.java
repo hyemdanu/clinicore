@@ -53,6 +53,9 @@ public class UserProfile {
     @Column
     private LocalDateTime updatedAt;
 
+    @Column
+    private String email;
+
     // child entities (admin/caregiver/resident) own these relationships via @MapsId
     // Lazy loading is used to avoid fetching unnecessary data
     @OneToOne(mappedBy = "userProfile", fetch = FetchType.LAZY)

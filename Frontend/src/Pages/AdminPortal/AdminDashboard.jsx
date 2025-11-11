@@ -1,11 +1,213 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Dropdown } from 'primereact/dropdown';
+import { get } from '../../services/api';
+import Header from '../../Components/Header';
+import AdminSidebar from '../../Components/AdminSidebar';
+import 'primereact/resources/themes/lara-light-blue/theme.css';
+import 'primeicons/primeicons.css';
 import "./css/admin.css";
 
 // Admin Dashboard Page
-export default function ResidentDashboard() {
+export default function AdminDashboard() {
+    const navigate = useNavigate();
+
+    // sidebarOpen controls whether the sidebar is visible or hidden
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+
+    // these hold the inventory data from the backend
+    // we store medications and consumables separately because they different types
+    const [medicationInventory, setMedicationInventory] = useState([]);
+    const [consumablesInventory, setConsumablesInventory] = useState([]);
+
+    // loading state - shows spinner while fetching data
+    // error state - holds error message if API call fails
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // sort states - each table can be sorted independently
+    // default is 'quantity-asc' which shows low stock items first
+    const [medicationSort, setMedicationSort] = useState('quantity-asc');
+    const [consumablesSort, setConsumablesSort] = useState('quantity-asc');
+
+    // dropdown options for sorting
+    const sortOptions = [
+        { label: 'Quantity: Low to High', value: 'quantity-asc' },
+        { label: 'Quantity: High to Low', value: 'quantity-desc' },
+        { label: 'Name: A to Z', value: 'name-asc' },
+        { label: 'Name: Z to A', value: 'name-desc' }
+    ];
+
+    // runs once when component loads, fetches inventory data
+    useEffect(() => {
+        fetchInventoryData();
+    }, []);
+
+    const fetchInventoryData = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            // check if user is logged in by looking at localStorage
+            // if no user found, kick them back to login page
+            const currentUserStr = localStorage.getItem('currentUser');
+            if (!currentUserStr) {
+                navigate('/');
+                return;
+            }
+
+            // parse the user data to get their ID
+            // we need this to make authenticated API calls
+            const currentUser = JSON.parse(currentUserStr);
+            const currentUserId = currentUser.id;
+
+            // fetch both inventories at the same time using Promise.all
+            const [medications, consumables] = await Promise.all([
+                get(`/inventory/medication?currentUserId=${currentUserId}`),
+                get(`/inventory/consumables?currentUserId=${currentUserId}`)
+            ]);
+
+            // update state with the fetched data
+            setMedicationInventory(medications);
+            setConsumablesInventory(consumables);
+        } catch (error) {
+            console.error('Error fetching inventory data:', error);
+            setError('Failed to load inventory data. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // toggle sidebar open/closed when hamburger is clicked
+    const toggleSidebar = () => {
+        setSidebarOpen(!sidebarOpen);
+    };
+
+    // sorting function
+    const sortData = (data, sortKey) => {
+        const [field, order] = sortKey.split('-'); // split into field and order
+
+
+        const sorted = [...data].sort((a, b) => {
+            if (field === 'quantity') {
+
+                return order === 'asc' ? a.quantity - b.quantity : b.quantity - a.quantity;
+            } else {
+                const nameA = a.name.toLowerCase();
+                const nameB = b.name.toLowerCase();
+                if (order === 'asc') {
+                    return nameA.localeCompare(nameB); // A to Z
+                } else {
+                    return nameB.localeCompare(nameA); // Z to A
+                }
+            }
+        });
+        return sorted;
+    };
+
+    // get sorted data based on current sort selections
+    const sortedMedications = sortData(medicationInventory, medicationSort);
+    const sortedConsumables = sortData(consumablesInventory, consumablesSort);
+
+    // shows a warning icon and red text if stock is low (≤ 10)
+    const quantityTemplate = (rowData) => {
+        const isLowStock = rowData.quantity <= 10; // threshold is 10
+        return (
+            <div className={`quantity-cell ${isLowStock ? 'low-stock' : ''}`}>
+                {/* show warning triangle if low stock */}
+                {isLowStock && <i className="pi pi-exclamation-triangle warning-icon"></i>}
+                <span>{rowData.quantity}</span>
+            </div>
+        );
+    };
+
+    // looooooaadddinnnngggg
+    const loadingIcon = (
+        <div className="custom-loading">
+            <i className="pi pi-spin pi-spinner custom-spinner"></i>
+            <span>Loading inventory...</span>
+        </div>
+    );
+
     return (
-        <div className="container">
-            <h1>Admin Dashboard</h1>
-            <p>Welcome to your Dashboard</p>
+        <div className="admin-dashboard-container">
+            <Header onToggleSidebar={toggleSidebar} title="Dashboard" />
+
+            <AdminSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
+
+            <main className={`dashboard-content ${sidebarOpen ? 'content-with-sidebar' : ''}`}>
+                <div className="alert-section">
+                    <h2 className="dashboard-title">Inventory Dashboard</h2>
+                </div>
+
+                {error && (
+                    <div className="error-message">
+                        {error}
+                    </div>
+                )}
+
+                <section className="inventory-section">
+                    <div className="inventory-header">
+                        <h3>Medication Inventory</h3>
+                        <div className="sort-dropdown-wrapper">
+                            <label>Sort by:</label>
+                            <Dropdown
+                                value={medicationSort}
+                                options={sortOptions}
+                                onChange={(e) => setMedicationSort(e.value)}
+                                className="sort-dropdown"
+                            />
+                        </div>
+                    </div>
+                    <DataTable
+                        value={sortedMedications}
+                        loading={loading}
+                        loadingIcon={loadingIcon}
+                        className="inventory-table"
+                        emptyMessage="No medications found"
+                    >
+                        <Column field="name" header="Medication" style={{ width: '60%' }} />
+                        <Column
+                            field="quantity"
+                            header="Quantity"
+                            body={quantityTemplate}
+                            style={{ width: '40%' }}
+                        />
+                    </DataTable>
+                </section>
+
+                <section className="inventory-section">
+                    <div className="inventory-header">
+                        <h3>Medical Consumables Inventory</h3>
+                        <div className="sort-dropdown-wrapper">
+                            <label>Sort by:</label>
+                            <Dropdown
+                                value={consumablesSort}
+                                options={sortOptions}
+                                onChange={(e) => setConsumablesSort(e.value)}
+                                className="sort-dropdown"
+                            />
+                        </div>
+                    </div>
+                    <DataTable
+                        value={sortedConsumables}
+                        loading={loading}
+                        loadingIcon={loadingIcon}
+                        className="inventory-table"
+                        emptyMessage="No consumables found"
+                    >
+                        <Column field="name" header="Items" style={{ width: '60%' }} />
+                        <Column
+                            field="quantity"
+                            header="Quantity"
+                            body={quantityTemplate}
+                            style={{ width: '40%' }}
+                        />
+                    </DataTable>
+                </section>
+            </main>
         </div>
     );
 }
