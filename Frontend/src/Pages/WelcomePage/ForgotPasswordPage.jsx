@@ -15,11 +15,16 @@ export default function ForgotPasswordPage() {
         setLoading(true);
 
         try {
-            // send request to backend endpoint (dummy for now)
-            await post("/accountCredential/forgot-password", { email });
-            setMessage("A password reset email has been sent.");
+            const response = await post("/api/accountCredential/forgot-userid", { email });
+
+            if (response && response.message === "Email verified successfully.") {
+                //  go to recovery page
+                navigate("/request-sent");
+            } else {
+                setMessage("Email not found. Please try again.");
+            }
         } catch (err) {
-            console.error("Error sending email:", err);
+            console.error("Error:", err);
             setMessage("Unable to send email. Please try again.");
         } finally {
             setLoading(false);

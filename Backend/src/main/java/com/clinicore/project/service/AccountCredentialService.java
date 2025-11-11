@@ -83,7 +83,7 @@ public class AccountCredentialService {
             throw new IllegalArgumentException("Email cannot be empty");
         }
 
-        // use your new email column
+        // uses the new email column
         return userProfileRepository.findByEmail(email).isPresent();
     }
 }

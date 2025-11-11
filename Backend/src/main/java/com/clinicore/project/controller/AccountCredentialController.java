@@ -150,12 +150,15 @@ public class AccountCredentialController {
     public ResponseEntity<?> forgotUserId(@RequestBody Map<String, String> request) {
         try {
             String email = request.get("email");
+            System.out.println("🔎 Received forgot-userid request for: " + email);  //
+
             if (email == null || email.isBlank()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("error", "Email is required."));
+                return ResponseEntity.badRequest().body(Map.of("error", "Email is required."));
             }
 
             boolean exists = accountCredentialService.checkIfUserExistsByEmail(email);
+            System.out.println("✅ Email exists? " + exists);  //
+
             if (exists) {
                 return ResponseEntity.ok(Map.of("message", "Email verified successfully."));
             } else {
@@ -164,25 +167,30 @@ public class AccountCredentialController {
             }
 
         } catch (Exception e) {
+            e.printStackTrace();  // 👈 print full stack trace
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to verify email: " + e.getMessage()));
         }
     }
 
 
-    @PostMapping("/forgot-password")
+    @PostMapping("/forgot-userid")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
         try {
             String email = request.get("email");
+
             if (email == null || email.isBlank()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(Map.of("error", "Email is required."));
             }
 
             boolean exists = accountCredentialService.checkIfUserExistsByEmail(email);
+
             if (exists) {
+                //  return 200 OK when email exists
                 return ResponseEntity.ok(Map.of("message", "Email verified successfully."));
             } else {
+                //  return 404 if email not found
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Map.of("error", "Email not found in system."));
             }
