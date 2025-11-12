@@ -120,7 +120,7 @@ public class AccountCredentialController {
             String gender = (String) request.get("gender");
             String birthday = (String) request.get("birthday");
             String contactNumber = (String) request.get("contactNumber");
-            String email = (String) request.get("email");
+            //String email = (String) request.get("email");
 
             // create account (business logic in invitation service layer) so send details to that
             // will return a new user object with all details filled in (new user account saved in db)
@@ -158,7 +158,7 @@ public class AccountCredentialController {
             }
 
             boolean exists = accountCredentialService.checkIfUserExistsByEmail(email);
-            System.out.println("✅ Email exists? " + exists);  //
+            System.out.println(" Email exists? " + exists);  //
 
             if (exists) {
                 return ResponseEntity.ok(Map.of("message", "Email verified successfully."));
@@ -168,14 +168,14 @@ public class AccountCredentialController {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();  // 👈 print full stack trace
+            //e.printStackTrace();  //  print full stack trace
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to verify email: " + e.getMessage()));
         }
     }
 
 
-    @PostMapping("/forgot-userid")
+    @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
         try {
             String email = request.get("email");
