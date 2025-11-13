@@ -14,12 +14,10 @@ export default function RequestSentPage() {
                 <h2>Request Sent</h2>
 
                 <p style={{ marginTop: "1rem", textAlign: "center" }}>
-
-                    If your email ID exists in our records, we will send a recovery email with steps to reset your login information.
+                    Your request has been received by the admin team.
                     <br />
-                    Please allow 2-5 minutes for the email to arrive.
+                    They will contact you with further details about your account soon.
                 </p>
-
                 <button
                     type="button"
                     className="create-btn"

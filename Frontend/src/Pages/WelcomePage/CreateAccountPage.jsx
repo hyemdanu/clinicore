@@ -1,33 +1,44 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { post } from "../../services/api";
-import "./css/LoginPage.css"; // reuse same CSS as Login
+import "./css/LoginPage.css"; // reuse same CSS
 
 export default function CreateAccountPage() {
     const navigate = useNavigate();
+
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [error, setError] = useState("");
+    const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
 
     const handleRequestAccess = async (e) => {
         e.preventDefault();
-        setError("");
+        setMessage("");
         setLoading(true);
 
         try {
+            // validate input
             if (!name.trim() || !email.trim()) {
-                throw new Error("Please fill in all fields.");
+                setMessage("Please fill in all fields.");
+                return;
             }
 
-            // Dummy backend call (replace with your real endpoint later)
-            await post("/accountCredential/request-access", { name, email });
+            // ⭐ Call backend (same pattern as Forgot Password page)
+            const response = await post("/accountCredential/request-access", {
+                name,
+                email
+            });
 
-            // Navigate to confirmation page
-            navigate("/request-sent");
+            // Backend should return { message: "Request received" }
+            if (response && response.message === "Request received") {
+                navigate("/request-sent");
+            } else {
+                setMessage("Unable to submit request. Please try again.");
+            }
+
         } catch (err) {
             console.error("Request access error:", err);
-            setError(err.message || "Something went wrong.");
+            setMessage("Unable to submit request. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -65,7 +76,9 @@ export default function CreateAccountPage() {
                         />
                     </div>
 
-                    {error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
+                    {message && (
+                        <p style={{ color: "red", marginTop: 10 }}>{message}</p>
+                    )}
 
                     <button
                         type="submit"

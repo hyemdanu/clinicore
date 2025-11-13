@@ -201,4 +201,26 @@ public class AccountCredentialController {
                     .body(Map.of("error", "Failed to verify email: " + e.getMessage()));
         }
     }
+
+    @PostMapping("/request-access")
+    public ResponseEntity<?> requestAccess(@RequestBody Map<String, String> request) {
+        try {
+            String name = request.get("name");
+            String email = request.get("email");
+
+            if (name == null || name.isBlank() || email == null || email.isBlank()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Missing required fields"));
+            }
+
+            System.out.println("📩 Received access request: " + name + " (" + email + ")");
+
+            // For now, just acknowledge receipt (fix later)
+            return ResponseEntity.ok(Map.of("message", "Request received"));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(Map.of("error", "Failed to process request"));
+        }
+    }
 }

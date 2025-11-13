@@ -15,11 +15,11 @@ export default function ForgotUserIdPage() {
         setLoading(true);
 
         try {
-            const response = await post("/api/accountCredential/forgot-userid", { email });
+            const response = await post("/accountCredential/forgot-userid", { email });
 
             if (response && response.message === "Email verified successfully.") {
                 // go to recovery page
-                navigate("/request-sent");
+                navigate("/recovery-email-sent");
             } else {
                 setMessage("Email not found. Please try again.");
             }
