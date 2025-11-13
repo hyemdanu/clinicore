@@ -40,6 +40,8 @@
     z-index: 2;
 }
 
+
+
 /* Dashboard title */
 .caregiver-page .caregiver-dashboard-title {
     position: relative;
@@ -48,6 +50,19 @@
     font-family: Poppins, sans-serif;
     font-size: 24px;
     font-weight: 700;
+}
+
+.text-wrapper {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.subtitle {
+    margin-top: 4px;
+    font-size: 14px;
+    font-weight: 400;
+    opacity: 0.9;
 }
 
 /* Medication section card */
@@ -74,6 +89,13 @@
     font-weight: 700;
     color: #111827;
 }
+
+.medication-subtitle {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #6b7280;
+}
+
 /* Progress summary on the right */
 .progress-summary {
     display: flex;
@@ -126,5 +148,84 @@
     width: 25%;
     background-color: #369df7;
     border-radius: 8px 0 0 8px;
+}
+
+
+/* Task list card */
+.medication-box {
+    margin-top: 20px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+    box-sizing: border-box;
+}
+
+/* Each row: person + task chip */
+.row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 8px 0;
+}
+
+.person-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+}
+
+/* Task pill */
+.task-rectangle {
+    padding: 6px 14px;
+    background: #eff6ff;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    white-space: nowrap;
+}
+
+/* Divider line between rows */
+.line {
+    height: 1px;
+    width: 100%;
+    background: #e5e7eb;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .box {
+        padding-inline: 20px;
+    }
+
+    .medication-section {
+        padding: 18px 16px 22px;
+    }
+
+    .medication-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .progress-summary {
+        align-items: flex-start;
+    }
+
+    .task-rectangle {
+        max-width: 60%;
+        text-align: right;
+    }
+}
+
+.progress-date {
+    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #6b7280;
+    font-family: Poppins, sans-serif;
+    text-align: right;
 }
 
