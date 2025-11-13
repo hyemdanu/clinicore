@@ -16,6 +16,12 @@ public class UserProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+    @Column(name = "email", unique = true, nullable = false)
+    private String email;
+
+
+
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
@@ -47,8 +53,7 @@ public class UserProfile {
     @Column
     private LocalDateTime updatedAt;
 
-    @Column
-    private String email;
+
 
     // child entities (admin/caregiver/resident) own these relationships via @MapsId
     // Lazy loading is used to avoid fetching unnecessary data

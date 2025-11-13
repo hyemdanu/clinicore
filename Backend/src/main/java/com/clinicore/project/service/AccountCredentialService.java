@@ -12,6 +12,7 @@ package com.clinicore.project.service;
 
 import com.clinicore.project.entity.UserProfile;
 import com.clinicore.project.repository.AccountCredentialRepository;
+import com.clinicore.project.repository.UserProfileRepository;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
@@ -21,12 +22,14 @@ public class AccountCredentialService {
     // variables
     private final AccountCredentialRepository accountCredentialRepository;
     private final InvitationService invitationService;
-
+    private final UserProfileRepository userProfileRepository;
     // constructor that injects all repositories so the service can access user and invitation data
     public AccountCredentialService(AccountCredentialRepository accountCredentialRepository,
-                                   InvitationService invitationService) {
+                                   InvitationService invitationService,
+                                    UserProfileRepository userProfileRepository) {
         this.accountCredentialRepository = accountCredentialRepository;
         this.invitationService = invitationService;
+        this.userProfileRepository = userProfileRepository;
     }
 
     // authenticate user with username and password
@@ -73,5 +76,14 @@ public class AccountCredentialService {
         if (roleString == null || roleString.trim().isEmpty()) {
             throw new IllegalArgumentException("Role is required");
         }
+    }
+
+    public boolean checkIfUserExistsByEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+
+        // uses the new email column
+        return userProfileRepository.findByEmail(email).isPresent();
     }
 }

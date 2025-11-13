@@ -120,7 +120,7 @@ public class AccountCredentialController {
             String gender = (String) request.get("gender");
             String birthday = (String) request.get("birthday");
             String contactNumber = (String) request.get("contactNumber");
-            String email = (String) request.get("email");
+            //String email = (String) request.get("email");
 
             // create account (business logic in invitation service layer) so send details to that
             // will return a new user object with all details filled in (new user account saved in db)
@@ -144,6 +144,83 @@ public class AccountCredentialController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to register user: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/forgot-userid")
+    public ResponseEntity<?> forgotUserId(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            System.out.println("🔎 Received forgot-userid request for: " + email);  //
+
+            if (email == null || email.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Email is required."));
+            }
+
+            boolean exists = accountCredentialService.checkIfUserExistsByEmail(email);
+            System.out.println(" Email exists? " + exists);  //
+
+            if (exists) {
+                return ResponseEntity.ok(Map.of("message", "Email verified successfully."));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Email not found in system."));
+            }
+
+        } catch (Exception e) {
+            //e.printStackTrace();  //  print full stack trace
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to verify email: " + e.getMessage()));
+        }
+    }
+
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+
+            if (email == null || email.isBlank()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "Email is required."));
+            }
+
+            boolean exists = accountCredentialService.checkIfUserExistsByEmail(email);
+
+            if (exists) {
+                //  return 200 OK when email exists
+                return ResponseEntity.ok(Map.of("message", "Email verified successfully."));
+            } else {
+                //  return 404 if email not found
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("error", "Email not found in system."));
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to verify email: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/request-access")
+    public ResponseEntity<?> requestAccess(@RequestBody Map<String, String> request) {
+        try {
+            String name = request.get("name");
+            String email = request.get("email");
+
+            if (name == null || name.isBlank() || email == null || email.isBlank()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Missing required fields"));
+            }
+
+            System.out.println("📩 Received access request: " + name + " (" + email + ")");
+
+            // For now, just acknowledge receipt (fix later)
+            return ResponseEntity.ok(Map.of("message", "Request received"));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(Map.of("error", "Failed to process request"));
         }
     }
 }
