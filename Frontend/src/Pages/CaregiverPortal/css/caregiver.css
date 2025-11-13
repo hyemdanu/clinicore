@@ -40,8 +40,6 @@
     z-index: 2;
 }
 
-
-
 /* Dashboard title */
 .caregiver-page .caregiver-dashboard-title {
     position: relative;
@@ -50,5 +48,30 @@
     font-family: Poppins, sans-serif;
     font-size: 24px;
     font-weight: 700;
+}
+
+/* Medication section card */
+.medication-section {
+    position: relative;
+    margin-top: 150px;
+    background: #f9fafb;
+    border-radius: 20px;
+    padding: 24px 24px 28px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+}
+
+/* Header row inside medication section */
+.medication-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.medication-label {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
 }
 
