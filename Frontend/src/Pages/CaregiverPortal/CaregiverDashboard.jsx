@@ -1,11 +1,15 @@
+import React from "react";
 import "./css/caregiver.css";
 
-// caregiver Dashboard Page
-export default function ResidentDashboard() {
-    return (
-        <div className="container">
-            <h1>Caregiver Dashboard</h1>
-            <p>Welcome to your Dashboard</p>
-        </div>
+export default function CaregiverDashboard() {
+     return (
+        <div className="caregiver-page">
+            <div className="box">
+                {/* Top blue header */}
+                <div className="rectangle">
+                    <div className="caregiver-dashboard-title">Dashboard</div>
+                </div>
+
     );
 }
+
