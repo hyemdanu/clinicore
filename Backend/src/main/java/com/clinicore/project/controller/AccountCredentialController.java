@@ -10,9 +10,13 @@
 
 package com.clinicore.project.controller;
 
+import com.clinicore.project.entity.AccountCreationRequest;
 import com.clinicore.project.entity.UserProfile;
 import com.clinicore.project.service.AccountCredentialService;
 import com.clinicore.project.service.InvitationService;
+import com.clinicore.project.service.AccountCreationRequestService;
+import com.clinicore.project.service.AccountRequestResultType;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,12 +29,15 @@ public class AccountCredentialController {
     // service layers to be injected
     private final AccountCredentialService accountCredentialService;
     private final InvitationService invitationService;
+    private final AccountCreationRequestService accountCreationRequestService;
 
     // inject service layers (service layers hold business logic - controller just forwards requests to service layers)
     public AccountCredentialController(AccountCredentialService accountCredentialService,
-                                      InvitationService invitationService) {
+                                       InvitationService invitationService,
+                                       AccountCreationRequestService accountCreationRequestService) {
         this.accountCredentialService = accountCredentialService;
         this.invitationService = invitationService;
+        this.accountCreationRequestService = accountCreationRequestService;
     }
 
     // login endpoint
@@ -202,23 +209,50 @@ public class AccountCredentialController {
         }
     }
 
+
     @PostMapping("/request-access")
     public ResponseEntity<?> requestAccess(@RequestBody Map<String, String> request) {
         try {
-            String name = request.get("name");
+            String firstName = request.get("firstName");
+            String lastName = request.get("lastName");
             String email = request.get("email");
+            String role = request.get("role");
 
-            if (name == null || name.isBlank() || email == null || email.isBlank()) {
+            if (role == null || role.isBlank()
+                    || firstName == null || firstName.isBlank()
+                    || lastName == null || lastName.isBlank()
+                    || email == null || email.isBlank()) {
+
                 return ResponseEntity.badRequest()
                         .body(Map.of("error", "Missing required fields"));
             }
 
-            System.out.println("📩 Received access request: " + name + " (" + email + ")");
+            AccountRequestResultType result =
+                    accountCreationRequestService.createAccountRequest(firstName, lastName, email, role);
 
-            // For now, just acknowledge receipt (fix later)
-            return ResponseEntity.ok(Map.of("message", "Request received"));
+            String message = switch (result) {
+                case USER_ALREADY_EXISTS -> "An account already exists for this email. Please log in.";
+                case NEW -> "Request received. Please wait for admin approval.";
+                case PENDING, REOPEN -> "Your request has been sent. Please wait for admin approval.";
+                case APPROVED ->
+                        "Your request is already approved. Please go to the activation page to complete your account.";
+                case COMPLETED -> "An account has already been created for this email.";
+            };
 
+            //{
+            //  "message": "Your request is already approved. Please go to the activation page.",
+            //  "status": "APPROVED"
+            //}
+            return ResponseEntity.ok(Map.of(
+                    "message", message,
+                    "status", result.name()
+            ));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(500)
                     .body(Map.of("error", "Failed to process request"));
         }
