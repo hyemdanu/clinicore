@@ -243,3 +243,100 @@
     min-width: unset;
   }
 }
+
+/* Table font size & header styling */
+.inventory-table.modern-table .p-datatable-thead > tr > th {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.inventory-table.modern-table .p-datatable-tbody > tr > td {
+    font-size: 0.95rem; /* slightly bigger data font */
+    line-height: 1.5;
+}
+
+/* Subtitle under main title */
+.dashboard-subtitle {
+    color: #666;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+}
+
+/* Modern dialog base */
+.modern-dialog .p-dialog {
+    border-radius: 16px;
+}
+
+.modern-dialog .p-dialog-header {
+    font-weight: 600;
+    font-size: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modern-dialog .p-dialog-content {
+    padding-top: 1.5rem;
+}
+
+/* Shared form layout inside dialogs */
+.dialog-form {
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.dialog-field label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #4b5563;
+    display: block;
+    margin-bottom: 0.35rem;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.dialog-confirm {
+    max-width: 480px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.dialog-confirm p {
+    color: #4b5563;
+    font-size: 0.95rem;
+}
+
+/* Activation code card */
+.dialog-subtitle {
+    color: #4b5563;
+    font-size: 0.9rem;
+}
+
+.activation-code-card {
+    background-color: #f3f4f6;
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    text-align: center;
+    border: 2px dashed #d1d5db;
+    margin: 0.5rem 0 1rem;
+}
+
+.activation-code-label {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.activation-code-value {
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: monospace;
+    letter-spacing: 0.25rem;
+    color: #111827;
+}

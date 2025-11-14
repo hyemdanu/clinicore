@@ -3,6 +3,7 @@ import LoginPage from "./Pages/WelcomePage/LoginPage";
 import ResidentDashboard from "./Pages/ResidentPortal/ResidentDashboard";
 import CaregiverDashboard from "./Pages/CaregiverPortal/CaregiverDashboard";
 import AdminDashboard from "./Pages/AdminPortal/AdminDashboard";
+import AccountRequests from "./Pages/AdminPortal/AccountRequests";
 import ForgotUserIdPage from "./Pages/WelcomePage/ForgotUserIdPage";
 import ForgotPasswordPage from "./Pages/WelcomePage/ForgotPasswordPage";
 import CreateAccountPage from "./Pages/WelcomePage/CreateAccountPage";
@@ -17,6 +18,7 @@ export default function App() {
                 <Route path="/resident" element={<ResidentDashboard/>} />
                 <Route path="/caregiver" element={<CaregiverDashboard/>} />
                 <Route path="/admin" element={<AdminDashboard/>} />
+                <Route path="/admin/account-requests" element={<AccountRequests/>} />
                 <Route path="/forgot-userid" element={<ForgotUserIdPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/create-account" element={<CreateAccountPage />} />

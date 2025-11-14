@@ -16,6 +16,7 @@ import com.clinicore.project.service.AccountCredentialService;
 import com.clinicore.project.service.InvitationService;
 import com.clinicore.project.service.AccountCreationRequestService;
 import com.clinicore.project.service.AccountRequestResultType;
+import com.clinicore.project.repository.UserProfileRepository;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,14 +31,17 @@ public class AccountCredentialController {
     private final AccountCredentialService accountCredentialService;
     private final InvitationService invitationService;
     private final AccountCreationRequestService accountCreationRequestService;
+    private final UserProfileRepository userProfileRepository;
 
     // inject service layers (service layers hold business logic - controller just forwards requests to service layers)
     public AccountCredentialController(AccountCredentialService accountCredentialService,
                                        InvitationService invitationService,
-                                       AccountCreationRequestService accountCreationRequestService) {
+                                       AccountCreationRequestService accountCreationRequestService,
+                                       UserProfileRepository userProfileRepository) {
         this.accountCredentialService = accountCredentialService;
         this.invitationService = invitationService;
         this.accountCreationRequestService = accountCreationRequestService;
+        this.userProfileRepository = userProfileRepository;
     }
 
     // login endpoint
@@ -255,6 +259,137 @@ public class AccountCredentialController {
             e.printStackTrace();
             return ResponseEntity.status(500)
                     .body(Map.of("error", "Failed to process request"));
+        }
+    }
+
+    @GetMapping("/account-requests")
+    public ResponseEntity<?> getAllAccountRequests(@RequestParam Long adminId) {
+        try {
+            // validate admin
+            UserProfile admin = userProfileRepository.findById(adminId)
+                    .filter(user -> user.getRole() == UserProfile.Role.ADMIN)
+                    .orElseThrow(() -> new IllegalArgumentException("Only admins can view account requests"));
+
+            List<AccountCreationRequest> requests = accountCreationRequestService.getAllAccountRequests();
+            return ResponseEntity.ok(requests);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to fetch account requests: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/account-requests/{requestId}")
+    public ResponseEntity<?> updateAccountRequest(
+            @PathVariable Long requestId,
+            @RequestParam Long adminId,
+            @RequestBody Map<String, String> updates) {
+        try {
+            // validate admin
+            UserProfile admin = userProfileRepository.findById(adminId)
+                    .filter(user -> user.getRole() == UserProfile.Role.ADMIN)
+                    .orElseThrow(() -> new IllegalArgumentException("Only admins can update account requests"));
+
+            String firstName = updates.get("firstName");
+            String lastName = updates.get("lastName");
+            String email = updates.get("email");
+
+            AccountCreationRequest updatedRequest = accountCreationRequestService.updateAccountRequest(
+                    requestId, firstName, lastName, email
+            );
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Account request updated successfully",
+                    "request", updatedRequest
+            ));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to update account request: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/account-requests/{requestId}/approve")
+    public ResponseEntity<?> approveAccountRequest(
+            @PathVariable Long requestId,
+            @RequestParam Long adminId) {
+        try {
+            // validate admin
+            UserProfile admin = userProfileRepository.findById(adminId)
+                    .filter(user -> user.getRole() == UserProfile.Role.ADMIN)
+                    .orElseThrow(() -> new IllegalArgumentException("Only admins can approve requests"));
+
+            String activationCode = accountCreationRequestService.approveAccountRequest(requestId, adminId);
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Account request approved successfully",
+                    "activationCode", activationCode
+            ));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to approve account request: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/account-requests/{requestId}/deny")
+    public ResponseEntity<?> denyAccountRequest(
+            @PathVariable Long requestId,
+            @RequestParam Long adminId,
+            @RequestParam(required = false) String reason) {
+        try {
+            // validate admin
+            UserProfile admin = userProfileRepository.findById(adminId)
+                    .filter(user -> user.getRole() == UserProfile.Role.ADMIN)
+                    .orElseThrow(() -> new IllegalArgumentException("Only admins can deny requests"));
+
+            accountCreationRequestService.denyAccountRequest(requestId, reason);
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Account request denied"
+            ));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to deny account request: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/account-requests/{requestId}/resend-activation-code")
+    public ResponseEntity<?> resendActivationCode(
+            @PathVariable Long requestId,
+            @RequestParam Long adminId) {
+        try {
+            // validate admin
+            UserProfile admin = userProfileRepository.findById(adminId)
+                    .filter(user -> user.getRole() == UserProfile.Role.ADMIN)
+                    .orElseThrow(() -> new IllegalArgumentException("Only admins can resend activation codes"));
+
+            String newActivationCode = accountCreationRequestService.resendActivationCode(requestId);
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Activation code resent successfully",
+                    "activationCode", newActivationCode
+            ));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to resend activation code: " + e.getMessage()));
         }
     }
 }

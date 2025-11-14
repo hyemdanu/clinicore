@@ -1,5 +1,7 @@
 package com.clinicore.project.service;
 
+import java.util.List;
+
 import com.clinicore.project.entity.AccountCreationRequest;
 import com.clinicore.project.entity.UserProfile;
 import com.clinicore.project.repository.AccountCreationRequestRepository;
@@ -127,8 +129,117 @@ public class AccountCreationRequestService {
         accountCreationRequestRepository.save(acr);
     }
 
-    // Keeping this for later when you implement "approve" / activation logic
-    private String generateActivationCode(int length) {
+    /**
+     * Get all account requests (for admin dashboard)
+     */
+    public List<AccountCreationRequest> getAllAccountRequests() {
+        return accountCreationRequestRepository.findAll();
+    }
+
+    /**
+     * Update account request fields (admin can edit)
+     */
+    public AccountCreationRequest updateAccountRequest(Long requestId, String firstName, String lastName, String email) {
+        AccountCreationRequest request = accountCreationRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Account request not found"));
+
+        // Only allow editing if status is PENDING or APPROVED
+        if (!"PENDING".equals(request.getStatus()) && !"APPROVED".equals(request.getStatus())) {
+            throw new IllegalArgumentException("Can only edit requests with PENDING or APPROVED status");
+        }
+
+        // Validate new email isn't already used if changed
+        if (!request.getEmail().equals(email)) {
+            if (userProfileRepository.findByEmail(email).isPresent()) {
+                throw new IllegalArgumentException("Email already exists in system");
+            }
+            if (accountCreationRequestRepository.findByEmail(email).isPresent()) {
+                throw new IllegalArgumentException("Email already has a pending request");
+            }
+        }
+
+        if (firstName != null && !firstName.isBlank()) {
+            request.setFirstName(firstName);
+        }
+        if (lastName != null && !lastName.isBlank()) {
+            request.setLastName(lastName);
+        }
+        if (email != null && !email.isBlank()) {
+            request.setEmail(email);
+        }
+
+        return accountCreationRequestRepository.save(request);
+    }
+
+    /**
+     * Approve account request and generate activation code
+     */
+    public String approveAccountRequest(Long requestId, Long adminId) {
+        AccountCreationRequest request = accountCreationRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Account request not found"));
+
+        if (!"PENDING".equals(request.getStatus())) {
+            throw new IllegalArgumentException("Only PENDING requests can be approved");
+        }
+
+        // Generate activation code
+        String activationCode = generateActivationCode(8);
+        String activationCodeHash = passwordEncoder.encode(activationCode);
+
+        request.setStatus("APPROVED");
+        request.setApprovedAt(LocalDateTime.now());
+        request.setApprovedByAdminId(adminId);
+        request.setActivationCodeHash(activationCodeHash);
+        request.setExpiresAt(LocalDateTime.now().plusDays(7)); // 7 days to activate
+
+        accountCreationRequestRepository.save(request);
+
+        return activationCode; // Return plaintext to show to admin (for sharing with user)
+    }
+
+    /**
+     * Deny account request
+     */
+    public void denyAccountRequest(Long requestId, String reason) {
+        AccountCreationRequest request = accountCreationRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Account request not found"));
+
+        if ("COMPLETED".equals(request.getStatus()) || "DENIED".equals(request.getStatus())) {
+            throw new IllegalArgumentException("Cannot deny already " + request.getStatus() + " requests");
+        }
+
+        request.setStatus("DENIED");
+        accountCreationRequestRepository.save(request);
+
+        // TODO: Send email to user about denial with reason
+    }
+
+    /**
+     * Resend activation code (only for APPROVED requests)
+     */
+    public String resendActivationCode(Long requestId) {
+        AccountCreationRequest request = accountCreationRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Account request not found"));
+
+        if (!"APPROVED".equals(request.getStatus())) {
+            throw new IllegalArgumentException("Can only resend codes for APPROVED requests");
+        }
+
+        // Generate new activation code
+        String activationCode = generateActivationCode(8);
+        String activationCodeHash = passwordEncoder.encode(activationCode);
+
+        request.setActivationCodeHash(activationCodeHash);
+        request.setActivationAttempts(0); // Reset attempts
+        request.setExpiresAt(LocalDateTime.now().plusDays(7)); // Extend expiration
+
+        accountCreationRequestRepository.save(request);
+
+        return activationCode;
+    }
+
+    // Make generateActivationCode public so it can be used
+    public String generateActivationCode(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         SecureRandom random = new SecureRandom();
         StringBuilder sb = new StringBuilder(length);

@@ -2,9 +2,10 @@ package com.clinicore.project.repository;
 
 import com.clinicore.project.entity.AccountCreationRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public interface AccountCreationRequestRepository extends JpaRepository<AccountCreationRequest, Long> {
@@ -17,4 +18,11 @@ public interface AccountCreationRequestRepository extends JpaRepository<AccountC
 
     // Filter by status
     Optional<AccountCreationRequest> findByEmailAndStatus(String email, String status);
+
+    // Find all by status
+    List<AccountCreationRequest> findByStatus(String status);
+
+    // Find all ordered by creation date (newest first)
+    @Query("SELECT acr FROM AccountCreationRequest acr ORDER BY acr.createdAt DESC")
+    List<AccountCreationRequest> findAllOrderedByCreatedAtDesc();
 }
