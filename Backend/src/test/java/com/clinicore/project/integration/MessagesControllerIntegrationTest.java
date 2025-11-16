@@ -1,4 +1,4 @@
-package com.clinicore.project.controller;
+package com.clinicore.project.integration;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +33,8 @@ class MessagesControllerIntegrationTest {
             }
             """;
 
-        /**
-         * Create message
+        /*
+          Create message
          */
         mockMvc.perform(post("/api/messages")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -45,14 +45,14 @@ class MessagesControllerIntegrationTest {
                 .andExpect(jsonPath("$.isRead").value(false))
                 .andExpect(jsonPath("$.readAt").doesNotExist());
 
-        /**
+        /*
          * Get all messages
          */
         mockMvc.perform(get("/api/messages"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
 
-        /**
+        /*
          * Mark message as read and read_at is set
          */
         mockMvc.perform(patch("/api/messages/1/read"))
