@@ -1,0 +1,52 @@
+.resident-user-profile-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+}
+
+.box {
+    display: flex;
+    width: 80%;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background: #fff;
+}
+
+.profile-left {
+    flex: 1;
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-picture {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-middle, .profile-right {
+    flex: 2;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 40px;
+}
+
+.profile-info {
+    margin-bottom: 20px;
+}
+
+h2 {
+    margin: 0;
+}
+
+p {
+    margin: 5px 0;
+}
