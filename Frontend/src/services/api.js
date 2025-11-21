@@ -21,9 +21,17 @@ const apiFetch = async (endpoint, method = 'GET', data = null) => {
 
     // make the request using fetch(api endpoint, our configs)
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-    
+
     if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
+        let errorMessage = `API Error: ${response.status}`;
+        try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+            // If response is not JSON, use status text
+            errorMessage = `${errorMessage} - ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
     }
 
     // return the response as json
@@ -36,4 +44,5 @@ const apiFetch = async (endpoint, method = 'GET', data = null) => {
 export const get = (endpoint) => apiFetch(endpoint, 'GET');
 export const post = (endpoint, data) => apiFetch(endpoint, 'POST', data);
 export const put = (endpoint, data) => apiFetch(endpoint, 'PUT', data);
+export const patch = (endpoint, data) => apiFetch(endpoint, 'PATCH', data);
 export const del = (endpoint) => apiFetch(endpoint, 'DELETE');
