@@ -31,7 +31,7 @@ public class Capability {
     // Relationship is owned by MedicalProfile (the owning side is the capability property in MedicalProfile)
     // MedicalProfile controls the FK via @JoinColumn
     @OneToOne(mappedBy = "capability")
-    private MedicalProfile medicalProfile; // allows accesss to related MedicalProfile from this capability object
+    private MedicalProfile medicalProfile; // allows access to related MedicalProfile from this capability object
 
     public enum IncontinenceStatus {
         CONTINENT,

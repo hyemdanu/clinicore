@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * DTO for Medication entity
- * To avoid circular reference issues and over-fetching of data - Edison
- */
+// DTO for medication records - what meds a resident takes
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,9 +23,7 @@ public class MedicationDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    /**
-     * Convert Medication entity to DTO
-     */
+    // convert entity to DTO
     public static MedicationDTO fromEntity(Medication medication) {
         if (medication == null) {
             return null;

@@ -25,11 +25,11 @@ public class CorsConfig {
         config.setAllowedOrigins(List.of("http://localhost:5173"));
 
 
-        // allow common HTTP methods (GET/POST/PUT/DELETE/OPTIONS for preflight)
+        // allow common HTTP methods (GET/POST/PUT/PATCH/DELETE/OPTIONS for preflight)
         // OPTIONS for preflight means "can this request be made?"
         // when frontend makes a request, browser automatically sends an OPTIONS request to check if the request is valid
         // preflight is triggered when request uses other HTTP methods or cross-origin reqs (which wes doing)
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 
         // allow all request headers (what browser is allowed to send)
         config.addAllowedHeader("*");
