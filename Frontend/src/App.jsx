@@ -9,6 +9,7 @@ import ForgotPasswordPage from "./Pages/WelcomePage/ForgotPasswordPage";
 import CreateAccountPage from "./Pages/WelcomePage/CreateAccountPage";
 import RequestSentPage from "./Pages/WelcomePage/RequestSentPage";
 import RecoveryEmailSentPage from "./Pages/WelcomePage/RecoveryEmailSentPage.jsx"
+import CompleteAccountCreation from "./Pages/WelcomePage/CompleteAccountCreation.jsx";
 
 export default function App() {
     return (
@@ -24,6 +25,7 @@ export default function App() {
                 <Route path="/create-account" element={<CreateAccountPage />} />
                 <Route path="/request-sent" element={<RequestSentPage />} />
                 <Route path="/recovery-email-sent" element={<RecoveryEmailSentPage />} />
+                <Route path="/activate-account" element={<CompleteAccountCreation />} />
             </Routes>
         </BrowserRouter>
     );

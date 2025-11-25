@@ -51,6 +51,8 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
+  flex-wrap: wrap;  /* ADD THIS - allows items to wrap on smaller screens */
+  gap: 20px;  /* ADD THIS - adds space between items */
 }
 
 .inventory-header h3 {
@@ -64,6 +66,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  margin: 0;
+  min-width: fit-content;  /* ADD THIS - prevents shrinking */
 }
 
 .sort-dropdown-wrapper label {
@@ -75,6 +79,7 @@
 
 .sort-dropdown {
   min-width: 200px;
+  flex-shrink: 0;  /* ADD THIS - prevents shrinking */
 }
 
 .sort-dropdown .p-dropdown {
@@ -239,8 +244,7 @@
   }
 
   .sort-dropdown {
-    flex: 1;
-    min-width: unset;
+    flex: 10;
   }
 }
 
@@ -340,3 +344,52 @@
     letter-spacing: 0.25rem;
     color: #111827;
 }
+/* Toast container */
+.p-toast {
+    z-index: 9999 !important;
+}
+
+/* Base toast styling */
+.p-toast-message {
+    background: #ffffff !important;
+    border-left: 6px #ffffff !important;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 10px; /* space between icon + text */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+    opacity: 1 !important;
+}
+
+/* Message text spacing */
+.p-toast-message .p-toast-message-text {
+    margin-left: 4px;
+}
+
+/* ERROR */
+.p-toast-message-error {
+    border-left-color: #dc3545 !important; /* red accent */
+    color: #721c24 !important;
+}
+
+/* SUCCESS */
+.p-toast-message-success {
+    border-left-color: #28a745 !important; /* green accent */
+    color: #155724 !important;
+}
+
+/* INFO */
+.p-toast-message-info {
+    border-left-color: #17a2b8 !important; /* blue accent */
+    color: #0c5460 !important;
+}
+
+/* Position the close (X) icon properly */
+.p-toast-message .p-toast-icon-close {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    margin: 0 !important;
+}
+

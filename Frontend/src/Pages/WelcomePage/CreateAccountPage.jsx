@@ -17,19 +17,6 @@ export default function CreateAccountPage() {
         e.preventDefault();
         setMessage("");
 
-        // ⭐ Validate fields
-        if (!firstName.trim() || !lastName.trim() || !email.trim() || !role.trim()) {
-            setMessage("Please fill in all fields.");
-            return;
-        }
-
-        // ⭐ Validate email format (optional)
-        const emailRegex = /\S+@\S+\.\S+/;
-        if (!emailRegex.test(email)) {
-            setMessage("Please enter a valid email address.");
-            return;
-        }
-
         setLoading(true);
 
         try {
@@ -41,13 +28,15 @@ export default function CreateAccountPage() {
             });
 
             if (response && response.message) {
-                // always go to Request Sent + pass message + status
+                // if request was sent, go to always go to request sent confirmation page + pass message + status
                 navigate("/request-sent", {
                     state: {
                         message: response.message,
                         status: response.status, // optional
                     },
                 });
+
+            //
             } else {
                 setMessage("Unable to submit request. Please try again.");
             }

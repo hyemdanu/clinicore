@@ -23,7 +23,18 @@ const apiFetch = async (endpoint, method = 'GET', data = null) => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
     
     if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
+        // Try to parse error response from backend
+        let errorData;
+        try {
+            errorData = await response.json();
+        } catch (e) {
+            errorData = { error: `HTTP ${response.status}` };
+        }
+        
+        const error = new Error(errorData.error || `HTTP Error: ${response.status}`);
+        error.status = response.status;
+        error.data = errorData;
+        throw error;
     }
 
     // return the response as json
