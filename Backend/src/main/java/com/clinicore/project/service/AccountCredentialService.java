@@ -21,14 +21,11 @@ public class AccountCredentialService {
 
     // variables
     private final AccountCredentialRepository accountCredentialRepository;
-    private final InvitationService invitationService;
     private final UserProfileRepository userProfileRepository;
     // constructor that injects all repositories so the service can access user and invitation data
     public AccountCredentialService(AccountCredentialRepository accountCredentialRepository,
-                                   InvitationService invitationService,
                                     UserProfileRepository userProfileRepository) {
         this.accountCredentialRepository = accountCredentialRepository;
-        this.invitationService = invitationService;
         this.userProfileRepository = userProfileRepository;
     }
 
@@ -67,16 +64,6 @@ public class AccountCredentialService {
         }
     }
 
-    // make sure email and role are provided in request
-    public void validateInvitationRequest(String email, String roleString) {
-        if (email == null || email.trim().isEmpty()) {
-            throw new IllegalArgumentException("Email is required");
-        }
-
-        if (roleString == null || roleString.trim().isEmpty()) {
-            throw new IllegalArgumentException("Role is required");
-        }
-    }
 
     public boolean checkIfUserExistsByEmail(String email) {
         if (email == null || email.trim().isEmpty()) {

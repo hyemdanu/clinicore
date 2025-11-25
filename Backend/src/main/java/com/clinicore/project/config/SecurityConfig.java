@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // enables CORS pre-flight requests
                     .requestMatchers(HttpMethod.POST, "/api/accountCredential/login").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/accountCredential/register").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/accountCredential/verify-activation-code").permitAll()
                     .anyRequest().permitAll() // we have to change this later to authenticate users...
                 )
 

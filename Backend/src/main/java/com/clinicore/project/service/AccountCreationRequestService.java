@@ -4,8 +4,15 @@ import java.util.List;
 
 import com.clinicore.project.entity.AccountCreationRequest;
 import com.clinicore.project.entity.UserProfile;
+import com.clinicore.project.entity.Admin;
+import com.clinicore.project.entity.Caregiver;
+import com.clinicore.project.entity.Resident;
 import com.clinicore.project.repository.AccountCreationRequestRepository;
+import com.clinicore.project.repository.AdminRepository;
+import com.clinicore.project.repository.CaregiverRepository;
+import com.clinicore.project.repository.ResidentGeneralRepository;
 import com.clinicore.project.repository.UserProfileRepository;
+import com.clinicore.project.entity.Resident;
 import com.clinicore.project.service.AccountRequestResultType;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,23 +21,60 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Map;
+
+import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDate;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 @Service
 public class AccountCreationRequestService {
 
     private final AccountCreationRequestRepository accountCreationRequestRepository;
-    private final UserProfileRepository userProfileRepository;
-    private final PasswordEncoder passwordEncoder; // likely used later for activation logic
 
-    public AccountCreationRequestService(AccountCreationRequestRepository accountCreationRequestRepository,
-                                         UserProfileRepository userProfileRepository,
-                                         PasswordEncoder passwordEncoder) {
+    private final UserProfileRepository userProfileRepository;
+    private final ResidentGeneralRepository residentRepository;
+    private final CaregiverRepository caregiverRepository;
+    private final AdminRepository adminRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+
+    // construct the service layer with all repositories
+    public AccountCreationRequestService(
+            AccountCreationRequestRepository accountCreationRequestRepository,
+
+            UserProfileRepository userProfileRepository,
+            ResidentGeneralRepository residentRepository,
+            CaregiverRepository caregiverRepository,
+            AdminRepository adminRepository,
+
+            PasswordEncoder passwordEncoder) {
         this.accountCreationRequestRepository = accountCreationRequestRepository;
+
         this.userProfileRepository = userProfileRepository;
+        this.residentRepository = residentRepository;
+        this.caregiverRepository = caregiverRepository;
+        this.adminRepository = adminRepository;
+
         this.passwordEncoder = passwordEncoder;
     }
 
 
+    // return if requesting account already exists (if so, status)
+    // returns (so UI knows display msg):
+    // public enum AccountRequestResultType {
+    //    USER_ALREADY_EXISTS,   // user already exists in db
+
+    //    NEW,                   // no existing request -> create new pending request
+
+    //    PENDING,               // existing PENDING -> user has pending request, user/admin request details can be changed still (e.g., name, role)
+    //    APPROVED,              // request already APPROVED -> user must create account; only admins can change request details
+    //    COMPLETED,             // user COMPLETED account creation -> user should exist in db
+    //    REOPEN (for EXP/DEN requests),  // request EXPIRED or DENIED (we mark it so it goes away from UI after idle). if new request after expiry/denial -> reopen as PENDING
+    //}
+    // return type depends on status from account.creation.reqs db (PENDING, APPROVED, DENIED, COMPLETED, EXPIRED)
     public AccountRequestResultType createAccountRequest(String firstName,
                                                          String lastName,
                                                          String email,
@@ -52,19 +96,22 @@ public class AccountCreationRequestService {
         Optional<AccountCreationRequest> existACR =
                 accountCreationRequestRepository.findByEmail(email);
 
-        // no existing request -> create new request
-        if (existACR.isEmpty()) {
-            createNewRequest(firstName, lastName, email, role, now);
-            return AccountRequestResultType.NEW;
-        }
+            // no existing request -> create new request in account.creation.request table
+            // return NEW
+            if (existACR.isEmpty()) {
 
-        // There IS an existing request with the given email
+                // call method to create new request
+                createNewRequest(firstName, lastName, email, role, now);
+                return AccountRequestResultType.NEW;
+            }
+
+        // If there IS an existing request with the given email, grab info
         AccountCreationRequest existing = existACR.get();
 
-        // get stats of request
+        // get stats of existing request
         String status = existing.getStatus(); // PENDING, APPROVED, COMPLETED, EXPIRED, DENIED
 
-        // check if request has expired
+        // check if request were expired
         boolean isExpiredByTime = existing.getExpiresAt() != null &&  existing.getExpiresAt().isBefore(now);
 
         // COMPLETED -> account already created, tell user to log in
@@ -78,13 +125,16 @@ public class AccountCreationRequestService {
             return AccountRequestResultType.APPROVED;
         }
 
-        // PENDING -> user can still change role, name with that email since it hasnt been approved yet
-        // basically send new request with that email
+        // PENDING -> user can still change request details of that email since it hasnt been approved yet
+        // basically send edit request details of that email
         if ("PENDING".equals(status) && !isExpiredByTime) {
+
+            // set new details
             existing.setFirstName(firstName);
             existing.setLastName(lastName);
             existing.setRole(role);
 
+            // save new details
             accountCreationRequestRepository.save(existing);
             return AccountRequestResultType.PENDING;
         }
@@ -95,6 +145,8 @@ public class AccountCreationRequestService {
             existing.setLastName(lastName);
             existing.setRole(role);
             existing.setStatus("PENDING");
+
+            // extend expiration & reset activation attempts
             existing.setExpiresAt(now.plusDays(3));
             existing.setActivationAttempts(0);
             accountCreationRequestRepository.save(existing);
@@ -106,13 +158,14 @@ public class AccountCreationRequestService {
         return AccountRequestResultType.NEW;
     }
 
+    // method to create new request in db
     private void createNewRequest(String firstName,
                                   String lastName,
                                   String email,
                                   String role,
                                   LocalDateTime now) {
 
-
+        // set fields
         AccountCreationRequest acr = new AccountCreationRequest();
         acr.setFirstName(firstName);
         acr.setLastName(lastName);
@@ -122,13 +175,30 @@ public class AccountCreationRequestService {
         acr.setCreatedAt(now);
         acr.setApprovedAt(null);
         acr.setApprovedByAdminId(null);
-        acr.setExpiresAt(now.plusDays(3)); // 3-day window for admin to act
-        acr.setActivationCodeHash(null);   // will be set upon approval
-        acr.setActivationAttempts(0);
+        acr.setExpiresAt(now.plusDays(5)); // 5 day window for admin to approve/deny
+        acr.setActivationCodeHash(null);   // code will be set upon approval
+        acr.setActivationAttempts(0);      // this so we can protect creation from bots
 
+        // save in repo
         accountCreationRequestRepository.save(acr);
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // for admins
     /**
      * Get all account requests (for admin dashboard)
      */
@@ -211,7 +281,6 @@ public class AccountCreationRequestService {
         request.setStatus("DENIED");
         accountCreationRequestRepository.save(request);
 
-        // TODO: Send email to user about denial with reason
     }
 
     /**
@@ -249,5 +318,184 @@ public class AccountCreationRequestService {
         }
 
         return sb.toString();
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Verify activation code with three possible outcomes:
+     * 1. SUCCESS: Email + Code match → Return account details
+     * 2. INVALID_CODE: Email exists but code doesn't match → Increment attempts
+     * 3. NOT_FOUND: Email doesn't exist → No approved request found
+     */
+    @Transactional
+    public Map<String, Object> verifyActivationCode(String email, String activationCode) {
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        // Find account creation request by email
+        AccountCreationRequest accountRequest = accountCreationRequestRepository
+                .findByEmail(email)
+                .orElse(null);
+
+        // Email doesn't exist or not apprroved
+        if (accountRequest == null || !"APPROVED".equals(accountRequest.getStatus())) {
+            response.put("success", false);
+            response.put("message", "No approved account request found for this email");
+            response.put("status", "NOT_FOUND");
+            return response;
+        }
+
+        // Check if request has expired
+        if (accountRequest.getExpiresAt().isBefore(LocalDateTime.now())) {
+            response.put("success", false);
+            response.put("message", "Activation code has expired");
+            response.put("status", "EXPIRED");
+            return response;
+        }
+
+        // Check activation attempts (optional: block after too many attempts)
+        if (accountRequest.getActivationAttempts() >= 5) {
+            response.put("success", false);
+            response.put("message", "Too many failed activation attempts. Please request a new code.");
+            response.put("status", "BLOCKED");
+            return response;
+        }
+
+        // Verify activation code matches
+        boolean codeMatches = verifyActivationCodeHash(activationCode, accountRequest.getActivationCodeHash());
+
+        //boolean codeMatches = true;
+        if (!codeMatches) {
+            accountRequest.setActivationAttempts(accountRequest.getActivationAttempts() + 1);
+            accountCreationRequestRepository.save(accountRequest);
+
+            response.put("success", false);
+            response.put("message", "Invalid activation code");
+            response.put("status", "INVALID_CODE");
+            response.put("attemptsRemaining", 5 - accountRequest.getActivationAttempts());
+            return response;
+        }
+
+        response.put("success", true);
+        response.put("message", "Activation code verified");
+        response.put("status", "VERIFIED");
+        response.put("requestId", accountRequest.getId());
+        response.put("firstName", accountRequest.getFirstName());
+        response.put("lastName", accountRequest.getLastName());
+        response.put("email", accountRequest.getEmail());
+        response.put("role", accountRequest.getRole());
+
+        return response;
+    }
+
+
+    private boolean verifyActivationCodeHash(String plainActivationCode, String storedHash) {
+        return passwordEncoder.matches(plainActivationCode, storedHash);
+    }
+
+    @Transactional
+    public UserProfile completeAccountActivation(
+            Long requestId,
+            String username,
+            String password,
+            String gender,
+            String birthday,
+            String contactNumber,
+            Map<String, Object> roleSpecificData) {
+
+        AccountCreationRequest request = accountCreationRequestRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+
+        if (!request.getStatus().equals("APPROVED")) {
+            throw new IllegalArgumentException("Request not approved");
+        }
+
+        if (userProfileRepository.findByUsername(username).isPresent()) {
+            throw new IllegalArgumentException("Username already taken");
+        }
+
+        String hashedPassword = passwordEncoder.encode(password);
+
+        UserProfile newUser = new UserProfile();
+        newUser.setFirstName(request.getFirstName());
+        newUser.setLastName(request.getLastName());
+        newUser.setEmail(request.getEmail());
+        newUser.setUsername(username);
+        newUser.setPasswordHash(hashedPassword);
+        newUser.setGender(gender);
+        newUser.setBirthday(LocalDate.parse(birthday));
+        newUser.setContactNumber(contactNumber);
+        newUser.setRole(UserProfile.Role.valueOf(request.getRole()));
+
+        UserProfile savedUser = userProfileRepository.save(newUser);
+
+        String role = request.getRole();
+        switch (role) {
+            case "RESIDENT":
+                createResidentProfile(savedUser, roleSpecificData);
+                break;
+            case "CAREGIVER":
+                createCaregiverProfile(savedUser, roleSpecificData);
+                break;
+            case "ADMIN":
+                createAdminProfile(savedUser);
+                break;
+        }
+
+        request.setStatus("COMPLETED");
+        accountCreationRequestRepository.save(request);
+
+        return savedUser;
+    }
+
+    private void createResidentProfile(UserProfile userProfile, Map<String, Object> roleSpecificData) {
+        Resident resident = new Resident();
+        resident.setUserProfile(userProfile);
+        resident.setEmergencyContactName((String) roleSpecificData.getOrDefault("emergencyContactName", ""));
+        resident.setEmergencyContactNumber((String) roleSpecificData.getOrDefault("emergencyContactNumber", ""));
+        resident.setNotes((String) roleSpecificData.getOrDefault("notes", ""));
+        residentRepository.save(resident);
+    }
+
+    private void createCaregiverProfile(UserProfile userProfile, Map<String, Object> roleSpecificData) {
+        Caregiver caregiver = new Caregiver();
+        caregiver.setUserProfile(userProfile);
+        caregiver.setNotes((String) roleSpecificData.getOrDefault("notes", ""));
+        caregiverRepository.save(caregiver);
+    }
+
+    private void createAdminProfile(UserProfile userProfile) {
+        Admin admin = new Admin();
+        admin.setUserProfile(userProfile);
+        adminRepository.save(admin);
     }
 }

@@ -13,10 +13,10 @@ package com.clinicore.project.controller;
 import com.clinicore.project.entity.AccountCreationRequest;
 import com.clinicore.project.entity.UserProfile;
 import com.clinicore.project.service.AccountCredentialService;
-import com.clinicore.project.service.InvitationService;
 import com.clinicore.project.service.AccountCreationRequestService;
 import com.clinicore.project.service.AccountRequestResultType;
 import com.clinicore.project.repository.UserProfileRepository;
+
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,17 +29,14 @@ public class AccountCredentialController {
 
     // service layers to be injected
     private final AccountCredentialService accountCredentialService;
-    private final InvitationService invitationService;
     private final AccountCreationRequestService accountCreationRequestService;
     private final UserProfileRepository userProfileRepository;
 
     // inject service layers (service layers hold business logic - controller just forwards requests to service layers)
     public AccountCredentialController(AccountCredentialService accountCredentialService,
-                                       InvitationService invitationService,
                                        AccountCreationRequestService accountCreationRequestService,
                                        UserProfileRepository userProfileRepository) {
         this.accountCredentialService = accountCredentialService;
-        this.invitationService = invitationService;
         this.accountCreationRequestService = accountCreationRequestService;
         this.userProfileRepository = userProfileRepository;
     }
@@ -69,92 +66,6 @@ public class AccountCredentialController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Login failed: " + e.getMessage()));
-        }
-    }
-
-    // endpoint for admins to create and send user registration invitations
-    // this will grab request details from the frontend and call the account credential service layer to create and send the invitation
-    @PostMapping("/invite")
-    public ResponseEntity<?> createInvitation(@RequestBody Map<String, Object> request) {
-        try {
-
-            // grab body requests and store into variables
-            Long adminId = ((Number) request.get("adminId")).longValue();
-            String email = (String) request.get("email");
-            String roleString = (String) request.get("role");
-
-            // validate email and role is provided
-            accountCredentialService.validateInvitationRequest(email, roleString);
-
-            // validate role (service layer will validate role exists)
-            // if validated, it will save the role as a role enum type from userProfile entity
-            UserProfile.Role role = accountCredentialService.validateRole(roleString);
-
-            // create and send invitation (business logic in service)
-            // need to pass adminId of whos sending the invitation + email and role of invited user
-            // this returns an invitation object with token, email, role, and expiration date
-            var invitation = invitationService.createAndSendInvitation(adminId, email, role);
-
-            // on invitation send success, build response from invitation object
-            Map<String, Object> response = new LinkedHashMap<>();
-            response.put("message", "Invitation created successfully");
-            response.put("token", invitation.getToken());
-            response.put("email", invitation.getEmail());
-            response.put("role", invitation.getRole().toString());
-            response.put("expiresAt", invitation.getExpiresAt());
-
-            // return invitation object response
-            return ResponseEntity.ok(response);
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to create invitation: " + e.getMessage()));
-        }
-    }
-
-    // endpoint to register new users
-    // it will grab user details from the frontend and call the account credential service layer to create and save the user account
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody Map<String, Object> request) { // request contains user details
-        try {
-
-            // save request details into variables
-            String token = (String) request.get("token");
-            String firstName = (String) request.get("firstName");
-            String lastName = (String) request.get("lastName");
-            String username = (String) request.get("username");
-            String password = (String) request.get("password");
-            String gender = (String) request.get("gender");
-            String birthday = (String) request.get("birthday");
-            String contactNumber = (String) request.get("contactNumber");
-            //String email = (String) request.get("email");
-
-            // create account (business logic in invitation service layer) so send details to that
-            // will return a new user object with all details filled in (new user account saved in db)
-            var newUser = invitationService.acceptInvitation(
-                    token, firstName, lastName, username, password, gender, birthday, contactNumber
-            );
-
-            // on success, build response from new user object
-            // to display in frontend...
-            Map<String, Object> response = new LinkedHashMap<>();
-            response.put("id", newUser.getId());
-            response.put("message", "Account created successfully");
-            response.put("username", newUser.getUsername());
-            response.put("role", newUser.getRole().toString());
-
-            return ResponseEntity.ok(response);
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to register user: " + e.getMessage()));
         }
     }
 
@@ -214,32 +125,39 @@ public class AccountCredentialController {
     }
 
 
+    // register a new user
     @PostMapping("/request-access")
     public ResponseEntity<?> requestAccess(@RequestBody Map<String, String> request) {
         try {
+
+            // extract values from the data sent from the frontend
             String firstName = request.get("firstName");
             String lastName = request.get("lastName");
             String email = request.get("email");
             String role = request.get("role");
 
+            // validate fields again
             if (role == null || role.isBlank()
-                    || firstName == null || firstName.isBlank()
-                    || lastName == null || lastName.isBlank()
-                    || email == null || email.isBlank()) {
+               || firstName == null || firstName.isBlank()
+               || lastName == null || lastName.isBlank()
+               || email == null || email.isBlank()) {
 
                 return ResponseEntity.badRequest()
                         .body(Map.of("error", "Missing required fields"));
             }
 
+            // since we have fields, go to service to create account request w fields
             AccountRequestResultType result =
                     accountCreationRequestService.createAccountRequest(firstName, lastName, email, role);
 
             String message = switch (result) {
                 case USER_ALREADY_EXISTS -> "An account already exists for this email. Please log in.";
-                case NEW -> "Request received. Please wait for admin approval.";
-                case PENDING, REOPEN -> "Your request has been sent. Please wait for admin approval.";
+                case PENDING -> "Your request has been updated. Please wait for admin approval.";
+                case NEW, REOPEN -> "Your request has been sent. Please wait for admin approval.";
                 case APPROVED ->
-                        "Your request is already approved. Please go to the activation page to complete your account.";
+                        "Your request's already approved. Please go to the activation page to complete your account.";
+
+                // this should rarely happen, but if it does, then ya
                 case COMPLETED -> "An account has already been created for this email.";
             };
 
@@ -262,6 +180,29 @@ public class AccountCredentialController {
         }
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // FOR ADMIN
     @GetMapping("/account-requests")
     public ResponseEntity<?> getAllAccountRequests(@RequestParam Long adminId) {
         try {
@@ -390,6 +331,126 @@ public class AccountCredentialController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to resend activation code: " + e.getMessage()));
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // acccouint creation
+    @PostMapping("/verify-activation-code")
+    public ResponseEntity<?> verifyActivationCode(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            String activationCode = request.get("activationCode");
+
+            if (email == null || email.isBlank()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Email is required"));
+            }
+            if (activationCode == null || activationCode.isBlank()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Activation code is required"));
+            }
+
+            Map<String, Object> verificationResult = accountCreationRequestService
+                    .verifyActivationCode(email, activationCode);
+
+            return ResponseEntity.ok(verificationResult);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Verification failed"));
+        }
+    }
+
+    @PostMapping("/create-account")
+    public ResponseEntity<?> completeAccountActivation(@RequestBody Map<String, Object> request) {
+        try {
+            Long requestId = ((Number) request.get("requestId")).longValue();
+            String username = (String) request.get("username");
+            String password = (String) request.get("password");
+            String gender = (String) request.get("gender");
+            String birthday = (String) request.get("birthday");
+            String contactNumber = (String) request.get("contactNumber");
+            String role = (String) request.get("role");
+
+            if (username == null || username.isBlank()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Username is required"));
+            }
+            if (password == null || password.isBlank()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Password is required"));
+            }
+            if (gender == null || gender.isBlank()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Gender is required"));
+            }
+            if (birthday == null || birthday.isBlank()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Birthday is required"));
+            }
+            if (contactNumber == null || contactNumber.isBlank()) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Contact number is required"));
+            }
+
+            Map<String, Object> roleSpecificData = new LinkedHashMap<>();
+            
+            if ("RESIDENT".equals(role)) {
+                String emergencyContactName = (String) request.get("emergencyContactName");
+                String emergencyContactNumber = (String) request.get("emergencyContactNumber");
+                
+                if (emergencyContactName == null || emergencyContactName.isBlank()) {
+                    return ResponseEntity.badRequest()
+                            .body(Map.of("error", "Emergency contact name is required"));
+                }
+                if (emergencyContactNumber == null || emergencyContactNumber.isBlank()) {
+                    return ResponseEntity.badRequest()
+                            .body(Map.of("error", "Emergency contact number is required"));
+                }
+                
+                roleSpecificData.put("emergencyContactName", emergencyContactName);
+                roleSpecificData.put("emergencyContactNumber", emergencyContactNumber);
+                roleSpecificData.put("notes", request.getOrDefault("notes", ""));
+                
+            } else if ("CAREGIVER".equals(role)) {
+                roleSpecificData.put("notes", request.getOrDefault("notes", ""));
+            }
+
+            UserProfile newUser = accountCreationRequestService.completeAccountActivation(
+                    requestId, username, password, gender, birthday, contactNumber, roleSpecificData
+            );
+
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("message", "Account created successfully");
+            response.put("userId", newUser.getId());
+            response.put("username", newUser.getUsername());
+            response.put("role", newUser.getRole().toString());
+
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to create account"));
         }
     }
 }
