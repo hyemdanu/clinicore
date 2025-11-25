@@ -1,7 +1,7 @@
 /* css for admin dashboard idk much lowkey */
 .admin-dashboard-container {
   min-height: 100vh;
-  background-color: #ffffff;
+  background-color: #f5f7fb;
 }
 
 .dashboard-content {
@@ -10,7 +10,7 @@
   padding: 40px;
   transition: margin-left 0.3s ease;
   min-height: calc(100vh - 56px);
-  background-color: #f5f5f5;
+  background-color: #f5f7fb;
 }
 
 .dashboard-content.content-with-sidebar {

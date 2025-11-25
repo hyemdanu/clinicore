@@ -4,7 +4,7 @@
   left: 0;
   top: 56px;
   height: calc(100vh - 56px);
-  background-color: #f5f5f5;
+  background-color: #f8fafc;
   transition: width 0.3s ease;
   z-index: 100;
   overflow: hidden;
@@ -32,11 +32,11 @@
 }
 
 .admin-sidebar-item:hover {
-  background-color: #e0e0e0;
+  background-color: #e8eef6;
 }
 
 .admin-sidebar-item-active {
-  background-color: #d6ebf5;
+  background-color: #e1e8f5;
   border-radius: 0 25px 25px 0;
   margin-right: 20px;
 }

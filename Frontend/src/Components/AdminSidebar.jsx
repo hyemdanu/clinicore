@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import './css/AdminSidebar.css';
 import dashboardIcon from '../assets/icons/dashboardicon.png';
 import residentIcon from '../assets/icons/residenticon.png';
@@ -10,9 +9,8 @@ import inventoryIcon from '../assets/icons/inventoryicon.png';
 // Admin Sidebar Component
 // this sidebar is specific to admin users
 // caregiver and resident would have their own sidebar cus they different
-const AdminSidebar = ({ isOpen, onToggle }) => {
-  // track which menu item is currently selected
-  const [activeItem, setActiveItem] = useState('dashboard');
+const AdminSidebar = ({ isOpen, onToggle, activeTab, onNavigate }) => {
+  // activeTab is now controlled by parent component
 
   // menu items configuration for the different tabs
   const menuItems = [
@@ -26,8 +24,9 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
 
   // update active item when a menu item is clicked
   const handleItemClick = (itemId) => {
-    setActiveItem(itemId);
-    // TODO: add navigation here when we build the other pages
+    if (onNavigate) {
+      onNavigate(itemId);
+    }
   };
 
   return (
@@ -37,7 +36,7 @@ const AdminSidebar = ({ isOpen, onToggle }) => {
         {menuItems.map((item) => (
           <div
             key={item.id}
-            className={`admin-sidebar-item ${activeItem === item.id ? 'admin-sidebar-item-active' : ''}`}
+            className={`admin-sidebar-item ${activeTab === item.id ? 'admin-sidebar-item-active' : ''}`}
             onClick={() => handleItemClick(item.id)}
           >
             <div className="admin-sidebar-icon">

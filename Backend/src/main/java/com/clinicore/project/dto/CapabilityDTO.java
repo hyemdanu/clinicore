@@ -5,10 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO for Capability entity
- * To avoid circular reference issues and over-fetching of data
- */
+// DTO for resident capabilities - what they can/can't do
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,9 +17,7 @@ public class CapabilityDTO {
     private Capability.IncontinenceStatus incontinenceStatus;
     private Capability.MobilityStatus mobilityStatus;
 
-    /**
-     * Convert Capability entity to DTO
-     */
+    // convert entity to DTO
     public static CapabilityDTO fromEntity(Capability capability) {
         if (capability == null) {
             return null;

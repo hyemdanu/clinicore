@@ -6,6 +6,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { get } from '../../services/api';
 import Header from '../../Components/Header';
 import AdminSidebar from '../../Components/AdminSidebar';
+import ResidentsTab from './ResidentsTab';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 import "./css/admin.css";
@@ -16,6 +17,7 @@ export default function AdminDashboard() {
 
     // sidebarOpen controls whether the sidebar is visible or hidden
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [activeTab, setActiveTab] = useState('dashboard');
 
     // these hold the inventory data from the backend
     // we store medications and consumables separately because they different types
@@ -85,14 +87,21 @@ export default function AdminDashboard() {
         setSidebarOpen(!sidebarOpen);
     };
 
+    const tabTitles = {
+        dashboard: 'Dashboard',
+        inventory: 'Inventory',
+        residents: 'Residents',
+        caregivers: 'Caregivers',
+        user: 'User',
+        messages: 'Messages'
+    };
+
     // sorting function
     const sortData = (data, sortKey) => {
         const [field, order] = sortKey.split('-'); // split into field and order
 
-
         const sorted = [...data].sort((a, b) => {
             if (field === 'quantity') {
-
                 return order === 'asc' ? a.quantity - b.quantity : b.quantity - a.quantity;
             } else {
                 const nameA = a.name.toLowerCase();
@@ -110,6 +119,14 @@ export default function AdminDashboard() {
     // get sorted data based on current sort selections
     const sortedMedications = sortData(medicationInventory, medicationSort);
     const sortedConsumables = sortData(consumablesInventory, consumablesSort);
+
+    // compute low-stock items for alert banner (quantity <= 10)
+    const lowStockItems = [
+        ...medicationInventory.map(item => ({ ...item, category: 'Medication' })),
+        ...consumablesInventory.map(item => ({ ...item, category: 'Consumable' }))
+    ].filter(item => Number(item.quantity) <= 10);
+
+    const lowStockCount = lowStockItems.length;
 
     // shows a warning icon and red text if stock is low (≤ 10)
     const quantityTemplate = (rowData) => {
@@ -131,83 +148,145 @@ export default function AdminDashboard() {
         </div>
     );
 
+    const renderPlaceholder = (label) => (
+        <div className="placeholder-content">
+            <h2>{label}</h2>
+            <p>Content coming soon.</p>
+        </div>
+    );
+
+    const renderInventoryContent = () => (
+        <>
+            <div className="alert-section">
+                <h2 className="dashboard-title">Inventory Dashboard</h2>
+            </div>
+
+            {/* Low stock alert banner shown above the tables when any item is low */}
+            {lowStockCount > 0 && (
+                <div
+                    className="low-stock-alert"
+                    role="alert"
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        backgroundColor: '#fff6f6',
+                        border: '1px solid #ffcccc',
+                        color: '#a94442',
+                        padding: '0.75rem 1rem',
+                        borderRadius: 4,
+                        marginBottom: '1rem'
+                    }}
+                >
+                    <i className="pi pi-exclamation-triangle" style={{ fontSize: '1.2rem', marginRight: '0.5rem' }}></i>
+                    <div style={{ flex: 1 }}>
+                        <strong>{lowStockCount} low stock item{lowStockCount > 1 ? 's' : ''}</strong>
+                        <div style={{ fontSize: '0.9rem', opacity: 0.9 }}>
+                            {lowStockItems.slice(0, 3).map(i => i.name).join(', ')}{lowStockItems.length > 3 ? ` and ${lowStockItems.length - 3} more` : ''}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {error && (
+                <div className="error-message">
+                    {error}
+                </div>
+            )}
+
+            <section className="inventory-section">
+                <div className="inventory-header">
+                    <h3>Medication Inventory</h3>
+                    <div className="sort-dropdown-wrapper">
+                        <label>Sort by:</label>
+                        <Dropdown
+                            value={medicationSort}
+                            options={sortOptions}
+                            onChange={(e) => setMedicationSort(e.value)}
+                            className="sort-dropdown"
+                        />
+                    </div>
+                </div>
+                <DataTable
+                    value={sortedMedications}
+                    loading={loading}
+                    loadingIcon={loadingIcon}
+                    className="inventory-table"
+                    emptyMessage="No medications found"
+                >
+                    <Column field="name" header="Medication" style={{ width: '60%' }} />
+                    <Column
+                        field="quantity"
+                        header="Quantity"
+                        body={quantityTemplate}
+                        style={{ width: '40%' }}
+                    />
+                </DataTable>
+            </section>
+
+            <section className="inventory-section">
+                <div className="inventory-header">
+                    <h3>Medical Consumables Inventory</h3>
+                    <div className="sort-dropdown-wrapper">
+                        <label>Sort by:</label>
+                        <Dropdown
+                            value={consumablesSort}
+                            options={sortOptions}
+                            onChange={(e) => setConsumablesSort(e.value)}
+                            className="sort-dropdown"
+                        />
+                    </div>
+                </div>
+                <DataTable
+                    value={sortedConsumables}
+                    loading={loading}
+                    loadingIcon={loadingIcon}
+                    className="inventory-table"
+                    emptyMessage="No consumables found"
+                >
+                    <Column field="name" header="Items" style={{ width: '60%' }} />
+                    <Column
+                        field="quantity"
+                        header="Quantity"
+                        body={quantityTemplate}
+                        style={{ width: '40%' }}
+                    />
+                </DataTable>
+            </section>
+        </>
+    );
+
+    const renderContent = () => {
+        switch (activeTab) {
+            case 'residents':
+                return <ResidentsTab />;
+            case 'caregivers':
+                return renderPlaceholder('Caregivers');
+            case 'user':
+                return renderPlaceholder('User Management');
+            case 'messages':
+                return renderPlaceholder('Messages');
+            case 'inventory':
+            case 'dashboard':
+            default:
+                return renderInventoryContent();
+        }
+    };
+
     return (
         <div className="admin-dashboard-container">
-            <Header onToggleSidebar={toggleSidebar} title="Dashboard" />
+            <Header onToggleSidebar={toggleSidebar} title={tabTitles[activeTab] || 'Dashboard'} />
 
-            <AdminSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
+            <AdminSidebar
+                isOpen={sidebarOpen}
+                onToggle={toggleSidebar}
+                activeTab={activeTab}
+                onNavigate={setActiveTab}
+            />
 
             <main className={`dashboard-content ${sidebarOpen ? 'content-with-sidebar' : ''}`}>
-                <div className="alert-section">
-                    <h2 className="dashboard-title">Inventory Dashboard</h2>
-                </div>
-
-                {error && (
-                    <div className="error-message">
-                        {error}
-                    </div>
-                )}
-
-                <section className="inventory-section">
-                    <div className="inventory-header">
-                        <h3>Medication Inventory</h3>
-                        <div className="sort-dropdown-wrapper">
-                            <label>Sort by:</label>
-                            <Dropdown
-                                value={medicationSort}
-                                options={sortOptions}
-                                onChange={(e) => setMedicationSort(e.value)}
-                                className="sort-dropdown"
-                            />
-                        </div>
-                    </div>
-                    <DataTable
-                        value={sortedMedications}
-                        loading={loading}
-                        loadingIcon={loadingIcon}
-                        className="inventory-table"
-                        emptyMessage="No medications found"
-                    >
-                        <Column field="name" header="Medication" style={{ width: '60%' }} />
-                        <Column
-                            field="quantity"
-                            header="Quantity"
-                            body={quantityTemplate}
-                            style={{ width: '40%' }}
-                        />
-                    </DataTable>
-                </section>
-
-                <section className="inventory-section">
-                    <div className="inventory-header">
-                        <h3>Medical Consumables Inventory</h3>
-                        <div className="sort-dropdown-wrapper">
-                            <label>Sort by:</label>
-                            <Dropdown
-                                value={consumablesSort}
-                                options={sortOptions}
-                                onChange={(e) => setConsumablesSort(e.value)}
-                                className="sort-dropdown"
-                            />
-                        </div>
-                    </div>
-                    <DataTable
-                        value={sortedConsumables}
-                        loading={loading}
-                        loadingIcon={loadingIcon}
-                        className="inventory-table"
-                        emptyMessage="No consumables found"
-                    >
-                        <Column field="name" header="Items" style={{ width: '60%' }} />
-                        <Column
-                            field="quantity"
-                            header="Quantity"
-                            body={quantityTemplate}
-                            style={{ width: '40%' }}
-                        />
-                    </DataTable>
-                </section>
+                {renderContent()}
             </main>
         </div>
     );
 }
+

@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * DTO for MedicationInventory entity
- * To avoid circular reference issues and over-fetching of data
- */
+// DTO for medication inventory - stock of meds we have on hand
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,9 +22,7 @@ public class MedicationInventoryDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    /**
-     * Convert MedicationInventory entity to DTO
-     */
+    // convert entity to DTO
     public static MedicationInventoryDTO fromEntity(MedicationInventory medicationInventory) {
         if (medicationInventory == null || medicationInventory.getItem() == null) {
             return null;

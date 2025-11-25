@@ -1,1 +1,77 @@
-/* just example file */
+/* Pull in admin layout (header, content spacing, error banner, etc.) */
+@import "../../AdminPortal/css/admin.css";
+
+/* Cards grid */
+.rd-card-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+@media (min-width: 720px) { .rd-card-grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1024px) { .rd-card-grid { grid-template-columns: 1fr 1fr; max-width: 1000px; } }
+
+/* Card look/feel */
+.rd-action-card {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background: #fff;
+    border: 0;
+    border-radius: 14px;
+    padding: 18px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    cursor: pointer;
+    transition: transform 120ms ease, box-shadow 120ms ease;
+    text-align: left;
+}
+.rd-action-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.10); }
+.rd-action-card:disabled { opacity: .75; cursor: default; }
+
+/* PNG icon in the card */
+.rd-card-img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    margin-right: 14px;
+}
+
+/* Card text */
+.rd-card-text { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.rd-card-title-row { display: flex; align-items: center; gap: 8px; }
+.rd-card-title { font-size: 20px; font-weight: 700; color: #333; }
+.rd-card-desc { color: #666; font-size: 14px; }
+.rd-badge { background: #dc3545; color: #fff; font-size: 12px; padding: 2px 8px; border-radius: 999px; }
+.rd-card-caret { font-size: 18px; color: #9ca3af; }
+
+/* Secondary panels */
+.rd-secondary { padding-top: 8px; display: grid; gap: 16px; }
+@media (min-width: 1024px) { .rd-secondary { grid-template-columns: 1fr 1fr; max-width: 1000px; } }
+
+.rd-panel { background: #fff; border-radius: 14px; padding: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.rd-panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.rd-link-button { background: transparent; border: 0; color: #369DF7; font-weight: 600; cursor: pointer; }
+.rd-link-button:hover { text-decoration: underline; }
+
+/* Recent docs list */
+.rd-doc-list { list-style: none; margin: 0; padding: 0; }
+.rd-doc-item { display: flex; align-items: center; gap: 12px; padding: 10px 6px; border-radius: 10px; cursor: pointer; }
+.rd-doc-item:hover { background: #f8f9fa; }
+.rd-doc-icon { color: #369DF7; font-size: 18px; }
+.rd-doc-meta { flex: 1; display: flex; flex-direction: column; }
+.rd-doc-title { font-weight: 600; color: #333; }
+.rd-doc-sub { font-size: 12px; color: #666; }
+.rd-doc-caret { color: #9ca3af; }
+
+/* KPIs */
+.rd-kpis { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+.rd-kpi { background: #f9fafb; border-radius: 12px; padding: 12px; text-align: center; }
+.rd-kpi-value { font-size: 22px; font-weight: 800; display: block; color: #333; }
+.rd-kpi-label { font-size: 12px; color: #666; }
+
+/* Skeleton + empty */
+.rd-skeleton-list .rd-skel-line {
+    height: 12px; background: linear-gradient(90deg, #eef2ff, #e5e7eb, #eef2ff);
+    border-radius: 6px; margin: 8px 0; animation: rd-skel 1.1s infinite ease-in-out;
+}
+@keyframes rd-skel { 0%{opacity:.6} 50%{opacity:.35} 100%{opacity:.6} }
+.rd-empty { color: #999; font-size: 14px; padding: 6px 0; }

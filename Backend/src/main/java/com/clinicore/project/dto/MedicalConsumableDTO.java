@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * DTO for MedicalConsumable entity
- * To avoid circular reference issues and over-fetching of data
- */
+// DTO for medical consumables - bandages, gloves, etc.
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,9 +20,7 @@ public class MedicalConsumableDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    /**
-     * Convert MedicalConsumable entity to DTO
-     */
+    // convert entity to DTO
     public static MedicalConsumableDTO fromEntity(MedicalConsumable medicalConsumable) {
         if (medicalConsumable == null || medicalConsumable.getItem() == null) {
             return null;
