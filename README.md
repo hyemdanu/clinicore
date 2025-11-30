@@ -8,7 +8,8 @@
 <img width="849" height="260" alt="image" src="https://github.com/user-attachments/assets/d4f7763f-08f9-4dea-848e-476ca41eae95" />
 
 
-This project is aimed at creating a fluid and dynamic EHR system for our client's medical practice.
+This project is being undertaken by the development team Lattice Labs, comprised of undergraduate students majoring in Computer Science at California State University, Sacramento. This project is aimed at creating a fluid and dynamic EHR system for our client's medical practice. It will replace their current EHR system with a more modern and custom built system.
+
 
 ## Features
 
@@ -27,6 +28,7 @@ You may need to install NPM via
 ```ssh
 npm install 
 ```
+# Future Timeline:
 
 
 # Team Members:
