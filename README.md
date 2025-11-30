@@ -1,18 +1,3 @@
-CliniCore by Lattice Labs
-
-Senior Project for CSC 190/191 at California State University, Sacramento
-
-Team Members:
-Olei Amelie Mae Ngan
-Sean Bombay
-Minh Nguyen
-Miles Le
-Rushabh Patel
-Adrian Perez
-Winni Wu
-Edison Ho
-
-
 [![code-style](https://github.com/cable8mm/water-melon/actions/workflows/code-style.yml/badge.svg)](https://github.com/cable8mm/water-melon/actions/workflows/code-style.yml)
 [![run-tests](https://github.com/cable8mm/water-melon/actions/workflows/run-tests.yml/badge.svg)](https://github.com/cable8mm/water-melon/actions/workflows/run-tests.yml)
 ![Packagist Version](https://img.shields.io/packagist/v/cable8mm/water-melon)
@@ -47,3 +32,13 @@ npm install
 ```
 
 
+# Team Members:
+
+Olei Amelie Mae Ngan
+Sean Bombay
+Minh Nguyen
+Miles Le
+Rushabh Patel
+Adrian Perez
+Winni Wu
+Edison Ho
