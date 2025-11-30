@@ -34,11 +34,11 @@ npm install
 
 # Team Members:
 
-Olei Amelie Mae Ngan
-Sean Bombay
-Minh Nguyen
-Miles Le
-Rushabh Patel
-Adrian Perez
-Winni Wu
-Edison Ho
+- Olei Amelie Mae Ngan
+- Sean Bombay
+- Minh Nguyen
+- Miles Le
+- Rushabh Patel
+- Adrian Perez
+- Winni Wu
+- Edison Ho
