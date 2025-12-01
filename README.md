@@ -20,9 +20,15 @@ This project is being undertaken by the development team Lattice Labs, comprised
 - [x] Tailor made for the client's specifcitaions and busisness needs
 
 ## Installation
-
+### Backend Initialization (Using Maven and Spring Boot)
 ```sh
-(ADD  COMMMAND TO RUN BACKEND HERE)
+(NAVIGATE TO PROJECT DIRECTORY)
+cd .\Backend
+nvm spring-boot:run
+```
+### Frontend Initialization (Using Node.js and NPM)
+```sh
+(NAVIGATE TO PROJECT DIRECTORY)
 cd .\Frontend
 npm run dev
 ```
