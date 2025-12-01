@@ -13,7 +13,9 @@ This project is being undertaken by the development team Lattice Labs, comprised
 
 ## Features
 
-- [x] Allows easy management of medical supplies and stocks
+- [x] Allows easy management of medical supplies and medication stock levels
+- [x] Provides caregivers with a dashboard to track daily tasks and patient information
+- [x] Streamlines communication between staff members, family members and residents through an internal messaging system
 - [x] Fast and secure logins for both patients and staff to access and store confidential medical information
 - [x] Tailor made for the client's specifcitaions and busisness needs
 
@@ -29,6 +31,14 @@ You may need to install NPM via
 npm install 
 ```
 # Future Timeline:
+- January 25, 2026 - February 7, 2026: 
+  - Completion of Admin Dashboard and Inventory Management System
+- February 8, 2026 - February 21, 2026: 
+  - Completion of Communication System and Patient Portal
+- February 22, 2026 - March 6, 2026: 
+  - Completion of Caregiver Portal with access to patient records and inventory management
+- March 7, 2026 - March 20, 2026: 
+  - Final Testing and Deployment
 
 
 # Team Members:
