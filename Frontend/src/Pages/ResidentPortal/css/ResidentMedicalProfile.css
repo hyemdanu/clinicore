@@ -1,0 +1,78 @@
+.medical-profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.medical-column {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.mp-card {
+    background: white;
+    border-radius: 14px;
+    padding: 18px 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+}
+
+.mp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.mp-value {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+.mp-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.mp-row:last-child {
+    border-bottom: none;
+}
+
+.mp-list-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.mp-edit-btn,
+.mp-add-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+.mp-add-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.mp-input {
+    flex: 1;
+    padding: 6px;
+}
+
+.mp-save-btn {
+    padding: 6px 12px;
+}
+
+.mp-cancel-btn {
+    padding: 6px 12px;
+    background-color: #ccc;
+}
