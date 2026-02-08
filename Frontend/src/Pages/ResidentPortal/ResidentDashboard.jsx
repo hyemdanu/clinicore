@@ -37,14 +37,16 @@ export default function ResidentDashboard() {
 
             try {
                 const currentUserStr = localStorage.getItem("currentUser");
-                if (!currentUserStr) { navigate("/"); return; }
+                if (!currentUserStr) {
+                    //navigate("/");
+                        return; }
 
                 const currentUser = JSON.parse(currentUserStr);
                 const currentUserId = currentUser.id;
 
                 // Optional role gate
                 if (currentUser.role && currentUser.role !== "RESIDENT") {
-                    navigate("/not-authorized");
+                    //navigate("/not-authorized");
                     return;
                 }
 
