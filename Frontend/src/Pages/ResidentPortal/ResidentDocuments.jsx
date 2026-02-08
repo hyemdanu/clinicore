@@ -1,6 +1,16 @@
 import React from "react";
 import "./css/residentDocuments.css";
 import searchIcon from "../../assets/icons/magnifying-glass.png";
+import documentIcon from "../../assets/icons/documentIcon.png";
+
+const documents = [
+    "Insurance Form",
+    "Medical History",
+    "Consent Form",
+    "Care Plan",
+    "Emergency Contacts",
+    "Billing Statement",
+];
 
 export default function ResidentDocuments() {
     return (
@@ -13,6 +23,7 @@ export default function ResidentDocuments() {
                 </div>
 
                 <section className="documents-section">
+                    {/* Search bar */}
                     <div className="documents-search">
                         <img
                             src={searchIcon}
@@ -25,7 +36,23 @@ export default function ResidentDocuments() {
                         />
                     </div>
 
+                    {/* Document list */}
+                    <div className="documents-box">
+                        {documents.map((doc, index) => (
+                            <React.Fragment key={index}>
+                                <div className="document-row">
+                                    <img
+                                        src={documentIcon}
+                                        alt="Document"
+                                        className="document-icon"
+                                    />
+                                    <span className="document-name">{doc}</span>
+                                </div>
 
+                                {index < documents.length - 1 && <div className="line" />}
+                            </React.Fragment>
+                        ))}
+                    </div>
                 </section>
             </div>
         </div>

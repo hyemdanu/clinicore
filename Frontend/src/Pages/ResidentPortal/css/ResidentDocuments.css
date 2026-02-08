@@ -73,6 +73,37 @@
     pointer-events: none;
 }
 
+.documents-box {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+}
+
+.document-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 0;
+}
+
+.document-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.document-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+}
+
+.line {
+    height: 1px;
+    background: #e5e7eb;
+}
+
 
 
 
