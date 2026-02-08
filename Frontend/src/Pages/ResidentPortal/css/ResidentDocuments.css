@@ -1,0 +1,21 @@
+/* src/pages/ResidentDocuments.css */
+
+.resident-documents {
+  padding: 24px;
+}
+
+.resident-documents__title {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.resident-documents__subtitle {
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.resident-documents__content {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 16px;
+}
