@@ -53,6 +53,8 @@ export default function ResidentDocuments() {
                             </React.Fragment>
                         ))}
                     </div>
+                    {/* Floating Action Button */}
+                    <button className="documents-fab">+</button>
                 </section>
             </div>
         </div>

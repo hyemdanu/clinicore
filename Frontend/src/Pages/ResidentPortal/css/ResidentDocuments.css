@@ -104,6 +104,31 @@
     background: #e5e7eb;
 }
 
+.documents-fab {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: none;
+    background: #369df7;
+    color: #ffffff;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
+}
+
+@media (max-width: 768px) {
+    .box {
+        padding-inline: 20px;
+    }
+
+    .documents-section {
+        padding: 18px 16px 60px;
+    }
+}
+
 
 
 
