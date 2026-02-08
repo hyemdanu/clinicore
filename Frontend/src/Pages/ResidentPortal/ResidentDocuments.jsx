@@ -1,5 +1,6 @@
 import React from "react";
 import "./css/residentDocuments.css";
+import searchIcon from "../../assets/icons/magnifying-glass.png";
 
 export default function ResidentDocuments() {
     return (
@@ -12,7 +13,19 @@ export default function ResidentDocuments() {
                 </div>
 
                 <section className="documents-section">
-                    {/* content coming next */}
+                    <div className="documents-search">
+                        <img
+                            src={searchIcon}
+                            alt="Search"
+                            className="search-icon"
+                        />
+                        <input
+                            type="text"
+                            placeholder="Search Document Name or Code"
+                        />
+                    </div>
+
+
                 </section>
             </div>
         </div>
