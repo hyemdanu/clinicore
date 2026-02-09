@@ -259,13 +259,6 @@ export default function ResidentMedication() {
                                         )}
                                         </tbody>
                                     </table>
-
-                                    <div className="add-medication-section">
-                                        <button className="add-medication-button" onClick={handleAddMedication}>
-                                            <span className="plus-icon">+</span>
-                                            Add Medication
-                                        </button>
-                                    </div>
                                 </div>
                             )}
                         </div>
