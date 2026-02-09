@@ -292,7 +292,7 @@ public class MessagesController {
     public ResponseEntity<?> getConversationMessages(@PathVariable String conversationId,
                                                       @RequestParam Long userId) {
         try {
-            List<MessageDTO> messages = messageService.getConversationMessages(conversationId, userId);
+            List<MessageDTO> messages = messageService.getConversationMessages(conversationId);
             return ResponseEntity.ok(messages);
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
