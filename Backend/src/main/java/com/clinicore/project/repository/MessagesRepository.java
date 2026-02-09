@@ -55,4 +55,46 @@ public interface MessagesRepository extends JpaRepository<CommunicationPortal, L
      * Get unread messages ordered by sent date
      */
     List<CommunicationPortal> findByRecipientIdAndIsReadOrderBySentAtDesc(Long recipientId, Boolean isRead);
+
+    /**
+     * get messages by conversationId ordered by time
+     */
+    List<CommunicationPortal> findByConversationIdOrderBySentAtAsc(String conversationId);
+
+    /**
+     * get all unique conversations a user is part of
+     */
+    @Query("SELECT cp FROM CommunicationPortal cp WHERE cp.id IN " +
+            "(SELECT MAX(cp2.id) FROM CommunicationPortal cp2 " +
+            "WHERE cp2.senderId = :userId OR cp2.recipientId = :userId " +
+            "GROUP BY cp2.conversationId) " +
+            "ORDER BY cp.sentAt DESC")
+    List<CommunicationPortal> findUserConversations(@Param("userId") Long userId);
+
+    /**
+     * count unread messages in a specific conversation for a user
+     */
+    @Query("SELECT COUNT(cp) FROM CommunicationPortal cp " +
+            "WHERE cp.conversationId = :conversationId " +
+            "AND cp.recipientId = :userId " +
+            "AND cp.isRead = false")
+    Integer countUnreadInConversation(@Param("conversationId") String conversationId,
+                                      @Param("userId") Long userId);
+
+    /**
+     * count total unread messages for a user across all conversations
+     */
+    @Query("SELECT COUNT(cp) FROM CommunicationPortal cp " +
+            "WHERE cp.recipientId = :userId AND cp.isRead = false")
+    Integer countTotalUnread(@Param("userId") Long userId);
+
+    /**
+     * mark all messages in a conversation as read for a user
+     */
+    @Query("SELECT cp FROM CommunicationPortal cp " +
+            "WHERE cp.conversationId = :conversationId " +
+            "AND cp.recipientId = :userId " +
+            "AND cp.isRead = false")
+    List<CommunicationPortal> findUnreadInConversation(@Param("conversationId") String conversationId,
+                                                       @Param("userId") Long userId);
 }
