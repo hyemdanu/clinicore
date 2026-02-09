@@ -12,6 +12,8 @@ import "primeicons/primeicons.css";
 import "./css/ResidentDashboard.css";
 import "./css/ResidentUserProfile.css";
 
+import defaultAvatar from "../../assets/icons/usericon.png";
+
 export default function ResidentUserProfile() {
     const navigate = useNavigate();
 
