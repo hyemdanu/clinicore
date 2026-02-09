@@ -7,6 +7,9 @@ import ResidentSidebar from "../../Components/ResidentSidebar";
 
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primeicons/primeicons.css";
+import femaleDefaultPfp from "../../assets/icons/femaleDefault.png";
+import maleDefaultPfp from "../../assets/icons/maleDefault.png";
+
 
 // Reuse the dashboard layout shell styles so the header/sidebar match across pages
 import "./css/ResidentDashboard.css";
@@ -44,10 +47,11 @@ export default function ResidentUserProfile() {
 
                 // Backend should return the resident's joined profile info.
                 // Fallback to currentUser if the endpoint isn't wired yet.
-                const profile = await get(`/residents/profile?currentUserId=${currentUserId}`).catch(
-                    () => currentUser
-                );
+                const profile = await get(`/user/${currentUserId}/profile?currentUserId=${currentUserId}`);
+                console.log("PROFILE RETURNED:", profile);
                 setResident(profile);
+
+
             } catch (e) {
                 console.error(e);
                 setResident(null);
@@ -80,7 +84,16 @@ export default function ResidentUserProfile() {
         const room = resident.roomNumber ?? resident.room ?? "—";
 
         // Allow backend-provided avatar URL if present; otherwise default icon.
-        const picture = resident.pictureUrl ?? resident.avatarUrl ?? defaultAvatar;
+        const genderValue = (resident.gender ?? "").toString().trim().toLowerCase();
+
+        const picture =
+            genderValue === "female"
+                ? femaleDefaultPfp
+                : genderValue === "male"
+                    ? maleDefaultPfp
+                    : defaultAvatar; // fallback if gender missing/other
+
+
 
         return { fullName: fullName || "—", dob, phone, gender, emergency, facility, room, username, picture };
     }, [resident]);
