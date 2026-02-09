@@ -39,14 +39,11 @@ export default function ResidentUserProfile() {
                 const currentUser = JSON.parse(currentUserStr);
                 const currentUserId = currentUser.id;
 
-                // Optional role gate (match dashboard behavior)
                 if (currentUser.role && currentUser.role !== "RESIDENT") {
                     navigate("/not-authorized");
                     return;
                 }
 
-                // Backend should return the resident's joined profile info.
-                // Fallback to currentUser if the endpoint isn't wired yet.
                 const profile = await get(`/user/${currentUserId}/profile?currentUserId=${currentUserId}`);
                 console.log("PROFILE RETURNED:", profile);
                 setResident(profile);
@@ -67,7 +64,6 @@ export default function ResidentUserProfile() {
         const fullName = [resident.firstName, resident.lastName].filter(Boolean).join(" ");
         const dob = resident.birthday ? new Date(resident.birthday).toLocaleDateString() : "—";
 
-        // Some APIs return resident-specific fields on the same object; others may nest them.
         const emergencyName = resident.emergencyContactName ?? resident.emergency_contact_name;
         const emergencyPhone = resident.emergencyContactNumber ?? resident.emergency_contact_number;
         const emergency =
@@ -79,7 +75,7 @@ export default function ResidentUserProfile() {
         const gender = resident.gender ?? "—";
         const username = resident.username ?? "—";
 
-        // If you later add facility/room to the profile API, these will automatically appear.
+        // If facilities and room ever get added, utilize this, for now ignore or delete this eventually
         const facility = resident.facility ?? resident.facilityName ?? "—";
         const room = resident.roomNumber ?? resident.room ?? "—";
 
