@@ -2,6 +2,7 @@
 .admin-dashboard-container {
   min-height: 100vh;
   background-color: #f5f7fb;
+  overflow-x: hidden;
 }
 
 .dashboard-content {
@@ -15,6 +16,20 @@
 
 .dashboard-content.content-with-sidebar {
   margin-left: 280px;
+}
+
+.admin-dashboard-container.messages-active {
+  overflow: hidden;
+  height: 100vh;
+  max-height: 100vh;
+}
+
+.dashboard-content.messages-content {
+  padding: 0;
+  overflow: hidden;
+  height: calc(100vh - 56px);
+  min-height: calc(100vh - 56px);
+  max-height: calc(100vh - 56px);
 }
 
 .alert-section {
@@ -98,7 +113,6 @@
   color: #666;
 }
 
-/* PrimeReact DataTable Customization */
 .inventory-table {
   border: none;
 }
@@ -140,12 +154,10 @@
   background-color: #f8f9fa;
 }
 
-/* Remove dark loading overlay */
 .inventory-table .p-datatable-loading-overlay {
   background-color: rgba(255, 255, 255, 0.9) !important;
 }
 
-/* Custom Loading Spinner */
 .custom-loading {
   display: flex;
   flex-direction: column;
@@ -166,14 +178,12 @@
   font-weight: 500;
 }
 
-/* Empty Message */
 .inventory-table .p-datatable-emptymessage > td {
   text-align: center;
   padding: 32px;
   color: #999;
 }
 
-/* Quantity Cell with Low Stock Warning */
 .quantity-cell {
   display: flex;
   align-items: center;
@@ -206,7 +216,6 @@
   }
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .dashboard-content {
     padding: 20px;
@@ -214,6 +223,10 @@
 
   .dashboard-content.content-with-sidebar {
     margin-left: 0;
+  }
+
+  .dashboard-content.messages-content {
+    padding: 0;
   }
 
   .dashboard-title {
