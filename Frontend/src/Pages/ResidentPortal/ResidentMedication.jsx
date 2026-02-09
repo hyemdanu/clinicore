@@ -33,43 +33,7 @@ export default function ResidentMedication() {
         { label: "Status", value: "intake_status", order: "asc" },
     ];
 
-    const loadSampleData = () => {
-        const sampleData = [
-            {
-                id: 1,
-                medication_name: "Medication 1",
-                frequency: "M, W, F",
-                scheduled_time: "AM",
-                intake_status: "ADMINISTERED",
-                notes: "Taken and went well",
-            },
-            {
-                id: 2,
-                medication_name: "Medication 2",
-                frequency: "W, F",
-                scheduled_time: "PM",
-                intake_status: "WITHHELD",
-                notes: "Some kind of description here...",
-            },
-            {
-                id: 3,
-                medication_name: "Medication 3",
-                frequency: "Th, S",
-                scheduled_time: "AM",
-                intake_status: "MISSED",
-                notes: "Some kind of description here...",
-            },
-            {
-                id: 4,
-                medication_name: "Medication 4",
-                frequency: "Everyday",
-                scheduled_time: "AM",
-                intake_status: "ADMINISTERED",
-                notes: "Taken and went well",
-            },
-        ];
-        setMedications(sampleData);
-    };
+
 
     const fetchData = async () => {
         setLoading(true);
@@ -122,7 +86,6 @@ export default function ResidentMedication() {
 
     useEffect(() => {
         fetchData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [navigate]);
 
     const handleSortChange = (e) => {
@@ -177,11 +140,6 @@ export default function ResidentMedication() {
     }, [medications, sortField, sortOrder]);
 
     const handleRefresh = () => fetchData();
-
-    const handleAddMedication = () => {
-        // If you have a route/form later, swap this to navigate("/resident/medications/new")
-        console.log("Add medication clicked");
-    };
 
     return (
         <div className="admin-dashboard-container">
