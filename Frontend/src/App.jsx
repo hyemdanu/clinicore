@@ -16,7 +16,7 @@ export default function App() {
             <Routes>
                 <Route path="/" element={<LoginPage/>} />
                 <Route path="/resident" element={<ResidentDashboard/>} />
-                <Route path="/resident/medication" element={<ResidentMedication/>} />
+                <Route path="/resident/medications" element={<ResidentMedication/>} />
                 <Route path="/caregiver" element={<CaregiverDashboard/>} />
                 <Route path="/admin" element={<AdminDashboard/>} />
                 <Route path="/forgot-userid" element={<ForgotUserIdPage />} />
