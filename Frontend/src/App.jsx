@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from "./Pages/WelcomePage/LoginPage";
 import ResidentDashboard from "./Pages/ResidentPortal/ResidentDashboard";
+import ResidentMedication from "./Pages/ResidentPortal/ResidentMedication";
 import CaregiverDashboard from "./Pages/CaregiverPortal/CaregiverDashboard";
 import AdminDashboard from "./Pages/AdminPortal/AdminDashboard";
 import ForgotUserIdPage from "./Pages/WelcomePage/ForgotUserIdPage";
@@ -16,6 +17,7 @@ export default function App() {
             <Routes>
                 <Route path="/" element={<LoginPage/>} />
                 <Route path="/resident" element={<ResidentDashboard/>} />
+                <Route path="/resident/medications" element={<ResidentMedication/>} />
                 <Route path="/resident/medical-profile" element={<ResidentMedicalProfile/>} />
                 <Route path="/caregiver" element={<CaregiverDashboard/>} />
                 <Route path="/admin" element={<AdminDashboard/>} />
