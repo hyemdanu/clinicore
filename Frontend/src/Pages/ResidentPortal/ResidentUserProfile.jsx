@@ -1,63 +1,177 @@
-import React from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { get } from "../../services/api";
+
+import Header from "../../Components/Header";
+import ResidentSidebar from "../../Components/ResidentSidebar";
+
+import "primereact/resources/themes/lara-light-blue/theme.css";
+import "primeicons/primeicons.css";
+
+// Reuse the dashboard layout shell styles so the header/sidebar match across pages
+import "./css/ResidentDashboard.css";
 import "./css/ResidentUserProfile.css";
 
 export default function ResidentUserProfile() {
-    // Sample user data
-    const user = {
-        name: "John Smith",
-        dob: "01/01/1980",
-        contactInfo: "123-456-7890",
-        admissionDate: "01/01/2020",
-        gender: "Male",
-        emergencyContact: "Jane Smith - 123-456-7890",
-        facility: "Sacramento",
-        roomNumber: "101A",
-        picture: "picture.jpg" // Replace with actual image path
-    };
+    const navigate = useNavigate();
+
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [loading, setLoading] = useState(true);
+    const [resident, setResident] = useState(null);
+
+    const toggleSidebar = () => setSidebarOpen((s) => !s);
+
+    useEffect(() => {
+        (async () => {
+            setLoading(true);
+            try {
+                const currentUserStr = localStorage.getItem("currentUser");
+                if (!currentUserStr) {
+                    navigate("/");
+                    return;
+                }
+
+                const currentUser = JSON.parse(currentUserStr);
+                const currentUserId = currentUser.id;
+
+                // Optional role gate (match dashboard behavior)
+                if (currentUser.role && currentUser.role !== "RESIDENT") {
+                    navigate("/not-authorized");
+                    return;
+                }
+
+                // Backend should return the resident's joined profile info.
+                // Fallback to currentUser if the endpoint isn't wired yet.
+                const profile = await get(`/residents/profile?currentUserId=${currentUserId}`).catch(
+                    () => currentUser
+                );
+                setResident(profile);
+            } catch (e) {
+                console.error(e);
+                setResident(null);
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, [navigate]);
+
+    const view = useMemo(() => {
+        if (!resident) return null;
+
+        const fullName = [resident.firstName, resident.lastName].filter(Boolean).join(" ");
+        const dob = resident.birthday ? new Date(resident.birthday).toLocaleDateString() : "—";
+
+        // Some APIs return resident-specific fields on the same object; others may nest them.
+        const emergencyName = resident.emergencyContactName ?? resident.emergency_contact_name;
+        const emergencyPhone = resident.emergencyContactNumber ?? resident.emergency_contact_number;
+        const emergency =
+            emergencyName || emergencyPhone
+                ? `${emergencyName || ""}${emergencyName && emergencyPhone ? " — " : ""}${emergencyPhone || ""}`
+                : "—";
+
+        const phone = resident.contactNumber ?? resident.phone ?? "—";
+        const gender = resident.gender ?? "—";
+        const username = resident.username ?? "—";
+
+        // If you later add facility/room to the profile API, these will automatically appear.
+        const facility = resident.facility ?? resident.facilityName ?? "—";
+        const room = resident.roomNumber ?? resident.room ?? "—";
+
+        // Allow backend-provided avatar URL if present; otherwise default icon.
+        const picture = resident.pictureUrl ?? resident.avatarUrl ?? defaultAvatar;
+
+        return { fullName: fullName || "—", dob, phone, gender, emergency, facility, room, username, picture };
+    }, [resident]);
 
     return (
-        <div className="resident-user-profile-page">
-            <div className="box">
-                <div className="profile-left">
-                    <img src={user.picture} alt="Profile" className="profile-picture" />
+        <div className="admin-dashboard-container">
+            <Header onToggleSidebar={toggleSidebar} title="User Profile" />
+            <ResidentSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
+
+            <main className={`dashboard-content ${sidebarOpen ? "content-with-sidebar" : ""}`}>
+                <div className="alert-section">
+                    <h2 className="dashboard-title">Your Profile</h2>
                 </div>
-                <div className="profile-middle">
-                    <div className="profile-info">
-                        <p><strong>Name:</strong></p>
-                        <p>{user.name}</p>
+
+                {loading ? (
+                    <div className="rd-skeleton-list" style={{ maxWidth: 720 }}>
+                        <div className="rd-skel-line" />
+                        <div className="rd-skel-line" />
+                        <div className="rd-skel-line" />
                     </div>
-                    <div className="profile-info">
-                        <p><strong>Date of Birth:</strong></p>
-                        <p>{user.dob}</p>
+                ) : !view ? (
+                    <div className="error-message">We couldn’t load your profile. Please try again.</div>
+                ) : (
+                    <div className="resident-user-profile-page">
+                        <div className="box">
+                            <div className="profile-left">
+                                <img
+                                    src={view.picture}
+                                    alt="Profile"
+                                    className="profile-picture"
+                                    onError={(e) => {
+                                        e.currentTarget.src = defaultAvatar;
+                                    }}
+                                />
+                            </div>
+
+                            <div className="profile-middle">
+                                <div className="profile-info">
+                                    <p>
+                                        <strong>Name:</strong>
+                                    </p>
+                                    <p>{view.fullName}</p>
+                                </div>
+                                <div className="profile-info">
+                                    <p>
+                                        <strong>Date of Birth:</strong>
+                                    </p>
+                                    <p>{view.dob}</p>
+                                </div>
+                                <div className="profile-info">
+                                    <p>
+                                        <strong>Contact Info:</strong>
+                                    </p>
+                                    <p>{view.phone}</p>
+                                </div>
+                                <div className="profile-info">
+                                    <p>
+                                        <strong>Username:</strong>
+                                    </p>
+                                    <p>{view.username}</p>
+                                </div>
+                            </div>
+
+                            <div className="profile-right">
+                                <div className="profile-info">
+                                    <p>
+                                        <strong>Gender:</strong>
+                                    </p>
+                                    <p>{view.gender}</p>
+                                </div>
+                                <div className="profile-info">
+                                    <p>
+                                        <strong>Emergency Contact:</strong>
+                                    </p>
+                                    <p>{view.emergency}</p>
+                                </div>
+                                <div className="profile-info">
+                                    <p>
+                                        <strong>Facility:</strong>
+                                    </p>
+                                    <p>{view.facility}</p>
+                                </div>
+                                <div className="profile-info">
+                                    <p>
+                                        <strong>Room Number:</strong>
+                                    </p>
+                                    <p>{view.room}</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="profile-info">
-                        <p><strong>Contact Info:</strong></p>
-                        <p>{user.contactInfo}</p>
-                    </div>
-                    <div className="profile-info">
-                        <p><strong>Admission Date:</strong></p>
-                        <p>{user.admissionDate}</p>
-                    </div>
-                </div>
-                <div className="profile-right">
-                    <div className="profile-info">
-                        <p><strong>Gender:</strong></p>
-                        <p>{user.gender}</p>
-                    </div>
-                    <div className="profile-info">
-                        <p><strong>Emergency Contact:</strong></p>
-                        <p>{user.emergencyContact}</p>
-                    </div>
-                    <div className="profile-info">
-                        <p><strong>Facility:</strong></p>
-                        <p>{user.facility}</p>
-                    </div>
-                    <div className="profile-info">
-                        <p><strong>Room Number:</strong></p>
-                        <p>{user.roomNumber}</p>
-                    </div>
-                </div>
-            </div>
+                )}
+            </main>
         </div>
     );
 }
