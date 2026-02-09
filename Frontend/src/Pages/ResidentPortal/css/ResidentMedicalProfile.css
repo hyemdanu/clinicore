@@ -1,78 +1,240 @@
+/* Pull in admin layout */
+@import "../../AdminPortal/css/admin.css";
+
+
+/* ===== GRID LAYOUT (MATCH RD SECONDARY PANELS) ===== */
 .medical-profile-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    grid-template-columns: 1fr;
+    gap: 16px;
 }
 
+@media (min-width: 720px) {
+    .medical-profile-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width: 1024px) {
+    .medical-profile-grid {
+        grid-template-columns: 1fr 1fr;
+        max-width: 1000px;
+    }
+}
+
+/* ===== COLUMN STACK ===== */
 .medical-column {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
 }
 
+/* ===== CARD BASE (MATCH rd-panel) ===== */
 .mp-card {
-    background: white;
+    background: #fff;
     border-radius: 14px;
-    padding: 18px 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    padding: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
 }
 
+/* ===== HEADER BAR (MATCH rd-panel-head) ===== */
 .mp-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    justify-content: space-between;
+    margin-bottom: 12px;
 }
 
+/* ===== TITLES ===== */
+.mp-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+}
+
+/* ===== INSURANCE BIG VALUE ===== */
 .mp-value {
-    font-size: 18px;
-    font-weight: 600;
-    margin-top: 6px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
 }
 
+/* ===== ROW DATA ===== */
 .mp-row {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
+    padding: 8px 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+.mp-row span:last-child {
+    font-weight: 600;
+}
+
+/* ===== LIST ITEMS (MATCH rd-doc-item STYLE) ===== */
+.mp-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 6px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 120ms ease;
     font-size: 14px;
 }
 
-.mp-row:last-child {
+.mp-list-item:hover {
+    background: #f8f9fa;
+}
+
+/* ===== BUTTON ICONS (MATCH rd-link-button FEEL) ===== */
+.mp-add-btn,
+.mp-edit-btn {
+    background: transparent;
+    border: 0;
+    color: #369DF7;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.mp-add-btn:hover,
+.mp-edit-btn:hover {
+    text-decoration: underline;
+}
+
+/* ===== ADD INPUT FORM ===== */
+.add-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.add-form input {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    font-size: 14px;
+}
+
+.add-form button {
+    background: #369DF7;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.add-form button:hover {
+    background: #1f7ddc;
+}
+
+/* ===== 3 DOT MENU ===== */
+.item-menu {
+    position: relative;
+}
+
+.item-menu-dropdown {
+    position: absolute;
+    right: 0;
+    top: 24px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 6px 18px rgba(0,0,0,.10);
+    overflow: hidden;
+    z-index: 10;
+}
+
+.item-menu-dropdown button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 14px;
+    background: transparent;
+    border: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+}
+
+.item-menu-dropdown button:hover {
+    background: #f8f9fa;
+}
+
+/* ===== RENAME INPUT ===== */
+.rename-input {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+}
+
+/* ===== EMPTY TEXT ===== */
+.mp-empty {
+    color: #999;
+    font-size: 14px;
+    padding: 6px 0;
+}
+
+.inventory-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 10px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+    color: #333;
+}
+
+.inventory-row:last-child {
     border-bottom: none;
 }
 
-.mp-list-item {
+.row-actions {
     display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-    font-size: 14px;
+    gap: 12px;
 }
 
-.mp-edit-btn,
-.mp-add-btn {
-    border: none;
+.row-actions button {
     background: none;
+    border: none;
     cursor: pointer;
+    color: #666;
     font-size: 16px;
 }
-.mp-add-row {
+
+.row-actions button:hover {
+    color: #369DF7;
+}
+
+.add-form {
     display: flex;
-    gap: 8px;
-    margin-top: 10px;
+    gap: 10px;
+    margin-top: 12px;
 }
 
-.mp-input {
+.add-form input {
     flex: 1;
-    padding: 6px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
 }
 
-.mp-save-btn {
-    padding: 6px 12px;
+.add-form button {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+    background-color: #369DF7;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
 }
 
-.mp-cancel-btn {
-    padding: 6px 12px;
-    background-color: #ccc;
-}

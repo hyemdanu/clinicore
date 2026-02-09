@@ -1,151 +1,273 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../../Components/Header";
-import ResidentSidebar from "../../Components/ResidentSidebar";
-
-import "primereact/resources/themes/lara-light-blue/theme.css";
-import "primeicons/primeicons.css";
-import "./css/ResidentMedicalProfile.css";
+import { get, post, patch, del } from "../../services/api";
+import './css/ResidentMedicalProfile.css';
 
 export default function ResidentMedicalProfile() {
     const navigate = useNavigate();
-    const [sidebarOpen, setSidebarOpen] = useState(true);
 
-    const toggleSidebar = () => setSidebarOpen((s) => !s);
+    const [resident, setResident] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Allergy state
-    const [allergies, setAllergies] = useState([
-        "Allergy1",
-        "Allergy2"
-    ]);
+    const [showAddAllergy, setShowAddAllergy] = useState(false);
     const [newAllergy, setNewAllergy] = useState("");
-    const [showAllergyInput, setShowAllergyInput] = useState(false);
 
-    const handleAddAllergy = () => {
-        if (!newAllergy.trim()) return;
+    const [showAddDiagnosis, setShowAddDiagnosis] = useState(false);
+    const [newDiagnosis, setNewDiagnosis] = useState("");
 
-        setAllergies([...allergies, newAllergy.trim()]);
-        setNewAllergy("");
-        setShowAllergyInput(false);
+    // Load resident
+    useEffect(() => {
+        loadResident();
+    }, []);
+
+    const loadResident = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const currentUserStr = localStorage.getItem("currentUser");
+            if (!currentUserStr) {
+                navigate("/");
+                return;
+            }
+
+            const currentUser = JSON.parse(currentUserStr);
+            const currentUserId = currentUser.id;
+
+            // If admin opened resident
+            const openResidentId = localStorage.getItem("openResidentId");
+
+            const residentId = openResidentId || currentUserId;
+
+            const data = await get(`/residents/full/${residentId}?currentUserId=${currentUserId}`);
+            setResident(data);
+        } catch (err) {
+            console.error("Failed to load resident:", err);
+            setError("Failed to load medical profile.");
+        } finally {
+            setLoading(false);
+        }
     };
 
+    const refreshResident = async () => {
+        const currentUserId = JSON.parse(localStorage.getItem("currentUser")).id;
+        const data = await get(`/residents/full/${resident.id}?currentUserId=${currentUserId}`);
+        setResident(data);
+    };
+
+    // -----------------------------
+    // DATA
+    // -----------------------------
+    const allergies = resident?.medicalRecord?.allergyDetails || [];
+    const diagnoses = resident?.medicalRecord?.diagnosisDetails || [];
+
+    // -----------------------------
+    // ADD ALLERGY
+    // -----------------------------
+    const handleAddAllergy = async () => {
+        if (!newAllergy.trim()) return;
+
+        try {
+            const currentUserId = JSON.parse(localStorage.getItem("currentUser")).id;
+
+            await post(`/residents/${resident.id}/allergies?currentUserId=${currentUserId}`, {
+                allergyType: newAllergy,
+                severity: 1,
+                notes: ""
+            });
+
+            setNewAllergy("");
+            setShowAddAllergy(false);
+            refreshResident();
+        } catch (err) {
+            console.error("Add allergy failed:", err);
+            alert("Failed to add allergy");
+        }
+    };
+
+    // -----------------------------
+    // DELETE ALLERGY
+    // -----------------------------
+    const handleDeleteAllergy = async (id) => {
+        if (!confirm("Delete allergy?")) return;
+
+        try {
+            const currentUserId = JSON.parse(localStorage.getItem("currentUser")).id;
+
+            await del(`/residents/allergies/${id}?currentUserId=${currentUserId}`);
+
+            refreshResident();
+        } catch (err) {
+            console.error("Delete failed:", err);
+        }
+    };
+
+    // -----------------------------
+    // ADD DIAGNOSIS
+    // -----------------------------
+    const handleAddDiagnosis = async () => {
+        if (!newDiagnosis.trim()) return;
+
+        try {
+            const currentUserId = JSON.parse(localStorage.getItem("currentUser")).id;
+
+            await post(`/residents/${resident.id}/diagnoses?currentUserId=${currentUserId}`, {
+                diagnosis: newDiagnosis,
+                notes: ""
+            });
+
+            setNewDiagnosis("");
+            setShowAddDiagnosis(false);
+            refreshResident();
+        } catch (err) {
+            console.error("Add diagnosis failed:", err);
+        }
+    };
+
+    // -----------------------------
+    // RENAME ITEM
+    // -----------------------------
+    const handleRenameItem = async (type, id, value) => {
+        const currentUserId = JSON.parse(localStorage.getItem("currentUser")).id;
+
+        const url = type === "allergy"
+            ? `/residents/allergies/${id}`
+            : `/residents/diagnoses/${id}`;
+
+        await patch(`${url}?currentUserId=${currentUserId}`, {
+            [type === "allergy" ? "allergyType" : "diagnosis"]: value
+        });
+
+        refreshResident();
+    };
+
+    // -----------------------------
+    // UI STATES
+    // -----------------------------
+    if (loading) {
+        return (
+            <div className="loading-state">
+                <i className="pi pi-spin pi-spinner"></i>
+                Loading medical profile...
+            </div>
+        );
+    }
+
+    if (error) {
+        return <div className="error-message">{error}</div>;
+    }
+
+    if (!resident) {
+        return <div>No resident loaded.</div>;
+    }
+
+    // -----------------------------
+    // UI RENDER
+    // -----------------------------
     return (
         <div className="admin-dashboard-container">
-            <Header onToggleSidebar={toggleSidebar} title="Medical Profile" />
-            <ResidentSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
 
-            <main className={`dashboard-content ${sidebarOpen ? "content-with-sidebar" : ""}`}>
+            <main className="dashboard-content">
 
-                <section className="medical-profile-grid">
+                <div className="alert-section">
+                    <h2 className="dashboard-title">
+                        Medical Profile — {resident.firstName} {resident.lastName}
+                    </h2>
+                </div>
 
-                    {/* LEFT COLUMN */}
-                    <div className="medical-column">
+                {error && <div className="error-message">{error}</div>}
 
-                        <div className="mp-card">
-                            <h3>Insurance</h3>
-                            <p className="mp-value">Medi-Cal</p>
-                        </div>
-
-                        <div className="mp-card">
-                            <div className="mp-header">
-                                <h3>Medical Services</h3>
-                                <button className="mp-edit-btn pi pi-pencil" />
-                            </div>
-
-                            <div className="mp-row"><span>DNR/POLST</span><span>Yes</span></div>
-                            <div className="mp-row"><span>On Hospice</span><span>Yes</span></div>
-                            <div className="mp-row"><span>Hospice Agency</span><span>ABC Hospice</span></div>
-                            <div className="mp-row"><span>Preferred Hospital</span><span>ABC Hospital</span></div>
-                            <div className="mp-row"><span>Preferred Pharmacy</span><span>ABC Pharmacy</span></div>
-                            <div className="mp-row"><span>On Home Health</span><span>No</span></div>
-                            <div className="mp-row"><span>Home Health Agency</span><span>N/A</span></div>
-                            <div className="mp-row"><span>Mortuary</span><span>ABC Mortuary</span></div>
-                            <div className="mp-row"><span>Mortuary Health</span><span>Completed</span></div>
-                        </div>
-
+                {/* ALLERGIES */}
+                <section className="inventory-section">
+                    <div className="inventory-header">
+                        <h3>Allergies</h3>
+                        <button className="action-btn" onClick={() => setShowAddAllergy(true)}>
+                            <i className="pi pi-plus"></i> Add
+                        </button>
                     </div>
 
-                    {/* RIGHT COLUMN */}
-                    <div className="medical-column">
-
-                        <div className="mp-card">
-                            <div className="mp-header">
-                                <h3>Capabilities</h3>
-                                <button className="mp-edit-btn pi pi-pencil" />
-                            </div>
-
-                            <div className="mp-row"><span>Is Verbal</span><span>Yes</span></div>
-                            <div className="mp-row"><span>Self-Medicates</span><span>Yes</span></div>
-                            <div className="mp-row"><span>Incontinence Status</span><span>Continent</span></div>
-                            <div className="mp-row"><span>Mobility Capability</span><span>Walks without assistance</span></div>
+                    {allergies.length === 0 && (
+                        <div className="custom-loading">
+                            <span>No allergies recorded</span>
                         </div>
+                    )}
 
-                        <div className="mp-card">
-                            <div className="mp-header">
-                                <h3>Diagnoses</h3>
-                                <button className="mp-add-btn pi pi-plus" />
-                            </div>
+                    {allergies.map((a) => (
+                        <div key={a.id} className="inventory-row">
+                            <span>{a.allergyType}</span>
 
-                            <div className="mp-list-item">Some Disease <span className="pi pi-ellipsis-v" /></div>
-                            <div className="mp-list-item">Nausea <span className="pi pi-ellipsis-v" /></div>
-                            <div className="mp-list-item">Injury <span className="pi pi-ellipsis-v" /></div>
-                        </div>
-
-                        <div className="mp-card">
-                            <div className="mp-header">
-                                <h3>Medical History</h3>
-                                <button className="mp-add-btn pi pi-plus" />
-                            </div>
-
-                            <div className="mp-list-item">Stroke <span className="pi pi-ellipsis-v" /></div>
-                            <div className="mp-list-item">Heart Attack <span className="pi pi-ellipsis-v" /></div>
-                        </div>
-
-                        {/* ✅ EDITABLE ALLERGIES */}
-                        <div className="mp-card">
-                            <div className="mp-header">
-                                <h3>Allergies</h3>
+                            <div className="row-actions">
                                 <button
-                                    className="mp-add-btn pi pi-plus"
-                                    onClick={() => setShowAllergyInput(true)}
+                                    className="pi pi-pencil"
+                                    onClick={() => {
+                                        const value = prompt("Rename allergy:", a.allergyType);
+                                        if (value) handleRenameItem("allergy", a.id, value);
+                                    }}
+                                />
+                                <button
+                                    className="pi pi-trash"
+                                    onClick={() => handleDeleteAllergy(a.id)}
                                 />
                             </div>
-
-                            {allergies.map((allergy, index) => (
-                                <div className="mp-list-item" key={index}>
-                                    {allergy} <span className="pi pi-ellipsis-v" />
-                                </div>
-                            ))}
-
-                            {showAllergyInput && (
-                                <div className="mp-add-row">
-                                    <input
-                                        type="text"
-                                        placeholder="Enter allergy name"
-                                        value={newAllergy}
-                                        onChange={(e) => setNewAllergy(e.target.value)}
-                                        className="mp-input"
-                                    />
-
-                                    <button className="mp-save-btn" onClick={handleAddAllergy}>
-                                        Add
-                                    </button>
-
-                                    <button
-                                        className="mp-cancel-btn"
-                                        onClick={() => {
-                                            setShowAllergyInput(false);
-                                            setNewAllergy("");
-                                        }}
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            )}
                         </div>
+                    ))}
 
+                    {showAddAllergy && (
+                        <div className="add-form">
+                            <input
+                                value={newAllergy}
+                                onChange={(e) => setNewAllergy(e.target.value)}
+                                placeholder="Enter allergy"
+                            />
+                            <button onClick={handleAddAllergy}>Add</button>
+                            <button onClick={() => setShowAddAllergy(false)}>Cancel</button>
+                        </div>
+                    )}
+                </section>
+
+                {/* DIAGNOSES */}
+                <section className="inventory-section">
+                    <div className="inventory-header">
+                        <h3>Diagnoses</h3>
+                        <button className="action-btn" onClick={() => setShowAddDiagnosis(true)}>
+                            <i className="pi pi-plus"></i> Add
+                        </button>
                     </div>
 
+                    {diagnoses.length === 0 && (
+                        <div className="custom-loading">
+                            <span>No diagnoses recorded</span>
+                        </div>
+                    )}
+
+                    {diagnoses.map((d) => (
+                        <div key={d.id} className="inventory-row">
+                            <span>{d.diagnosis}</span>
+
+                            <div className="row-actions">
+                                <button
+                                    className="pi pi-pencil"
+                                    onClick={() => {
+                                        const value = prompt("Rename diagnosis:", d.diagnosis);
+                                        if (value) handleRenameItem("diagnosis", d.id, value);
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    ))}
+
+                    {showAddDiagnosis && (
+                        <div className="add-form">
+                            <input
+                                value={newDiagnosis}
+                                onChange={(e) => setNewDiagnosis(e.target.value)}
+                                placeholder="Enter diagnosis"
+                            />
+                            <button onClick={handleAddDiagnosis}>Add</button>
+                            <button onClick={() => setShowAddDiagnosis(false)}>Cancel</button>
+                        </div>
+                    )}
                 </section>
 
             </main>
