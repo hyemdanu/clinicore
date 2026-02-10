@@ -537,6 +537,7 @@ export default function AccountRequests() {
                 header="Edit Account Request"
                 // Make dialog modal (blocks background interactions)
                 modal
+                closable={false}
                 className="modern-dialog"
                 // Make dialog responsive on different screen sizes
                 breakpoints={{ '960px': '80vw', '640px': '95vw' }}
@@ -591,24 +592,20 @@ export default function AccountRequests() {
                     </div>
 
                     {/* Cancel and Save buttons */}
-                    <div className="dialog-actions">
-                        {/* Cancel button - closes dialog without saving */}
+                    <div className="dialog-actions dialog-actions--right">
                         <Button
                             label="Cancel"
-                            icon="pi pi-times"
-                            // Call handler to close dialog without saving
                             onClick={() => handleEditRequest(null, true)}
-                            className="p-button-text"
+                            className="p-button-secondary"
                         />
-                        {/* Save button - sends edited data to backend */}
+
                         <Button
                             label="Save Changes"
-                            icon="pi pi-check"
-                            // Call handler to save edited data
                             onClick={handleSaveEditedRequest}
                             className="p-button-success"
                         />
                     </div>
+
                 </div>
             </Dialog>
 
@@ -621,6 +618,7 @@ export default function AccountRequests() {
                 header="Confirm Deny Request"
                 // Make dialog modal (blocks background interactions)
                 modal
+                closable={false}
                 className="modern-dialog"
                 // Make dialog responsive on different screen sizes
                 breakpoints={{ '960px': '80vw', '640px': '95vw' }}
@@ -635,20 +633,15 @@ export default function AccountRequests() {
                     </p>
 
                     {/* Cancel and Deny buttons */}
-                    <div className="dialog-actions">
-                        {/* Cancel button - closes without denying */}
+                    <div className="dialog-actions dialog-actions--right">
                         <Button
                             label="Cancel"
-                            icon="pi pi-times"
-                            // Call handler to close dialog
                             onClick={handleCloseDenyDialog}
-                            className="p-button-text"
+                            className="p-button-secondary"
                         />
-                        {/* Deny button - confirms denial */}
+
                         <Button
                             label="Deny Request"
-                            icon="pi pi-ban"
-                            // Call handler to deny request
                             onClick={handleDenyRequest}
                             className="p-button-danger"
                         />
@@ -665,6 +658,7 @@ export default function AccountRequests() {
                 header="Activation Code"
                 // Make dialog modal (blocks background interactions)
                 modal
+                closable={false}
                 className="modern-dialog"
                 // Make dialog responsive on different screen sizes
                 breakpoints={{ '960px': '80vw', '640px': '95vw' }}
@@ -685,23 +679,18 @@ export default function AccountRequests() {
                         <p className="activation-code-value">{activationCode}</p>
                     </div>
 
-                    {/* Copy to clipboard button */}
-                    <Button
-                        label="Copy to Clipboard"
-                        icon="pi pi-copy"
-                        // Call handler to copy code to clipboard
-                        onClick={handleCopyActivationCode}
-                        className="p-button-info"
-                        style={{ width: '100%' }}
-                    />
+                    <div className="activation-buttons">
+                        <Button
+                            label="Copy to Clipboard"
+                            onClick={handleCopyActivationCode}
+                            className="p-button-info"
+                        />
+                        <Button
+                            label="Done"
+                            onClick={handleCloseActivationCodeDialog}
+                        />
+                    </div>
 
-                    {/* Done button to close dialog */}
-                    <Button
-                        label="Done"
-                        // Call handler to close dialog
-                        onClick={handleCloseActivationCodeDialog}
-                        style={{ width: '100%' }}
-                    />
                 </div>
             </Dialog>
         </div>

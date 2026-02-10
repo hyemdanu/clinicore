@@ -11,6 +11,7 @@ import CreateAccountPage from "./Pages/WelcomePage/CreateAccountPage";
 import RequestSentPage from "./Pages/WelcomePage/RequestSentPage";
 import RecoveryEmailSentPage from "./Pages/WelcomePage/RecoveryEmailSentPage.jsx"
 import CompleteAccountCreation from "./Pages/WelcomePage/CompleteAccountCreation.jsx";
+import ResidentMedicalProfile from "./Pages/ResidentPortal/ResidentMedicalProfile";
 
 export default function App() {
     return (

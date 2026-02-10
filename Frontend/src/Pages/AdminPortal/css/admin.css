@@ -61,47 +61,65 @@
   font-weight: 600;
   color: #333;
 }
-
-.sort-dropdown-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0;
-  min-width: fit-content;  /* ADD THIS - prevents shrinking */
+/* Target the actual dropdown root (same element), not a child */
+.sort-dropdown.p-dropdown {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: none;
+    height: 30px;              /* ✅ adjust this (try 34–40px) */
+    padding: 0;                /* remove any extra padding */
 }
 
-.sort-dropdown-wrapper label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #666;
-  white-space: nowrap;
+/* Remove the loud blue focus ring */
+.sort-dropdown.p-dropdown:not(.p-disabled).p-focus {
+    box-shadow: none !important;
+    border-color: #369DF7; /* keep a subtle focus border */
 }
 
-.sort-dropdown {
-  min-width: 200px;
-  flex-shrink: 0;  /* ADD THIS - prevents shrinking */
+/* Make the label area look clean (no inner box) */
+.sort-dropdown.p-dropdown .p-dropdown-label {
+    padding: 0 12px !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    font-size: 0.95rem;
+
+    height: 35px;          /* controls total height */
+    display: flex;
+    align-items: center;   /* 🔥 vertical center */
 }
 
-.sort-dropdown .p-dropdown {
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  background-color: white;
-  transition: border-color 0.2s ease;
+
+/* Tidy up the trigger (arrow area) */
+.sort-dropdown.p-dropdown .p-dropdown-trigger {
+    width: 42px;                /* ✅ arrow box width */
+    height: 38px;               /* ✅ match height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none !important;
+    background: transparent !important;
 }
 
-.sort-dropdown .p-dropdown:hover {
-  border-color: #369DF7;
+/* Dropdown panel (the opened list) */
+.p-dropdown-panel {
+    border-radius: 10px;
+    overflow: hidden;
 }
 
-.sort-dropdown .p-dropdown-label {
-  padding: 8px 12px;
-  font-size: 14px;
-  color: #333;
+/* Items */
+.p-dropdown-items .p-dropdown-item {
+    padding: 0.6rem 0.9rem;
+    font-size: 0.95rem;
 }
 
-.sort-dropdown .p-dropdown-trigger {
-  color: #666;
+/* Selected item highlight (optional: make it softer) */
+.p-dropdown-items .p-dropdown-item.p-highlight {
+    background: #eef6ff;
+    color: #1d4ed8;
 }
+
 
 /* PrimeReact DataTable Customization */
 .inventory-table {
@@ -267,19 +285,108 @@
 }
 
 /* Modern dialog base */
-.modern-dialog .p-dialog {
-    border-radius: 16px;
+/* ✅ PrimeReact Dialog root is usually .p-dialog itself */
+.p-dialog.modern-dialog {
+    border: none;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.25);
 }
 
-.modern-dialog .p-dialog-header {
+.p-dialog.modern-dialog .p-dialog-header {
     font-weight: 600;
     font-size: 1rem;
     border-bottom: 1px solid #e5e7eb;
+    padding: 1rem 1.25rem;
 }
 
-.modern-dialog .p-dialog-content {
-    padding-top: 1.5rem;
+.p-dialog.modern-dialog .p-dialog-content {
+    padding: 1.25rem;
 }
+
+/* ✅ Ensure overlay always sits above tables/sidebars */
+.p-dialog-mask {
+    z-index: 5000 !important;
+}
+
+.p-dialog {
+    z-index: 5001 !important;
+}
+
+/* ===== Activation Code dialog layout fix ===== */
+/* Remove the "narrow centered column inside a wide modal" effect */
+.p-dialog.activation-code-dialog .p-dialog-content .dialog-form {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+}
+
+/* Make the code card feel tighter + more intentional */
+.p-dialog.activation-code-dialog .activation-code-card {
+    padding: 1rem;
+    margin: 0.25rem 0 0.75rem;
+}
+
+/* Code styling: big but not awkwardly spaced */
+.p-dialog.activation-code-dialog .activation-code-value {
+    font-size: 2rem;
+    letter-spacing: 0.18rem; /* was 0.25rem; less "stretched" */
+}
+
+/* Buttons: consistent width + spacing */
+.p-dialog.activation-code-dialog .p-button {
+    width: 100%;
+}
+
+.p-dialog.activation-code-dialog .p-button + .p-button {
+    margin-top: 0.75rem;
+}
+
+/* Mobile: reduce code size so it doesn't overflow */
+@media (max-width: 640px) {
+    .p-dialog.activation-code-dialog .activation-code-value {
+        font-size: 1.6rem;
+        letter-spacing: 0.12rem;
+    }
+}
+
+/* Button row for activation dialog */
+.activation-code-dialog .dialog-form > .p-button {
+    flex: 1;
+}
+
+.activation-code-dialog .dialog-form {
+    gap: 1rem;
+}
+
+/* Wrap buttons in a flex row */
+.activation-code-dialog .dialog-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.activation-code-dialog .dialog-form .p-button {
+    margin: 0;
+}
+
+/* Create button container */
+.activation-code-dialog .dialog-form::after {
+    content: "";
+}
+
+.activation-buttons {
+    display: flex;
+    gap: 1.25rem;
+    margin-top: 0.75rem;
+    justify-content: center;
+}
+
+.activation-buttons .p-button {
+    padding: 0.8rem 1.4rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    min-width: 180px;
+}
+
 
 /* Shared form layout inside dialogs */
 .dialog-form {
@@ -287,8 +394,10 @@
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;   /* tighter spacing */
 }
+
+
 
 .dialog-field label {
     font-size: 0.85rem;
@@ -324,12 +433,15 @@
 
 .activation-code-card {
     background-color: #f3f4f6;
-    padding: 1.25rem;
+    padding: 0.85rem 1.25rem;  /* tighter vertical padding */
     border-radius: 0.75rem;
     text-align: center;
     border: 2px dashed #d1d5db;
-    margin: 0.5rem 0 1rem;
+    margin: 0.5rem 0 0.75rem;
+    display: inline-block;     /* <-- makes border wrap content */
+    width: 100%;
 }
+
 
 .activation-code-label {
     font-size: 0.85rem;
@@ -393,3 +505,19 @@
     margin: 0 !important;
 }
 
+.dialog-actions--right .p-button {
+    padding: 0.8rem 1.6rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+/* Make Deny button wider */
+.dialog-actions--right .p-button.p-button-danger {
+    min-width: 250px;   /* 🔥 increase this */
+}
+
+/* Keep Cancel smaller */
+.dialog-actions--right .p-button.p-button-secondary {
+    min-width: 160px;
+}
