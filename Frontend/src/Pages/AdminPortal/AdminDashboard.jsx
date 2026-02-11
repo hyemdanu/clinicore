@@ -7,6 +7,7 @@ import { get } from '../../services/api';
 import Header from '../../Components/Header';
 import AdminSidebar from '../../Components/AdminSidebar';
 import ResidentsTab from './ResidentsTab';
+import CaregiverResidentList from './CaregiverResidentList';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 import "./css/admin.css";
@@ -260,7 +261,7 @@ export default function AdminDashboard() {
             case 'residents':
                 return <ResidentsTab />;
             case 'caregivers':
-                return renderPlaceholder('Caregivers');
+                return <CaregiverResidentList />;
             case 'user':
                 return renderPlaceholder('User Management');
             case 'messages':

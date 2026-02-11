@@ -1640,6 +1640,163 @@ body.sidebar-open .dashboard-content {
     }
 }
 
+/* Caregiver List */
+.caregiver-card {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+}
+
+.caregiver-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.caregiver-card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.caregiver-avatar {
+    background-color: #369DF7;
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.caregiver-item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+
+.caregiver-email {
+    font-size: 13px;
+    color: #8b92a7;
+}
+
+.caregiver-item-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.caregiver-expand-icon {
+    font-size: 13px;
+    color: #8b92a7;
+    flex-shrink: 0;
+    transition: color 0.2s ease;
+}
+
+.caregiver-card-header:hover .caregiver-expand-icon {
+    color: #369DF7;
+}
+
+.stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+}
+
+.stat-pill i {
+    font-size: 10px;
+}
+
+.resident-count-pill {
+    background-color: rgba(54, 157, 247, 0.12);
+    color: #007AFF;
+    border: 1px solid rgba(54, 157, 247, 0.3);
+}
+
+.no-resident-pill {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #8b92a7;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Expanded residents panel inside a caregiver card */
+.caregiver-residents-panel {
+    border-top: 1px solid #f0f1f3;
+    padding: 12px 24px 16px 24px;
+    background-color: #f8f9fb;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.caregiver-no-residents {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #8b92a7;
+    font-style: italic;
+}
+
+.caregiver-no-residents i {
+    font-size: 14px;
+    color: #b0b7c3;
+}
+
+.caregiver-resident-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid #e8edf5;
+}
+
+.caregiver-resident-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #6c757d;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.caregiver-resident-name {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: #2d3748;
+}
+
+.caregiver-assigned-at {
+    font-size: 12px;
+    color: #8b92a7;
+    white-space: nowrap;
+}
+
 /* Mantine DatePicker Styling */
 .mantine-date-picker {
     width: 100%;
