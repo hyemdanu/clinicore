@@ -5,6 +5,7 @@ import com.clinicore.project.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -13,13 +14,16 @@ public class CaregiverService {
     private final CaregiverRepository caregiverRepository;
     private final UserProfileRepository userProfileRepository;
     private final ResidentCaregiverRepository residentCaregiverRepository;
+    private final ResidentGeneralRepository residentGeneralRepository;
 
     public CaregiverService(CaregiverRepository caregiverRepository,
                             UserProfileRepository userProfileRepository,
-                            ResidentCaregiverRepository residentCaregiverRepository) {
+                            ResidentCaregiverRepository residentCaregiverRepository,
+                            ResidentGeneralRepository residentGeneralRepository) {
         this.caregiverRepository = caregiverRepository;
         this.userProfileRepository = userProfileRepository;
         this.residentCaregiverRepository = residentCaregiverRepository;
+        this.residentGeneralRepository = residentGeneralRepository;
     }
 
     // grab all caregivers + who they're assigned to, admins only
@@ -64,5 +68,107 @@ public class CaregiverService {
         }
 
         return result;
+    }
+
+    // get all residents (id, firstName, lastName) for dropdowns — admins only
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getAllResidents(Long currentUserId) {
+        UserProfile currentUser = userProfileRepository.findById(currentUserId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + currentUserId));
+
+        if (currentUser.getRole() != UserProfile.Role.ADMIN) {
+            throw new IllegalArgumentException("Only admins can access this");
+        }
+
+        List<UserProfile> residents = userProfileRepository.findByRole(UserProfile.Role.RESIDENT);
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (UserProfile r : residents) {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", r.getId());
+            m.put("firstName", r.getFirstName());
+            m.put("lastName", r.getLastName());
+            result.add(m);
+        }
+
+        return result;
+    }
+
+    // assign a resident to a caregiver
+    @Transactional
+    public void assignResident(Long caregiverId, Long residentId, Long currentUserId) {
+        UserProfile currentUser = userProfileRepository.findById(currentUserId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + currentUserId));
+
+        if (currentUser.getRole() != UserProfile.Role.ADMIN) {
+            throw new IllegalArgumentException("Only admins can manage assignments");
+        }
+
+        Caregiver caregiver = caregiverRepository.findById(caregiverId)
+                .orElseThrow(() -> new IllegalArgumentException("Caregiver not found with ID: " + caregiverId));
+
+        Resident resident = residentGeneralRepository.findById(residentId)
+                .orElseThrow(() -> new IllegalArgumentException("Resident not found with ID: " + residentId));
+
+        ResidentCaregiverId id = new ResidentCaregiverId(residentId, caregiverId);
+        if (residentCaregiverRepository.existsById(id)) {
+            throw new IllegalArgumentException("Resident is already assigned to this caregiver");
+        }
+
+        ResidentCaregiver assignment = new ResidentCaregiver(id, resident, caregiver, LocalDateTime.now());
+        residentCaregiverRepository.save(assignment);
+    }
+
+    // remove a resident from a caregiver
+    @Transactional
+    public void removeResident(Long caregiverId, Long residentId, Long currentUserId) {
+        UserProfile currentUser = userProfileRepository.findById(currentUserId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + currentUserId));
+
+        if (currentUser.getRole() != UserProfile.Role.ADMIN) {
+            throw new IllegalArgumentException("Only admins can manage assignments");
+        }
+
+        ResidentCaregiverId id = new ResidentCaregiverId(residentId, caregiverId);
+        if (!residentCaregiverRepository.existsById(id)) {
+            throw new IllegalArgumentException("Assignment not found");
+        }
+
+        residentCaregiverRepository.deleteById(id);
+    }
+
+    // switch a resident from one caregiver to another
+    @Transactional
+    public void switchResident(Long fromCaregiverId, Long residentId, Long toCaregiverId, Long currentUserId) {
+        UserProfile currentUser = userProfileRepository.findById(currentUserId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + currentUserId));
+
+        if (currentUser.getRole() != UserProfile.Role.ADMIN) {
+            throw new IllegalArgumentException("Only admins can manage assignments");
+        }
+
+        if (fromCaregiverId.equals(toCaregiverId)) {
+            throw new IllegalArgumentException("Cannot switch to the same caregiver");
+        }
+
+        Caregiver toCaregiver = caregiverRepository.findById(toCaregiverId)
+                .orElseThrow(() -> new IllegalArgumentException("Target caregiver not found with ID: " + toCaregiverId));
+
+        Resident resident = residentGeneralRepository.findById(residentId)
+                .orElseThrow(() -> new IllegalArgumentException("Resident not found with ID: " + residentId));
+
+        // remove from old caregiver
+        ResidentCaregiverId oldId = new ResidentCaregiverId(residentId, fromCaregiverId);
+        if (!residentCaregiverRepository.existsById(oldId)) {
+            throw new IllegalArgumentException("Assignment not found");
+        }
+        residentCaregiverRepository.deleteById(oldId);
+
+        // assign to new caregiver (skip if already assigned)
+        ResidentCaregiverId newId = new ResidentCaregiverId(residentId, toCaregiverId);
+        if (!residentCaregiverRepository.existsById(newId)) {
+            ResidentCaregiver newAssignment = new ResidentCaregiver(newId, resident, toCaregiver, LocalDateTime.now());
+            residentCaregiverRepository.save(newAssignment);
+        }
     }
 }

@@ -1640,6 +1640,87 @@ body.sidebar-open .dashboard-content {
     }
 }
 
+/* Caregiver panel header (label + Add Resident button) */
+.caregiver-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.caregiver-panel-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #8b92a7;
+}
+
+.add-resident-btn {
+    font-size: 12px;
+    padding: 5px 12px;
+    color: #007AFF;
+    border-color: rgba(0, 122, 255, 0.25);
+}
+
+.add-resident-btn:hover {
+    background-color: rgba(0, 122, 255, 0.06);
+    border-color: rgba(0, 122, 255, 0.4);
+}
+
+.add-resident-btn i {
+    font-size: 11px;
+}
+
+/* Action buttons on each resident row */
+.resident-row-actions {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.resident-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: none;
+}
+
+.resident-action-btn i {
+    font-size: 11px;
+}
+
+.resident-action-btn.switch-btn {
+    color: #007AFF;
+    border-color: rgba(0, 122, 255, 0.2);
+    background-color: rgba(0, 122, 255, 0.04);
+}
+
+.resident-action-btn.switch-btn:hover {
+    background-color: rgba(0, 122, 255, 0.1);
+    border-color: rgba(0, 122, 255, 0.35);
+}
+
+.resident-action-btn.remove-btn {
+    color: #FF3B30;
+    border-color: rgba(255, 59, 48, 0.2);
+    background-color: rgba(255, 59, 48, 0.03);
+}
+
+.resident-action-btn.remove-btn:hover {
+    background-color: rgba(255, 59, 48, 0.1);
+    border-color: rgba(255, 59, 48, 0.35);
+}
+
 /* Caregiver List */
 .caregiver-card {
     background-color: white;

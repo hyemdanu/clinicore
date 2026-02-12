@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -12,30 +12,21 @@ import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 import "./css/admin.css";
 
-// Admin Dashboard Page
 export default function AdminDashboard() {
     const navigate = useNavigate();
 
-    // sidebarOpen controls whether the sidebar is visible or hidden
     const [sidebarOpen, setSidebarOpen] = useState(true);
-    const [activeTab, setActiveTab] = useState('dashboard');
+    const [activeTab, setActiveTab] = useState(
+        () => localStorage.getItem('adminActiveTab') || 'dashboard'
+    );
 
-    // these hold the inventory data from the backend
-    // we store medications and consumables separately because they different types
     const [medicationInventory, setMedicationInventory] = useState([]);
     const [consumablesInventory, setConsumablesInventory] = useState([]);
-
-    // loading state - shows spinner while fetching data
-    // error state - holds error message if API call fails
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // sort states - each table can be sorted independently
-    // default is 'quantity-asc' which shows low stock items first
     const [medicationSort, setMedicationSort] = useState('quantity-asc');
     const [consumablesSort, setConsumablesSort] = useState('quantity-asc');
 
-    // dropdown options for sorting
     const sortOptions = [
         { label: 'Quantity: Low to High', value: 'quantity-asc' },
         { label: 'Quantity: High to Low', value: 'quantity-desc' },
@@ -43,49 +34,36 @@ export default function AdminDashboard() {
         { label: 'Name: Z to A', value: 'name-desc' }
     ];
 
-    // runs once when component loads, fetches inventory data
-    useEffect(() => {
-        fetchInventoryData();
-    }, []);
-
-    const fetchInventoryData = async () => {
-        setLoading(true);
+    const fetchInventoryData = useCallback(async () => {
         setError(null);
-
         try {
-            // check if user is logged in by looking at localStorage
-            // if no user found, kick them back to login page
             const currentUserStr = localStorage.getItem('currentUser');
             if (!currentUserStr) {
                 navigate('/');
                 return;
             }
-
-            // parse the user data to get their ID
-            // we need this to make authenticated API calls
             const currentUser = JSON.parse(currentUserStr);
-            const currentUserId = currentUser.id;
-
-            // fetch both inventories at the same time using Promise.all
             const [medications, consumables] = await Promise.all([
-                get(`/inventory/medication?currentUserId=${currentUserId}`),
-                get(`/inventory/consumables?currentUserId=${currentUserId}`)
+                get(`/inventory/medication?currentUserId=${currentUser.id}`),
+                get(`/inventory/consumables?currentUserId=${currentUser.id}`)
             ]);
-
-            // update state with the fetched data
             setMedicationInventory(medications);
             setConsumablesInventory(consumables);
         } catch (error) {
             console.error('Error fetching inventory data:', error);
             setError('Failed to load inventory data. Please try again.');
-        } finally {
-            setLoading(false);
         }
-    };
+    }, [navigate]);
 
-    // toggle sidebar open/closed when hamburger is clicked
-    const toggleSidebar = () => {
-        setSidebarOpen(!sidebarOpen);
+    useEffect(() => {
+        fetchInventoryData();
+    }, [fetchInventoryData]);
+
+    const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+
+    const handleNavigate = (tab) => {
+        setActiveTab(tab);
+        localStorage.setItem('adminActiveTab', tab);
     };
 
     const tabTitles = {
@@ -97,31 +75,22 @@ export default function AdminDashboard() {
         messages: 'Messages'
     };
 
-    // sorting function
     const sortData = (data, sortKey) => {
-        const [field, order] = sortKey.split('-'); // split into field and order
-
-        const sorted = [...data].sort((a, b) => {
+        const [field, order] = sortKey.split('-');
+        return [...data].sort((a, b) => {
             if (field === 'quantity') {
                 return order === 'asc' ? a.quantity - b.quantity : b.quantity - a.quantity;
-            } else {
-                const nameA = a.name.toLowerCase();
-                const nameB = b.name.toLowerCase();
-                if (order === 'asc') {
-                    return nameA.localeCompare(nameB); // A to Z
-                } else {
-                    return nameB.localeCompare(nameA); // Z to A
-                }
             }
+            const nameA = a.name.toLowerCase();
+            const nameB = b.name.toLowerCase();
+            return order === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
         });
-        return sorted;
     };
 
-    // get sorted data based on current sort selections
     const sortedMedications = sortData(medicationInventory, medicationSort);
     const sortedConsumables = sortData(consumablesInventory, consumablesSort);
 
-    // compute low-stock items for alert banner (quantity <= 10)
+    // items with quantity <= 10
     const lowStockItems = [
         ...medicationInventory.map(item => ({ ...item, category: 'Medication' })),
         ...consumablesInventory.map(item => ({ ...item, category: 'Consumable' }))
@@ -129,25 +98,15 @@ export default function AdminDashboard() {
 
     const lowStockCount = lowStockItems.length;
 
-    // shows a warning icon and red text if stock is low (≤ 10)
     const quantityTemplate = (rowData) => {
-        const isLowStock = rowData.quantity <= 10; // threshold is 10
+        const isLowStock = rowData.quantity <= 10;
         return (
             <div className={`quantity-cell ${isLowStock ? 'low-stock' : ''}`}>
-                {/* show warning triangle if low stock */}
                 {isLowStock && <i className="pi pi-exclamation-triangle warning-icon"></i>}
                 <span>{rowData.quantity}</span>
             </div>
         );
     };
-
-    // looooooaadddinnnngggg
-    const loadingIcon = (
-        <div className="custom-loading">
-            <i className="pi pi-spin pi-spinner custom-spinner"></i>
-            <span>Loading inventory...</span>
-        </div>
-    );
 
     const renderPlaceholder = (label) => (
         <div className="placeholder-content">
@@ -162,7 +121,6 @@ export default function AdminDashboard() {
                 <h2 className="dashboard-title">Inventory Dashboard</h2>
             </div>
 
-            {/* Low stock alert banner shown above the tables when any item is low */}
             {lowStockCount > 0 && (
                 <div
                     className="low-stock-alert"
@@ -188,11 +146,7 @@ export default function AdminDashboard() {
                 </div>
             )}
 
-            {error && (
-                <div className="error-message">
-                    {error}
-                </div>
-            )}
+            {error && <div className="error-message">{error}</div>}
 
             <section className="inventory-section">
                 <div className="inventory-header">
@@ -209,18 +163,11 @@ export default function AdminDashboard() {
                 </div>
                 <DataTable
                     value={sortedMedications}
-                    loading={loading}
-                    loadingIcon={loadingIcon}
                     className="inventory-table"
                     emptyMessage="No medications found"
                 >
                     <Column field="name" header="Medication" style={{ width: '60%' }} />
-                    <Column
-                        field="quantity"
-                        header="Quantity"
-                        body={quantityTemplate}
-                        style={{ width: '40%' }}
-                    />
+                    <Column field="quantity" header="Quantity" body={quantityTemplate} style={{ width: '40%' }} />
                 </DataTable>
             </section>
 
@@ -239,18 +186,11 @@ export default function AdminDashboard() {
                 </div>
                 <DataTable
                     value={sortedConsumables}
-                    loading={loading}
-                    loadingIcon={loadingIcon}
                     className="inventory-table"
                     emptyMessage="No consumables found"
                 >
                     <Column field="name" header="Items" style={{ width: '60%' }} />
-                    <Column
-                        field="quantity"
-                        header="Quantity"
-                        body={quantityTemplate}
-                        style={{ width: '40%' }}
-                    />
+                    <Column field="quantity" header="Quantity" body={quantityTemplate} style={{ width: '40%' }} />
                 </DataTable>
             </section>
         </>
@@ -281,7 +221,7 @@ export default function AdminDashboard() {
                 isOpen={sidebarOpen}
                 onToggle={toggleSidebar}
                 activeTab={activeTab}
-                onNavigate={setActiveTab}
+                onNavigate={handleNavigate}
             />
 
             <main className={`dashboard-content ${sidebarOpen ? 'content-with-sidebar' : ''}`}>
@@ -290,4 +230,3 @@ export default function AdminDashboard() {
         </div>
     );
 }
-
