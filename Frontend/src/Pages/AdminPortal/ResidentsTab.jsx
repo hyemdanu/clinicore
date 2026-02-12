@@ -110,17 +110,9 @@ export default function ResidentsTab() {
     return (
         <div className="residents-tab">
             <div className="residents-actions">
-                <button className="action-btn reports-btn">
-                    <i className="pi pi-file"></i>
-                    REPORTS
-                </button>
                 <button className="action-btn sort-btn" onClick={toggleSort}>
                     <i className="pi pi-sort-alt"></i>
                     SORT: {sortBy === 'firstName' ? 'FIRST NAME' : 'LAST NAME'}
-                </button>
-                <button className="action-btn filter-btn">
-                    <i className="pi pi-filter"></i>
-                    FILTER
                 </button>
             </div>
 
