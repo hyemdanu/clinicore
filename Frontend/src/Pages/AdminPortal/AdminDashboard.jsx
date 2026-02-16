@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -7,6 +7,7 @@ import { get } from '../../services/api';
 import Header from '../../Components/Header';
 import AdminSidebar from '../../Components/AdminSidebar';
 import ResidentsTab from './ResidentsTab';
+import MessagesTab from './MessagesTab';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 import "./css/admin.css";
@@ -42,12 +43,7 @@ export default function AdminDashboard() {
         { label: 'Name: Z to A', value: 'name-desc' }
     ];
 
-    // runs once when component loads, fetches inventory data
-    useEffect(() => {
-        fetchInventoryData();
-    }, []);
-
-    const fetchInventoryData = async () => {
+    const fetchInventoryData = useCallback(async () => {
         setLoading(true);
         setError(null);
 
@@ -80,7 +76,12 @@ export default function AdminDashboard() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [navigate]);
+
+    // runs once when component loads, fetches inventory data
+    useEffect(() => {
+        fetchInventoryData();
+    }, [fetchInventoryData]);
 
     // toggle sidebar open/closed when hamburger is clicked
     const toggleSidebar = () => {
@@ -100,7 +101,7 @@ export default function AdminDashboard() {
     const sortData = (data, sortKey) => {
         const [field, order] = sortKey.split('-'); // split into field and order
 
-        const sorted = [...data].sort((a, b) => {
+        return [...data].sort((a, b) => {
             if (field === 'quantity') {
                 return order === 'asc' ? a.quantity - b.quantity : b.quantity - a.quantity;
             } else {
@@ -113,7 +114,6 @@ export default function AdminDashboard() {
                 }
             }
         });
-        return sorted;
     };
 
     // get sorted data based on current sort selections
@@ -264,7 +264,7 @@ export default function AdminDashboard() {
             case 'user':
                 return renderPlaceholder('User Management');
             case 'messages':
-                return renderPlaceholder('Messages');
+                return <MessagesTab />;
             case 'inventory':
             case 'dashboard':
             default:
@@ -273,7 +273,7 @@ export default function AdminDashboard() {
     };
 
     return (
-        <div className="admin-dashboard-container">
+        <div className={`admin-dashboard-container ${activeTab === 'messages' ? 'messages-active' : ''}`}>
             <Header onToggleSidebar={toggleSidebar} title={tabTitles[activeTab] || 'Dashboard'} />
 
             <AdminSidebar
@@ -283,7 +283,7 @@ export default function AdminDashboard() {
                 onNavigate={setActiveTab}
             />
 
-            <main className={`dashboard-content ${sidebarOpen ? 'content-with-sidebar' : ''}`}>
+            <main className={`dashboard-content ${sidebarOpen ? 'content-with-sidebar' : ''} ${activeTab === 'messages' ? 'messages-content' : ''}`}>
                 {renderContent()}
             </main>
         </div>
