@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import Header from "../../Components/Header";
 import ResidentSidebar from "../../Components/ResidentSidebar";
-
+import "./css/residentDocuments.css";
+import "./css/ResidentDashboard.css";
 import "./css/residentDocuments.css";
 import searchIcon from "../../assets/icons/magnifying-glass.png";
 import documentIcon from "../../assets/icons/documentIcon.png";
@@ -25,6 +26,9 @@ export default function ResidentDocuments() {
             <ResidentSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
 
             <main className={`dashboard-content ${sidebarOpen ? "content-with-sidebar" : ""}`}>
+                <div className="resident-documents-component">
+                    <h2 className="dashboard-title">Documents</h2>
+                        <div className="inventory-section">
                 <div className="resident-documents-page">
                     <div className="box">
                         <div className="rectangle">
