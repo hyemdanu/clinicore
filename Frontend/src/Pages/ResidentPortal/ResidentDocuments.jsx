@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import Header from "../../Components/Header";
 import ResidentSidebar from "../../Components/ResidentSidebar";
-import "./css/residentDocuments.css";
 import "./css/ResidentDashboard.css";
-import "./css/residentDocuments.css";
+import "./css/ResidentDocuments.css";
+
 import searchIcon from "../../assets/icons/magnifying-glass.png";
 import documentIcon from "../../assets/icons/documentIcon.png";
 
@@ -28,54 +28,37 @@ export default function ResidentDocuments() {
             <main className={`dashboard-content ${sidebarOpen ? "content-with-sidebar" : ""}`}>
                 <div className="resident-documents-component">
                     <h2 className="dashboard-title">Documents</h2>
-                        <div className="inventory-section">
-                <div className="resident-documents-page">
-                    <div className="box">
-                        <div className="rectangle">
-                            <div className="resident-documents-title">
-                                Documents
-                            </div>
+
+                    <div className="inventory-section">
+                        <div className="documents-search">
+                            <img src={searchIcon} alt="Search" className="search-icon" />
+                            <input
+                                type="text"
+                                placeholder="Search Document Name or Code"
+                            />
                         </div>
 
-                        <section className="documents-section">
-                            {/* Search bar */}
-                            <div className="documents-search">
-                                <img
-                                    src={searchIcon}
-                                    alt="Search"
-                                    className="search-icon"
-                                />
-                                <input
-                                    type="text"
-                                    placeholder="Search Document Name or Code"
-                                />
-                            </div>
-                                {/* Documents List */}
-                            <div className="documents-box">
-                                {documents.map((doc, index) => (
-                                    <React.Fragment key={index}>
-                                        <div className="document-row">
-                                            <img
-                                                src={documentIcon}
-                                                alt="Document"
-                                                className="document-icon"
-                                            />
-                                            <span className="document-name">{doc}</span>
-                                        </div>
+                        <div className="documents-box">
+                            {documents.map((doc, index) => (
+                                <div key={index} className="document-row">
+                                    <img
+                                        src={documentIcon}
+                                        alt="Document"
+                                        className="document-icon"
+                                    />
+                                    <span className="document-name">{doc}</span>
+                                </div>
+                            ))}
+                        </div>
 
-                                        {index < documents.length - 1 && <div className="line" />}
-                                    </React.Fragment>
-                                ))}
-                            </div>
-                               {/* Floating Action Button */}
-                            <button className="documents-fab">+</button>
-                        </section>
+                        <button className="documents-fab">+</button>
                     </div>
                 </div>
             </main>
         </div>
     );
 }
+
 
 
 
