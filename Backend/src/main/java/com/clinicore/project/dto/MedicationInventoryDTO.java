@@ -1,5 +1,6 @@
 package com.clinicore.project.dto;
 
+import com.clinicore.project.entity.Item;
 import com.clinicore.project.entity.MedicationInventory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,6 +24,8 @@ public class MedicationInventoryDTO {
     private LocalDateTime updatedAt;
 
     // convert entity to DTO
+
+
     public static MedicationInventoryDTO fromEntity(MedicationInventory medicationInventory) {
         if (medicationInventory == null || medicationInventory.getItem() == null) {
             return null;
@@ -38,5 +41,33 @@ public class MedicationInventoryDTO {
             medicationInventory.getItem().getCreated_at(),
             medicationInventory.getItem().getUpdated_at()
         );
+    }
+
+    /**
+     * Convert DTO to Entity
+     */
+    public MedicationInventory toEntity() {
+        MedicationInventory medication = new MedicationInventory();
+
+        if (medication.getItem() == null) {
+            medication.setItem(new Item());
+        }
+
+        medication.getItem().setName(this.name);
+        medication.getItem().setQuantity(this.quantity);
+
+        return medication;
+    }
+
+    /**
+     * Update an existing entity
+     */
+    public void updateEntity(MedicationInventory medication) {
+        if (medication.getItem() == null) {
+            medication.setItem(new Item());
+        }
+
+        medication.getItem().setName(this.name);
+        medication.getItem().setQuantity(this.quantity);
     }
 }
