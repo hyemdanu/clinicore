@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
-import { get, post } from "../../services/api";
-import "./css/residents.css";
+import { get, post } from "../../services/api.js";
+import "../Shared/css/residents.css";
 
 /*
  * this the modal in the sidebar when you wanna

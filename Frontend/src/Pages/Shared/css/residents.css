@@ -2297,6 +2297,41 @@ body.sidebar-open .dashboard-content {
     box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.1);
 }
 
+/* caregiver residents tab — two section layout */
+.residents-section-container {
+    margin-bottom: 2rem;
+}
+
+.residents-section-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.resident-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.resident-assigned-badge {
+    font-size: 0.75rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.resident-assigned-badge.unassigned {
+    color: #9ca3af;
+    font-style: italic;
+}
+
 /* Edit Form Grid */
 .edit-form-grid {
     display: grid;

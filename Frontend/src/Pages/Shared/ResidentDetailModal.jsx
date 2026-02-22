@@ -3,9 +3,9 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
-import AddMedicationForm from "./AddMedicationModal";
-import { patch } from "../../services/api";
-import "./css/residents.css";
+import AddMedicationForm from "../Shared/AddMedicationModal.jsx";
+import { patch } from "../../services/api.js";
+import "../Shared/css/residents.css";
 
 /*
  * this the modal in the sidebar when you wanna
@@ -45,7 +45,7 @@ export default function ResidentDetailModal({ resident, onClose, onResidentUpdat
         const interval = setInterval(async () => {
             if (!showAddMedicationForm && resident.id) {
                 try {
-                    const { get } = await import('../../services/api');
+                    const { get } = await import('../../services/api.js');
                     const currentUserStr = localStorage.getItem('currentUser');
                     if (currentUserStr) {
                         const currentUserId = JSON.parse(currentUserStr).id;
@@ -109,7 +109,7 @@ export default function ResidentDetailModal({ resident, onClose, onResidentUpdat
 
     const handleSaveEdit = async (medicationId) => {
         try {
-            const { patch } = await import('../../services/api');
+            const { patch } = await import('../../services/api.js');
             const currentUserStr = localStorage.getItem('currentUser');
             if (!currentUserStr) throw new Error("User not authenticated");
             const currentUserId = JSON.parse(currentUserStr).id;
@@ -133,7 +133,7 @@ export default function ResidentDetailModal({ resident, onClose, onResidentUpdat
         if (!confirm("Are you sure you want to delete this medication?")) return;
 
         try {
-            const { del } = await import('../../services/api');
+            const { del } = await import('../../services/api.js');
             const currentUserStr = localStorage.getItem('currentUser');
             if (!currentUserStr) throw new Error("User not authenticated");
             const currentUserId = JSON.parse(currentUserStr).id;
@@ -271,7 +271,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
 
         setIsSubmitting(true);
         try {
-            const { post } = await import('../../services/api');
+            const { post } = await import('../../services/api.js');
             const currentUserStr = localStorage.getItem('currentUser');
             if (!currentUserStr) throw new Error("User not authenticated");
             const currentUserId = JSON.parse(currentUserStr).id;
@@ -292,7 +292,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
         if (!confirm("Are you sure you want to delete this allergy?")) return;
 
         try {
-            const { del } = await import('../../services/api');
+            const { del } = await import('../../services/api.js');
             const currentUserStr = localStorage.getItem('currentUser');
             if (!currentUserStr) throw new Error("User not authenticated");
             const currentUserId = JSON.parse(currentUserStr).id;
@@ -313,7 +313,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
 
         setIsSubmitting(true);
         try {
-            const { post } = await import('../../services/api');
+            const { post } = await import('../../services/api.js');
             const currentUserStr = localStorage.getItem('currentUser');
             if (!currentUserStr) throw new Error("User not authenticated");
             const currentUserId = JSON.parse(currentUserStr).id;
@@ -334,7 +334,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
         if (!confirm("Are you sure you want to delete this diagnosis?")) return;
 
         try {
-            const { del } = await import('../../services/api');
+            const { del } = await import('../../services/api.js');
             const currentUserStr = localStorage.getItem('currentUser');
             if (!currentUserStr) throw new Error("User not authenticated");
             const currentUserId = JSON.parse(currentUserStr).id;
@@ -350,7 +350,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
     const handleSaveInsurance = async () => {
         setIsSubmitting(true);
         try {
-            const { patch } = await import('../../services/api');
+            const { patch } = await import('../../services/api.js');
             const currentUserStr = localStorage.getItem('currentUser');
             if (!currentUserStr) throw new Error("User not authenticated");
             const currentUserId = JSON.parse(currentUserStr).id;
@@ -369,7 +369,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
     const handleSaveMedicalNotes = async () => {
         setIsSubmitting(true);
         try {
-            const { patch } = await import('../../services/api');
+            const { patch } = await import('../../services/api.js');
             const currentUserStr = localStorage.getItem('currentUser');
             if (!currentUserStr) throw new Error("User not authenticated");
             const currentUserId = JSON.parse(currentUserStr).id;
@@ -388,7 +388,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
     const handleSaveServices = async () => {
         setIsSubmitting(true);
         try {
-            const { patch } = await import('../../services/api');
+            const { patch } = await import('../../services/api.js');
             const currentUserStr = localStorage.getItem('currentUser');
             if (!currentUserStr) throw new Error("User not authenticated");
             const currentUserId = JSON.parse(currentUserStr).id;
@@ -407,7 +407,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
     const handleSaveCapabilities = async () => {
         setIsSubmitting(true);
         try {
-            const { patch } = await import('../../services/api');
+            const { patch } = await import('../../services/api.js');
             const currentUserStr = localStorage.getItem('currentUser');
             if (!currentUserStr) throw new Error("User not authenticated");
             const currentUserId = JSON.parse(currentUserStr).id;

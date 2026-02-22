@@ -39,6 +39,9 @@ public class ResidentService {
     @Autowired
     private DiagnosisRepository diagnosisRepository;
 
+    @Autowired
+    private ResidentCaregiverRepository residentCaregiverRepository;
+
     /**
      * Get all residents with their full details
      * this includes user profile, resident info, medical profile, services, capability, records, and medications
@@ -91,6 +94,16 @@ public class ResidentService {
             dto.setEmergencyContactName(resident.getEmergencyContactName());
             dto.setEmergencyContactNumber(resident.getEmergencyContactNumber());
             dto.setResidentNotes(resident.getNotes());
+
+            // resolve assigned caregivers for this resident
+            List<ResidentCaregiver> assignments = residentCaregiverRepository.findById_ResidentId(userProfile.getId());
+            List<ResidentFullDTO.AssignedCaregiverDTO> caregiverDTOs = assignments.stream()
+                    .map(a -> new ResidentFullDTO.AssignedCaregiverDTO(
+                            a.getCaregiver().getUserProfile().getId(),
+                            a.getCaregiver().getUserProfile().getFirstName() + " " + a.getCaregiver().getUserProfile().getLastName()
+                    ))
+                    .collect(Collectors.toList());
+            dto.setAssignedCaregivers(caregiverDTOs);
         }
 
         // map medical profile and related entities
