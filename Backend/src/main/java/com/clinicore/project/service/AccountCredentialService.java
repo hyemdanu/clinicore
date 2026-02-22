@@ -15,18 +15,25 @@ import com.clinicore.project.repository.AccountCredentialRepository;
 import com.clinicore.project.repository.UserProfileRepository;
 import org.springframework.stereotype.Service;
 import java.util.*;
+import com.clinicore.project.service.EmailService;
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 public class AccountCredentialService {
 
-    // variables
     private final AccountCredentialRepository accountCredentialRepository;
     private final UserProfileRepository userProfileRepository;
-    // constructor that injects all repositories so the service can access user and invitation data
+    private final EmailService emailService;
+
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
+
     public AccountCredentialService(AccountCredentialRepository accountCredentialRepository,
-                                    UserProfileRepository userProfileRepository) {
+                                    UserProfileRepository userProfileRepository,
+                                    EmailService emailService) {
         this.accountCredentialRepository = accountCredentialRepository;
         this.userProfileRepository = userProfileRepository;
+        this.emailService = emailService;
     }
 
     // authenticate user with username and password
@@ -69,8 +76,32 @@ public class AccountCredentialService {
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("Email cannot be empty");
         }
-
-        // uses the new email column
         return userProfileRepository.findByEmail(email).isPresent();
+    }
+
+    public String getUsernameByEmail(String email) {
+        return userProfileRepository.findByEmail(email)
+                .map(user -> user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("Email not found"));
+    }
+
+    public void sendPasswordReset(String email) {
+        // verify email exists first
+        if (!userProfileRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("Email not found");
+        }
+
+        // encode email to be safe in URL
+        String encodedEmail = java.net.URLEncoder.encode(email, java.nio.charset.StandardCharsets.UTF_8);
+        String resetLink = frontendUrl + "/reset-password?email=" + encodedEmail;
+        emailService.sendPasswordResetLink(email, resetLink);
+    }
+
+    public void resetPassword(String email, String newPassword) {
+        UserProfile user = userProfileRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Email not found"));
+
+        user.setPasswordHash(newPassword);
+        userProfileRepository.save(user);
     }
 }

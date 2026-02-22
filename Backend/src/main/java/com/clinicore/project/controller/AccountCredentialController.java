@@ -31,14 +31,17 @@ public class AccountCredentialController {
     private final AccountCredentialService accountCredentialService;
     private final AccountCreationRequestService accountCreationRequestService;
     private final UserProfileRepository userProfileRepository;
+    private final com.clinicore.project.service.EmailService emailService;
 
-    // inject service layers (service layers hold business logic - controller just forwards requests to service layers)
+    // inject service layers
     public AccountCredentialController(AccountCredentialService accountCredentialService,
                                        AccountCreationRequestService accountCreationRequestService,
-                                       UserProfileRepository userProfileRepository) {
+                                       UserProfileRepository userProfileRepository,
+                                       com.clinicore.project.service.EmailService emailService) {
         this.accountCredentialService = accountCredentialService;
         this.accountCreationRequestService = accountCreationRequestService;
         this.userProfileRepository = userProfileRepository;
+        this.emailService = emailService;
     }
 
     // login endpoint
@@ -66,61 +69,6 @@ public class AccountCredentialController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Login failed: " + e.getMessage()));
-        }
-    }
-
-    @PostMapping("/forgot-userid")
-    public ResponseEntity<?> forgotUserId(@RequestBody Map<String, String> request) {
-        try {
-            String email = request.get("email");
-            System.out.println("🔎 Received forgot-userid request for: " + email);  //
-
-            if (email == null || email.isBlank()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Email is required."));
-            }
-
-            boolean exists = accountCredentialService.checkIfUserExistsByEmail(email);
-            System.out.println(" Email exists? " + exists);  //
-
-            if (exists) {
-                return ResponseEntity.ok(Map.of("message", "Email verified successfully."));
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Email not found in system."));
-            }
-
-        } catch (Exception e) {
-            //e.printStackTrace();  //  print full stack trace
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to verify email: " + e.getMessage()));
-        }
-    }
-
-
-    @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
-        try {
-            String email = request.get("email");
-
-            if (email == null || email.isBlank()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("error", "Email is required."));
-            }
-
-            boolean exists = accountCredentialService.checkIfUserExistsByEmail(email);
-
-            if (exists) {
-                //  return 200 OK when email exists
-                return ResponseEntity.ok(Map.of("message", "Email verified successfully."));
-            } else {
-                //  return 404 if email not found
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Email not found in system."));
-            }
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to verify email: " + e.getMessage()));
         }
     }
 
@@ -258,6 +206,7 @@ public class AccountCredentialController {
 
     @PostMapping("/account-requests/{requestId}/approve")
     public ResponseEntity<?> approveAccountRequest(
+            
             @PathVariable Long requestId,
             @RequestParam Long adminId) {
         try {
@@ -451,6 +400,75 @@ public class AccountCredentialController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to create account"));
+        }
+    }
+
+    @PostMapping("/forgot-userid")
+    public ResponseEntity<?> forgotUserId(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+
+            if (email == null || email.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Email is required."));
+            }
+
+            String username = accountCredentialService.getUsernameByEmail(email);
+            emailService.sendUsernameReminder(email, username);
+            return ResponseEntity.ok(Map.of("message", "Username sent to your email."));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to process request: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+
+            if (email == null || email.isBlank()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "Email is required."));
+            }
+
+            accountCredentialService.sendPasswordReset(email);
+            return ResponseEntity.ok(Map.of("message", "Password reset email sent."));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to process request: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            String newPassword = request.get("newPassword");
+
+            if (email == null || email.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Email is required."));
+            }
+            if (newPassword == null || newPassword.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "New password is required."));
+            }
+
+            accountCredentialService.resetPassword(email, newPassword);
+            return ResponseEntity.ok(Map.of("message", "Password reset successfully."));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to reset password: " + e.getMessage()));
         }
     }
 }

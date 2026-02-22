@@ -3,6 +3,7 @@ package com.clinicore.project.service;
 import java.util.List;
 
 import com.clinicore.project.entity.AccountCreationRequest;
+
 import com.clinicore.project.entity.UserProfile;
 import com.clinicore.project.entity.Admin;
 import com.clinicore.project.entity.Caregiver;
@@ -12,8 +13,6 @@ import com.clinicore.project.repository.AdminRepository;
 import com.clinicore.project.repository.CaregiverRepository;
 import com.clinicore.project.repository.ResidentGeneralRepository;
 import com.clinicore.project.repository.UserProfileRepository;
-import com.clinicore.project.entity.Resident;
-import com.clinicore.project.service.AccountRequestResultType;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,6 @@ import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 @Service
 public class AccountCreationRequestService {
@@ -39,6 +37,7 @@ public class AccountCreationRequestService {
     private final AdminRepository adminRepository;
 
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
 
     // construct the service layer with all repositories
@@ -49,7 +48,7 @@ public class AccountCreationRequestService {
             ResidentGeneralRepository residentRepository,
             CaregiverRepository caregiverRepository,
             AdminRepository adminRepository,
-
+            EmailService emailService,
             PasswordEncoder passwordEncoder) {
         this.accountCreationRequestRepository = accountCreationRequestRepository;
 
@@ -57,7 +56,7 @@ public class AccountCreationRequestService {
         this.residentRepository = residentRepository;
         this.caregiverRepository = caregiverRepository;
         this.adminRepository = adminRepository;
-
+        this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -264,6 +263,9 @@ public class AccountCreationRequestService {
 
         accountCreationRequestRepository.save(request);
 
+        // send email
+        emailService.sendActivationCode(request.getEmail(), activationCode);
+
         return activationCode; // Return plaintext to show to admin (for sharing with user)
     }
 
@@ -303,6 +305,9 @@ public class AccountCreationRequestService {
         request.setExpiresAt(LocalDateTime.now().plusDays(7)); // Extend expiration
 
         accountCreationRequestRepository.save(request);
+
+        // resend email
+        emailService.sendActivationCode(request.getEmail(), activationCode);
 
         return activationCode;
     }
@@ -377,7 +382,7 @@ public class AccountCreationRequestService {
         // Check if request has expired
         if (accountRequest.getExpiresAt().isBefore(LocalDateTime.now())) {
             response.put("success", false);
-            response.put("message", "Activation code has expired");
+            response.put("message", "Activation code has expired or invalid email.");
             response.put("status", "EXPIRED");
             return response;
         }
@@ -443,7 +448,8 @@ public class AccountCreationRequestService {
             throw new IllegalArgumentException("Username already taken");
         }
 
-        String hashedPassword = passwordEncoder.encode(password);
+        // need to encode later
+        String hashedPassword = password;
 
         UserProfile newUser = new UserProfile();
         newUser.setFirstName(request.getFirstName());
@@ -473,6 +479,19 @@ public class AccountCreationRequestService {
 
         request.setStatus("COMPLETED");
         accountCreationRequestRepository.save(request);
+
+        // notify the new user
+        String fullNameN = savedUser.getFirstName() + " " + savedUser.getLastName();
+        String usernameN = savedUser.getUsername();
+        String roleN = savedUser.getRole().toString();
+        emailService.sendAccountCreatedConfirmation(savedUser.getEmail(), fullNameN, usernameN, roleN);
+
+        // notify the admin who approved the request
+        if (request.getApprovedByAdminId() != null) {
+            userProfileRepository.findById(request.getApprovedByAdminId()).ifPresent(admin ->
+                emailService.sendAccountCreatedConfirmation(admin.getEmail(), fullNameN, usernameN, roleN)
+            );
+        }
 
         return savedUser;
     }
