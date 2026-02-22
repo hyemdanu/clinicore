@@ -66,6 +66,8 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
+  flex-wrap: wrap;  /* ADD THIS - allows items to wrap on smaller screens */
+  gap: 20px;  /* ADD THIS - adds space between items */
 }
 
 .inventory-header h3 {
@@ -74,44 +76,65 @@
   font-weight: 600;
   color: #333;
 }
-
-.sort-dropdown-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* Target the actual dropdown root (same element), not a child */
+.sort-dropdown.p-dropdown {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: none;
+    height: 30px;              /* ✅ adjust this (try 34–40px) */
+    padding: 0;                /* remove any extra padding */
 }
 
-.sort-dropdown-wrapper label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #666;
-  white-space: nowrap;
+/* Remove the loud blue focus ring */
+.sort-dropdown.p-dropdown:not(.p-disabled).p-focus {
+    box-shadow: none !important;
+    border-color: #369DF7; /* keep a subtle focus border */
 }
 
-.sort-dropdown {
-  min-width: 200px;
+/* Make the label area look clean (no inner box) */
+.sort-dropdown.p-dropdown .p-dropdown-label {
+    padding: 0 12px !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    font-size: 0.95rem;
+
+    height: 35px;          /* controls total height */
+    display: flex;
+    align-items: center;   /* 🔥 vertical center */
 }
 
-.sort-dropdown .p-dropdown {
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  background-color: white;
-  transition: border-color 0.2s ease;
+
+/* Tidy up the trigger (arrow area) */
+.sort-dropdown.p-dropdown .p-dropdown-trigger {
+    width: 42px;                /* ✅ arrow box width */
+    height: 38px;               /* ✅ match height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none !important;
+    background: transparent !important;
 }
 
-.sort-dropdown .p-dropdown:hover {
-  border-color: #369DF7;
+/* Dropdown panel (the opened list) */
+.p-dropdown-panel {
+    border-radius: 10px;
+    overflow: hidden;
 }
 
-.sort-dropdown .p-dropdown-label {
-  padding: 8px 12px;
-  font-size: 14px;
-  color: #333;
+/* Items */
+.p-dropdown-items .p-dropdown-item {
+    padding: 0.6rem 0.9rem;
+    font-size: 0.95rem;
 }
 
-.sort-dropdown .p-dropdown-trigger {
-  color: #666;
+/* Selected item highlight (optional: make it softer) */
+.p-dropdown-items .p-dropdown-item.p-highlight {
+    background: #eef6ff;
+    color: #1d4ed8;
 }
+
 
 .inventory-table {
   border: none;
@@ -252,7 +275,262 @@
   }
 
   .sort-dropdown {
-    flex: 1;
-    min-width: unset;
+    flex: 10;
   }
+}
+
+/* Table font size & header styling */
+.inventory-table.modern-table .p-datatable-thead > tr > th {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.inventory-table.modern-table .p-datatable-tbody > tr > td {
+    font-size: 0.95rem; /* slightly bigger data font */
+    line-height: 1.5;
+}
+
+/* Subtitle under main title */
+.dashboard-subtitle {
+    color: #666;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+}
+
+/* Modern dialog base */
+/* ✅ PrimeReact Dialog root is usually .p-dialog itself */
+.p-dialog.modern-dialog {
+    border: none;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+}
+
+.p-dialog.modern-dialog .p-dialog-header {
+    font-weight: 600;
+    font-size: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1rem 1.25rem;
+}
+
+.p-dialog.modern-dialog .p-dialog-content {
+    padding: 1.25rem;
+}
+
+/* ✅ Ensure overlay always sits above tables/sidebars */
+.p-dialog-mask {
+    z-index: 5000 !important;
+}
+
+.p-dialog {
+    z-index: 5001 !important;
+}
+
+/* ===== Activation Code dialog layout fix ===== */
+/* Remove the "narrow centered column inside a wide modal" effect */
+.p-dialog.activation-code-dialog .p-dialog-content .dialog-form {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+}
+
+/* Make the code card feel tighter + more intentional */
+.p-dialog.activation-code-dialog .activation-code-card {
+    padding: 1rem;
+    margin: 0.25rem 0 0.75rem;
+}
+
+/* Code styling: big but not awkwardly spaced */
+.p-dialog.activation-code-dialog .activation-code-value {
+    font-size: 2rem;
+    letter-spacing: 0.18rem; /* was 0.25rem; less "stretched" */
+}
+
+/* Buttons: consistent width + spacing */
+.p-dialog.activation-code-dialog .p-button {
+    width: 100%;
+}
+
+.p-dialog.activation-code-dialog .p-button + .p-button {
+    margin-top: 0.75rem;
+}
+
+/* Mobile: reduce code size so it doesn't overflow */
+@media (max-width: 640px) {
+    .p-dialog.activation-code-dialog .activation-code-value {
+        font-size: 1.6rem;
+        letter-spacing: 0.12rem;
+    }
+}
+
+/* Button row for activation dialog */
+.activation-code-dialog .dialog-form > .p-button {
+    flex: 1;
+}
+
+.activation-code-dialog .dialog-form {
+    gap: 1rem;
+}
+
+/* Wrap buttons in a flex row */
+.activation-code-dialog .dialog-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.activation-code-dialog .dialog-form .p-button {
+    margin: 0;
+}
+
+/* Create button container */
+.activation-code-dialog .dialog-form::after {
+    content: "";
+}
+
+.activation-buttons {
+    display: flex;
+    gap: 1.25rem;
+    margin-top: 0.75rem;
+    justify-content: center;
+}
+
+.activation-buttons .p-button {
+    padding: 0.8rem 1.4rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    min-width: 180px;
+}
+
+
+/* Shared form layout inside dialogs */
+.dialog-form {
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;   /* tighter spacing */
+}
+
+
+
+.dialog-field label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #4b5563;
+    display: block;
+    margin-bottom: 0.35rem;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.dialog-confirm {
+    max-width: 480px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.dialog-confirm p {
+    color: #4b5563;
+    font-size: 0.95rem;
+}
+
+/* Activation code card */
+.dialog-subtitle {
+    color: #4b5563;
+    font-size: 0.9rem;
+}
+
+.activation-code-card {
+    background-color: #f3f4f6;
+    padding: 0.85rem 1.25rem;  /* tighter vertical padding */
+    border-radius: 0.75rem;
+    text-align: center;
+    border: 2px dashed #d1d5db;
+    margin: 0.5rem 0 0.75rem;
+    display: inline-block;     /* <-- makes border wrap content */
+    width: 100%;
+}
+
+
+.activation-code-label {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.activation-code-value {
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: monospace;
+    letter-spacing: 0.25rem;
+    color: #111827;
+}
+/* Toast container */
+.p-toast {
+    z-index: 9999 !important;
+}
+
+/* Base toast styling */
+.p-toast-message {
+    background: #ffffff !important;
+    border-left: 6px #ffffff !important;
+    border-radius: 8px !important;
+    padding: 12px 16px !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 10px; /* space between icon + text */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+    opacity: 1 !important;
+}
+
+/* Message text spacing */
+.p-toast-message .p-toast-message-text {
+    margin-left: 4px;
+}
+
+/* ERROR */
+.p-toast-message-error {
+    border-left-color: #dc3545 !important; /* red accent */
+    color: #721c24 !important;
+}
+
+/* SUCCESS */
+.p-toast-message-success {
+    border-left-color: #28a745 !important; /* green accent */
+    color: #155724 !important;
+}
+
+/* INFO */
+.p-toast-message-info {
+    border-left-color: #17a2b8 !important; /* blue accent */
+    color: #0c5460 !important;
+}
+
+/* Position the close (X) icon properly */
+.p-toast-message .p-toast-icon-close {
+    position: absolute !important;
+    top: 10px !important;
+    right: 10px !important;
+    margin: 0 !important;
+}
+
+.dialog-actions--right .p-button {
+    padding: 0.8rem 1.6rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+/* Make Deny button wider */
+.dialog-actions--right .p-button.p-button-danger {
+    min-width: 250px;   /* 🔥 increase this */
+}
+
+/* Keep Cancel smaller */
+.dialog-actions--right .p-button.p-button-secondary {
+    min-width: 160px;
 }

@@ -15,17 +15,11 @@ export default function ForgotPasswordPage() {
         setLoading(true);
 
         try {
-            const response = await post("/accountCredential/forgot-userid", { email });
-
-            if (response && response.message === "Email verified successfully.") {
-                //  go to recovery page
-                navigate("/recovery-email-sent");
-            } else {
-                setMessage("Email not found. Please try again.");
-            }
+            await post("/accountCredential/forgot-password", { email });
+            navigate("/recovery-email-sent");
         } catch (err) {
             console.error("Error:", err);
-            setMessage("Unable to send email. Please try again.");
+            setMessage("Email not found. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -53,7 +47,7 @@ export default function ForgotPasswordPage() {
                     </div>
 
                     {message && (
-                        <p style={{ color: message.includes("Unable") ? "red" : "green" }}>
+                        <p style={{ color: message.includes("Unable") ? "blue" : "red" }}>
                             {message}
                         </p>
                     )}

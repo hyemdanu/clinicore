@@ -1,21 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { get } from "../../services/api";
-
 import Header from "../../Components/Header";
 import ResidentSidebar from "../../Components/ResidentSidebar";
-
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primeicons/primeicons.css";
-import femaleDefaultPfp from "../../assets/icons/femaleDefault.png";
-import maleDefaultPfp from "../../assets/icons/maleDefault.png";
-
-
-// Reuse the dashboard layout shell styles so the header/sidebar match across pages
 import "./css/ResidentDashboard.css";
 import "./css/ResidentUserProfile.css";
-
-import defaultAvatar from "../../assets/icons/usericon.png";
 
 export default function ResidentUserProfile() {
     const navigate = useNavigate();
@@ -27,6 +18,7 @@ export default function ResidentUserProfile() {
     const toggleSidebar = () => setSidebarOpen((s) => !s);
 
     useEffect(() => {
+        // grab user info when page loads
         (async () => {
             setLoading(true);
             try {
@@ -48,7 +40,6 @@ export default function ResidentUserProfile() {
                 console.log("PROFILE RETURNED:", profile);
                 setResident(profile);
 
-
             } catch (e) {
                 console.error(e);
                 setResident(null);
@@ -58,41 +49,56 @@ export default function ResidentUserProfile() {
         })();
     }, [navigate]);
 
-    const view = useMemo(() => {
-        if (!resident) return null;
+    // get initials for the avatar
+    const getInitials = () => {
+        if (!resident) return "?";
+        const first = resident.firstName?.charAt(0) || "";
+        const last = resident.lastName?.charAt(0) || "";
+        return (first + last).toUpperCase() || "?";
+    };
 
-        const fullName = [resident.firstName, resident.lastName].filter(Boolean).join(" ");
-        const dob = resident.birthday ? new Date(resident.birthday).toLocaleDateString() : "—";
+    if (loading) {
+        return (
+            <div className="admin-dashboard-container">
+                <Header onToggleSidebar={toggleSidebar} title="User Profile" />
+                <ResidentSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
+                <main className={`dashboard-content ${sidebarOpen ? "content-with-sidebar" : ""}`}>
+                    <div className="profile-loading">
+                        <i className="pi pi-spin pi-spinner" style={{ fontSize: '2rem' }}></i>
+                        <p>Loading your profile...</p>
+                    </div>
+                </main>
+            </div>
+        );
+    }
 
-        const emergencyName = resident.emergencyContactName ?? resident.emergency_contact_name;
-        const emergencyPhone = resident.emergencyContactNumber ?? resident.emergency_contact_number;
-        const emergency =
-            emergencyName || emergencyPhone
-                ? `${emergencyName || ""}${emergencyName && emergencyPhone ? " — " : ""}${emergencyPhone || ""}`
-                : "—";
+    if (!resident) {
+        return (
+            <div className="admin-dashboard-container">
+                <Header onToggleSidebar={toggleSidebar} title="User Profile" />
+                <ResidentSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
+                <main className={`dashboard-content ${sidebarOpen ? "content-with-sidebar" : ""}`}>
+                    <div className="error-message">
+                        We couldn't load your profile. Please try again.
+                    </div>
+                </main>
+            </div>
+        );
+    }
 
-        const phone = resident.contactNumber ?? resident.phone ?? "—";
-        const gender = resident.gender ?? "—";
-        const username = resident.username ?? "—";
-
-        // If facilities and room ever get added, utilize this, for now ignore or delete this eventually
-        const facility = resident.facility ?? resident.facilityName ?? "—";
-        const room = resident.roomNumber ?? resident.room ?? "—";
-
-        // Allow backend-provided avatar URL if present; otherwise default icon.
-        const genderValue = (resident.gender ?? "").toString().trim().toLowerCase();
-
-        const picture =
-            genderValue === "female"
-                ? femaleDefaultPfp
-                : genderValue === "male"
-                    ? maleDefaultPfp
-                    : defaultAvatar; // fallback if gender missing/other
-
-
-
-        return { fullName: fullName || "—", dob, phone, gender, emergency, facility, room, username, picture };
-    }, [resident]);
+    const fullName = [resident.firstName, resident.lastName].filter(Boolean).join(" ");
+    const firstName = resident.firstName || "—";
+    const lastName = resident.lastName || "—";
+    const dob = resident.birthday ? new Date(resident.birthday).toLocaleDateString() : "—";
+    const emergencyName = resident.emergencyContactName ?? resident.emergency_contact_name;
+    const emergencyPhone = resident.emergencyContactNumber ?? resident.emergency_contact_number;
+    const emergency = emergencyName || emergencyPhone
+        ? `${emergencyName || ""}${emergencyName && emergencyPhone ? " — " : ""}${emergencyPhone || ""}`
+        : "—";
+    const phone = resident.contactNumber ?? resident.phone ?? "—";
+    const email = resident.email ?? "—";
+    const gender = resident.gender ?? "—";
+    const username = resident.username ?? "—";
 
     return (
         <div className="admin-dashboard-container">
@@ -100,88 +106,84 @@ export default function ResidentUserProfile() {
             <ResidentSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
 
             <main className={`dashboard-content ${sidebarOpen ? "content-with-sidebar" : ""}`}>
-                <div className="alert-section">
-                    <h2 className="dashboard-title">Your Profile</h2>
-                </div>
-
-                {loading ? (
-                    <div className="rd-skeleton-list" style={{ maxWidth: 720 }}>
-                        <div className="rd-skel-line" />
-                        <div className="rd-skel-line" />
-                        <div className="rd-skel-line" />
+                <div className="user-profile-page">
+                    <div className="alert-section">
+                        <h2 className="dashboard-title">Your Profile</h2>
+                        <p className="profile-subtitle">View your account information</p>
                     </div>
-                ) : !view ? (
-                    <div className="error-message">We couldn’t load your profile. Please try again.</div>
-                ) : (
-                    <div className="resident-user-profile-page">
-                        <div className="box">
-                            <div className="profile-left">
-                                <img
-                                    src={view.picture}
-                                    alt="Profile"
-                                    className="profile-picture"
-                                    onError={(e) => {
-                                        e.currentTarget.src = defaultAvatar;
-                                    }}
-                                />
-                            </div>
 
-                            <div className="profile-middle">
-                                <div className="profile-info">
-                                    <p>
-                                        <strong>Name:</strong>
-                                    </p>
-                                    <p>{view.fullName}</p>
+                    <div className="profile-container">
+                        {/* top section with avatar and basic info */}
+                        <div className="profile-header">
+                            <div className="profile-avatar-section">
+                                <div className="profile-avatar-initials">
+                                    {getInitials()}
                                 </div>
-                                <div className="profile-info">
-                                    <p>
-                                        <strong>Date of Birth:</strong>
-                                    </p>
-                                    <p>{view.dob}</p>
-                                </div>
-                                <div className="profile-info">
-                                    <p>
-                                        <strong>Contact Info:</strong>
-                                    </p>
-                                    <p>{view.phone}</p>
-                                </div>
-                                <div className="profile-info">
-                                    <p>
-                                        <strong>Username:</strong>
-                                    </p>
-                                    <p>{view.username}</p>
+                                <div className="profile-avatar-info">
+                                    <h2>{fullName || "—"}</h2>
+                                    <p className="profile-role-badge">RESIDENT</p>
                                 </div>
                             </div>
+                        </div>
 
-                            <div className="profile-right">
-                                <div className="profile-info">
-                                    <p>
-                                        <strong>Gender:</strong>
-                                    </p>
-                                    <p>{view.gender}</p>
+                        {/* main info cards */}
+                        <div className="profile-info-grid">
+                            {/* personal info card */}
+                            <div className="profile-info-card">
+                                <div className="card-title-row">
+                                    <h3 className="card-title">
+                                        <i className="pi pi-user"></i> Personal Information
+                                    </h3>
                                 </div>
-                                <div className="profile-info">
-                                    <p>
-                                        <strong>Emergency Contact:</strong>
-                                    </p>
-                                    <p>{view.emergency}</p>
+
+                                <div className="info-row">
+                                    <span className="info-label">First Name</span>
+                                    <span className="info-value">{firstName}</span>
                                 </div>
-                                <div className="profile-info">
-                                    <p>
-                                        <strong>Facility:</strong>
-                                    </p>
-                                    <p>{view.facility}</p>
+                                <div className="info-row">
+                                    <span className="info-label">Last Name</span>
+                                    <span className="info-value">{lastName}</span>
                                 </div>
-                                <div className="profile-info">
-                                    <p>
-                                        <strong>Room Number:</strong>
-                                    </p>
-                                    <p>{view.room}</p>
+                                <div className="info-row">
+                                    <span className="info-label">Username</span>
+                                    <span className="info-value">{username}</span>
+                                </div>
+                                <div className="info-row">
+                                    <span className="info-label">Email</span>
+                                    <span className="info-value">{email}</span>
+                                </div>
+                                <div className="info-row">
+                                    <span className="info-label">Phone Number</span>
+                                    <span className="info-value">{phone}</span>
+                                </div>
+                                <div className="info-row">
+                                    <span className="info-label">Emergency Contact</span>
+                                    <span className="info-value">{emergency}</span>
+                                </div>
+                            </div>
+
+                            {/* additional info card */}
+                            <div className="profile-info-card">
+                                <h3 className="card-title">
+                                    <i className="pi pi-info-circle"></i> Additional Details
+                                </h3>
+
+                                <div className="info-row">
+                                    <span className="info-label">Date of Birth</span>
+                                    <span className="info-value">{dob}</span>
+                                </div>
+                                <div className="info-row">
+                                    <span className="info-label">Gender</span>
+                                    <span className="info-value">{gender}</span>
+                                </div>
+                                <div className="info-row">
+                                    <span className="info-label">Account Type</span>
+                                    <span className="info-value">Resident</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                )}
+                </div>
             </main>
         </div>
     );

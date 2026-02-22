@@ -8,6 +8,8 @@
   transition: width 0.3s ease;
   z-index: 100;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .caregiver-sidebar-open {
@@ -20,6 +22,8 @@
 
 .caregiver-sidebar-nav {
   padding-top: 20px;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .caregiver-sidebar-item {
@@ -61,3 +65,18 @@
   color: #333;
 }
 
+/* logout button at the bottom */
+.sidebar-logout {
+  display: flex;
+  align-items: center;
+  padding: 20px 24px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  border-top: 1px solid #e0e0e0;
+  margin-top: auto;
+}
+
+.sidebar-logout:hover {
+  background-color: #ffe5e5;
+}
