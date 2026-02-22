@@ -9,6 +9,7 @@ import AdminSidebar from '../../Components/AdminSidebar';
 import ResidentsTab from './ResidentsTab';
 import CaregiverResidentList from './CaregiverResidentList';
 import MessagesTab from './MessagesTab';
+import AccountRequests from './AccountRequests';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 import "./css/admin.css";
@@ -23,6 +24,7 @@ export default function AdminDashboard() {
 
     const [medicationInventory, setMedicationInventory] = useState([]);
     const [consumablesInventory, setConsumablesInventory] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const [medicationSort, setMedicationSort] = useState('quantity-asc');
@@ -54,6 +56,8 @@ export default function AdminDashboard() {
         } catch (error) {
             console.error('Error fetching inventory data:', error);
             setError('Failed to load inventory data. Please try again.');
+        } finally {
+            setLoading(false);
         }
     }, [navigate]);
 
@@ -73,6 +77,7 @@ export default function AdminDashboard() {
         inventory: 'Inventory',
         residents: 'Residents',
         caregivers: 'Caregivers',
+        'account-requests': 'Account Requests',
         user: 'User',
         messages: 'Messages'
     };
@@ -109,6 +114,13 @@ export default function AdminDashboard() {
             </div>
         );
     };
+
+    const loadingIcon = (
+        <div className="custom-loading">
+            <i className="pi pi-spin pi-spinner custom-spinner"></i>
+            <span>Loading inventory...</span>
+        </div>
+    );
 
     const renderPlaceholder = (label) => (
         <div className="placeholder-content">
@@ -165,6 +177,8 @@ export default function AdminDashboard() {
                 </div>
                 <DataTable
                     value={sortedMedications}
+                    loading={loading}
+                    loadingIcon={loadingIcon}
                     className="inventory-table"
                     emptyMessage="No medications found"
                 >
@@ -188,6 +202,8 @@ export default function AdminDashboard() {
                 </div>
                 <DataTable
                     value={sortedConsumables}
+                    loading={loading}
+                    loadingIcon={loadingIcon}
                     className="inventory-table"
                     emptyMessage="No consumables found"
                 >
@@ -204,11 +220,14 @@ export default function AdminDashboard() {
                 return <ResidentsTab />;
             case 'caregivers':
                 return <CaregiverResidentList />;
+            case 'account-requests':
+                return <AccountRequests embedded={true} />;
             case 'user':
                 return renderPlaceholder('User Management');
             case 'messages':
                 return <MessagesTab />;
             case 'inventory':
+                return renderPlaceholder('Inventory');
             case 'dashboard':
             default:
                 return renderInventoryContent();

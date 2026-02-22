@@ -5,11 +5,12 @@ import caregiverIcon from '../assets/icons/caregivericon.png';
 import userIcon from '../assets/icons/usericon.png';
 import messageIcon from '../assets/icons/Messageicon.png';
 import inventoryIcon from '../assets/icons/inventoryicon.png';
+import documentIcon from '../assets/icons/documentIcon.png';
 
 // Admin Sidebar Component
 // this sidebar is specific to admin users
 // caregiver and resident would have their own sidebar cus they different
-const AdminSidebar = ({ isOpen, onToggle, activeTab, onNavigate }) => {
+const AdminSidebar = ({ isOpen, activeTab, onNavigate }) => {
   // activeTab is now controlled by parent component
 
   // menu items configuration for the different tabs
@@ -17,6 +18,7 @@ const AdminSidebar = ({ isOpen, onToggle, activeTab, onNavigate }) => {
     { id: 'dashboard', label: 'Dashboard', icon: dashboardIcon },
     { id: 'residents', label: 'Residents', icon: residentIcon },
     { id: 'caregivers', label: 'Caregivers', icon: caregiverIcon },
+    { id: 'account-requests', label: 'Account Requests', icon: documentIcon },
     { id: 'user', label: 'User', icon: userIcon },
     { id: 'messages', label: 'Messages', icon: messageIcon },
     { id: 'inventory', label: 'Inventory', icon: inventoryIcon }

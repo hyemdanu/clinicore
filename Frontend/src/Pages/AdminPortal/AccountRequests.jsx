@@ -52,7 +52,7 @@ const getCurrentUserData = () => {
 
 // start of function
 // defining state variables
-export default function AccountRequests() {
+export default function AccountRequests({ embedded = false }) {
 
     // page itself //
 
@@ -448,26 +448,15 @@ export default function AccountRequests() {
         setSidebarOpen(!sidebarOpen);
     };
 
-    return (
-        <div className="admin-dashboard-container">
-            {/* Toast component - displays notification messages */}
-            <Toast ref={toastRef} />
-
-            {/* Header with sidebar toggle button */}
-            <Header onToggleSidebar={toggleSidebar} title="Account Requests" />
-
-            {/* Sidebar navigation menu */}
-            <AdminSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
-
-            {/* Main content area */}
-            <main className={`dashboard-content ${sidebarOpen ? 'content-with-sidebar' : ''}`}>
-                {/* Page header and description */}
-                <div className="alert-section">
-                    <h2 className="dashboard-title">Account Creation Requests</h2>
-                    <p className="dashboard-subtitle">
-                        Review and manage pending account creation requests
-                    </p>
-                </div>
+    const contentSection = (
+        <>
+            {/* Page header and description */}
+            <div className="alert-section">
+                <h2 className="dashboard-title">Account Creation Requests</h2>
+                <p className="dashboard-subtitle">
+                    Review and manage pending account creation requests
+                </p>
+            </div>
 
                 {/* Display error message if API call fails */}
                 {error && <div className="error-message">{error}</div>}
@@ -503,8 +492,6 @@ export default function AccountRequests() {
                         paginator
                         // Show 10 rows per page
                         rows={10}
-
-                        responsiveLayout="scroll"
                         style={{ fontSize: '0.95rem' }}
                     >
                         {/* Column for first name */}
@@ -526,7 +513,11 @@ export default function AccountRequests() {
                         <Column body={actionTemplate} header="Actions" style={{ width: '10%' }} />
                     </DataTable>
                 </section>
-            </main>
+        </>
+    );
+
+    const dialogsSection = (
+        <>
 
             {/* Edit dialog form for updating account request details */}
             <Dialog
@@ -693,6 +684,28 @@ export default function AccountRequests() {
 
                 </div>
             </Dialog>
+        </>
+    );
+
+    if (embedded) {
+        return (
+            <>
+                <Toast ref={toastRef} />
+                {contentSection}
+                {dialogsSection}
+            </>
+        );
+    }
+
+    return (
+        <div className="admin-dashboard-container">
+            <Toast ref={toastRef} />
+            <Header onToggleSidebar={toggleSidebar} title="Account Requests" />
+            <AdminSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
+            <main className={`dashboard-content ${sidebarOpen ? 'content-with-sidebar' : ''}`}>
+                {contentSection}
+            </main>
+            {dialogsSection}
         </div>
     );
 }
