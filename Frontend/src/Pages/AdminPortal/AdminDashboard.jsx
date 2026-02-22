@@ -10,6 +10,7 @@ import ResidentsTab from './ResidentsTab';
 import CaregiverResidentList from './CaregiverResidentList';
 import MessagesTab from './MessagesTab';
 import AccountRequests from './AccountRequests';
+import AdminProfile from './AdminProfile';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 import "./css/admin.css";
@@ -24,7 +25,7 @@ export default function AdminDashboard() {
 
     const [medicationInventory, setMedicationInventory] = useState([]);
     const [consumablesInventory, setConsumablesInventory] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const [medicationSort, setMedicationSort] = useState('quantity-asc');
@@ -115,12 +116,6 @@ export default function AdminDashboard() {
         );
     };
 
-    const loadingIcon = (
-        <div className="custom-loading">
-            <i className="pi pi-spin pi-spinner custom-spinner"></i>
-            <span>Loading inventory...</span>
-        </div>
-    );
 
     const renderPlaceholder = (label) => (
         <div className="placeholder-content">
@@ -177,8 +172,6 @@ export default function AdminDashboard() {
                 </div>
                 <DataTable
                     value={sortedMedications}
-                    loading={loading}
-                    loadingIcon={loadingIcon}
                     className="inventory-table"
                     emptyMessage="No medications found"
                 >
@@ -202,8 +195,6 @@ export default function AdminDashboard() {
                 </div>
                 <DataTable
                     value={sortedConsumables}
-                    loading={loading}
-                    loadingIcon={loadingIcon}
                     className="inventory-table"
                     emptyMessage="No consumables found"
                 >
@@ -223,7 +214,7 @@ export default function AdminDashboard() {
             case 'account-requests':
                 return <AccountRequests embedded={true} />;
             case 'user':
-                return renderPlaceholder('User Management');
+                return <AdminProfile />;
             case 'messages':
                 return <MessagesTab />;
             case 'inventory':

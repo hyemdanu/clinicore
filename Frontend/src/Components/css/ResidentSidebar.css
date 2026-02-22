@@ -15,12 +15,13 @@
     background-color:var(--resident-sidebar-bg);
     transition:width .3s ease;
     z-index:100; overflow:hidden;
+    display:flex; flex-direction:column;
 }
 .resident-sidebar-open{ width:var(--resident-sidebar-width); }
 .resident-sidebar-closed{ width:0; }
 
 /* Nav */
-.resident-sidebar-nav{ padding-top:20px; }
+.resident-sidebar-nav{ padding-top:20px; flex:1; overflow-y:auto; }
 
 /* Items */
 .resident-sidebar-item{
@@ -46,3 +47,14 @@
 .resident-sidebar-label{
     margin-left:16px; font-size:16px; font-weight:400; color:var(--resident-text);
 }
+
+/* logout button at the bottom */
+.sidebar-logout{
+    display:flex; align-items:center;
+    padding:20px 24px; cursor:pointer;
+    transition:background-color .2s ease;
+    white-space:nowrap;
+    border-top:1px solid #e0e0e0;
+    margin-top:auto;
+}
+.sidebar-logout:hover{ background-color:#ffe5e5; }

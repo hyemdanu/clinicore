@@ -4,42 +4,42 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { Dropdown } from 'primereact/dropdown';
 import { get } from '../../services/api';
 import Header from '../../Components/Header';
 import CaregiverSidebar from "../../Components/CaregiverSidebar.jsx";
+import CaregiverProfile from "./CaregiverProfile";
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 
 export default function CaregiverDashboard() {
     const navigate = useNavigate();
 
-    // State for sidebar visibility and active tab
+    // sidebar and tab state
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [activeTab, setActiveTab] = useState("dashboard");
 
-    // store patient medication tasks, and patient info for display in table
+    // data for displaying in the table
     const [residents, setResidents] = useState([]);
 
-    // loading and error states for data fetching
+    // loading and error states
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const tabTitles = {
         dashboard: "Dashboard",
         residents: "Residents",
-        profile: "Profile",
+        profile: "User",
         messages: "Messages",
         documents: "Documents",
         inventory: "Inventory"
     };
 
-    // toggle sidebar open/closed when hamburger is clicked
+    // toggle the sidebar
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
 
-    // medication progression card to track how many medications are pending, taken, or missed
+    // medication progress card
     const MedicationProgressCard = ({percent}) => {
         return (
             <div className="progress-card">
@@ -62,7 +62,7 @@ export default function CaregiverDashboard() {
         );
     };
 
-    // resident task cards to show their medication progress
+    // resident task cards
     const TaskBadge = ({ label, color }) => {
         return (
             <div className="task-badge" style={{ backgroundColor: color }}>
@@ -71,7 +71,7 @@ export default function CaregiverDashboard() {
         );
     };
 
-    // resident rows in the table
+    // table rows
     const ResidentRow = ({ resident }) => {
         const tasks = resident.tasks || [];
         return (
@@ -218,7 +218,7 @@ export default function CaregiverDashboard() {
             case "residents":
                 return renderPlaceholder("Residents");
             case "profile":
-                return renderPlaceholder("Profile");
+                return <CaregiverProfile />;
             case "messages":
                 return renderPlaceholder("Messages");
             case "documents":
