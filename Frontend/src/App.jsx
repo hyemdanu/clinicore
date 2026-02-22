@@ -16,6 +16,13 @@ import RecoveryEmailSentPage from "./Pages/WelcomePage/RecoveryEmailSentPage.jsx
 import CompleteAccountCreation from "./Pages/WelcomePage/CompleteAccountCreation.jsx";
 import ResidentMedicalProfile from "./Pages/ResidentPortal/ResidentMedicalProfile";
 import ResetPasswordPage from "./Pages/WelcomePage/ResetPasswordPage.jsx";
+import RecoveryEmailSentPage from "./Pages/WelcomePage/RecoveryEmailSentPage.jsx";
+import ResidentMedicalProfile from "./Pages/ResidentPortal/ResidentMedicalProfile.jsx";
+import CaregiverMedicationInventory from './Pages/CaregiverPortal/CaregiverMedicationInventory.jsx';
+import InventoryLanding from './Pages/CaregiverPortal/InventoryLanding.jsx';
+//import MedicationInventory from './Pages/CaregiverPortal/MedicationInventory';
+import CaregiverMedicalConsumablesInventory from './Pages/CaregiverPortal/ConsumablesInventory.jsx';
+
 
 
 export default function App() {
@@ -39,6 +46,9 @@ export default function App() {
                 <Route path="/recovery-email-sent" element={<RecoveryEmailSentPage />} />
                 <Route path="/activate-account" element={<CompleteAccountCreation />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/caregiver/medication-inventory" element={<CaregiverMedicationInventory />} /> //change MedicationInventory later
+                <Route path="/caregiver/inventory" element={<InventoryLanding />} />
+                <Route path="/caregiver/consumables-inventory" element={<CaregiverMedicalConsumablesInventory />} />
             </Routes>
         </BrowserRouter>
     );

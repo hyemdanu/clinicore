@@ -8,6 +8,7 @@ import messageIcon from '../assets/icons/Messageicon.png';
 import inventoryIcon from '../assets/icons/inventoryicon.png';
 import documentIcon from '../assets/icons/documentIcon.png';
 
+
 // Admin Sidebar Component
 // this sidebar is specific to admin users
 // caregiver and resident would have their own sidebar cus they different
@@ -25,12 +26,15 @@ const AdminSidebar = ({ isOpen, activeTab, onNavigate }) => {
     { id: 'user', label: 'User', icon: userIcon },
     { id: 'messages', label: 'Messages', icon: messageIcon },
     { id: 'inventory', label: 'Inventory', icon: inventoryIcon }
+
   ];
 
   // update active item when a menu item is clicked
   const handleItemClick = (itemId) => {
     if (onNavigate) {
       onNavigate(itemId);
+
+
     }
   };
 
