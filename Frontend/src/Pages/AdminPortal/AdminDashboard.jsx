@@ -8,6 +8,7 @@ import Header from '../../Components/Header';
 import AdminSidebar from '../../Components/AdminSidebar';
 import ResidentsTab from './ResidentsTab';
 import CaregiverResidentList from './CaregiverResidentList';
+import MessagesTab from './MessagesTab';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 import "./css/admin.css";
@@ -35,6 +36,7 @@ export default function AdminDashboard() {
     ];
 
     const fetchInventoryData = useCallback(async () => {
+        setLoading(true);
         setError(null);
         try {
             const currentUserStr = localStorage.getItem('currentUser');
@@ -205,7 +207,7 @@ export default function AdminDashboard() {
             case 'user':
                 return renderPlaceholder('User Management');
             case 'messages':
-                return renderPlaceholder('Messages');
+                return <MessagesTab />;
             case 'inventory':
             case 'dashboard':
             default:
@@ -214,7 +216,7 @@ export default function AdminDashboard() {
     };
 
     return (
-        <div className="admin-dashboard-container">
+        <div className={`admin-dashboard-container ${activeTab === 'messages' ? 'messages-active' : ''}`}>
             <Header onToggleSidebar={toggleSidebar} title={tabTitles[activeTab] || 'Dashboard'} />
 
             <AdminSidebar
@@ -224,7 +226,7 @@ export default function AdminDashboard() {
                 onNavigate={handleNavigate}
             />
 
-            <main className={`dashboard-content ${sidebarOpen ? 'content-with-sidebar' : ''}`}>
+            <main className={`dashboard-content ${sidebarOpen ? 'content-with-sidebar' : ''} ${activeTab === 'messages' ? 'messages-content' : ''}`}>
                 {renderContent()}
             </main>
         </div>
