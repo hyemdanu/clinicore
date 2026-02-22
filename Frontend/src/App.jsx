@@ -5,7 +5,7 @@ import ResidentDocuments from "./Pages/ResidentPortal/ResidentDocuments";
 import ResidentUserProfile from "./Pages/ResidentPortal/ResidentUserProfile";
 import ResidentMedication from "./Pages/ResidentPortal/ResidentMedication";
 import CaregiverDashboard from "./Pages/CaregiverPortal/CaregiverDashboard";
-import CaregiverDocument from "./Pages/Caregiver/CaregiverDocument";
+import CaregiverDocument from "./Pages/CaregiverPortal/CaregiverDocument";
 import AdminDashboard from "./Pages/AdminPortal/AdminDashboard";
 import ForgotUserIdPage from "./Pages/WelcomePage/ForgotUserIdPage";
 import ForgotPasswordPage from "./Pages/WelcomePage/ForgotPasswordPage";
