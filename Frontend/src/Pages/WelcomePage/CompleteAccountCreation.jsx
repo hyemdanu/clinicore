@@ -164,6 +164,16 @@ export default function CompleteAccountCreation() {
         }));
     };
 
+    // Handle number-only input changes (strips any non-digit characters)
+    const handleNumberInputChange = (e) => {
+        const { name, value } = e.target;
+        const numbersOnly = value.replace(/\D/g, "");
+        setAccountData(prev => ({
+            ...prev,
+            [name]: numbersOnly
+        }));
+    };
+
     // Render role-specific form fields
     const renderRoleSpecificFields = () => {
         if (accountData.role === "RESIDENT") {
@@ -195,8 +205,8 @@ export default function CompleteAccountCreation() {
                             type="tel"
                             name="emergencyContactNumber"
                             value={accountData.emergencyContactNumber}
-                            onChange={handleInputChange}
-                            placeholder="Phone number"
+                            onChange={handleNumberInputChange}
+                            placeholder="e.g. 9161234567"
                             required
                         />
                     </div>
@@ -417,7 +427,8 @@ export default function CompleteAccountCreation() {
                                     type="tel"
                                     name="contactNumber"
                                     value={accountData.contactNumber}
-                                    onChange={handleInputChange}
+                                    onChange={handleNumberInputChange}
+                                    placeholder="e.g. 9161234567"
                                     required
                                 />
                             </div>

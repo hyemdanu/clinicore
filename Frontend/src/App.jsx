@@ -12,6 +12,7 @@ import RequestSentPage from "./Pages/WelcomePage/RequestSentPage";
 import RecoveryEmailSentPage from "./Pages/WelcomePage/RecoveryEmailSentPage.jsx"
 import CompleteAccountCreation from "./Pages/WelcomePage/CompleteAccountCreation.jsx";
 import ResidentMedicalProfile from "./Pages/ResidentPortal/ResidentMedicalProfile";
+import ResetPasswordPage from "./Pages/WelcomePage/ResetPasswordPage.jsx";
 
 export default function App() {
     return (
@@ -30,6 +31,7 @@ export default function App() {
                 <Route path="/request-sent" element={<RequestSentPage />} />
                 <Route path="/recovery-email-sent" element={<RecoveryEmailSentPage />} />
                 <Route path="/activate-account" element={<CompleteAccountCreation />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
             </Routes>
         </BrowserRouter>
     );
