@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class CaregiverService {
@@ -170,5 +172,54 @@ public class CaregiverService {
             ResidentCaregiver newAssignment = new ResidentCaregiver(newId, resident, toCaregiver, LocalDateTime.now());
             residentCaregiverRepository.save(newAssignment);
         }
+    }
+
+    // returns residents split into assigned/others for a caregiver's resident tab
+    @Transactional(readOnly = true)
+    public Map<String, Object> getResidentsSplitForCaregiver(Long currentUserId) {
+        UserProfile currentUser = userProfileRepository.findById(currentUserId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + currentUserId));
+
+        if (currentUser.getRole() != UserProfile.Role.CAREGIVER) {
+            throw new IllegalArgumentException("Only caregivers can access this endpoint");
+        }
+
+        // get all residents assigned to this caregiver
+        List<ResidentCaregiver> myAssignments = residentCaregiverRepository.findById_CaregiverId(currentUserId);
+        Set<Long> myResidentIds = myAssignments.stream()
+                .map(a -> a.getResident().getUserProfile().getId())
+                .collect(Collectors.toSet());
+
+        // get all residents
+        List<UserProfile> allResidents = userProfileRepository.findByRole(UserProfile.Role.RESIDENT);
+
+        List<Map<String, Object>> assigned = new ArrayList<>();
+        List<Map<String, Object>> others = new ArrayList<>();
+
+        for (UserProfile resident : allResidents) {
+            // get all caregivers assigned to this resident
+            List<ResidentCaregiver> residentAssignments = residentCaregiverRepository.findById_ResidentId(resident.getId());
+
+            Map<String, Object> residentMap = new LinkedHashMap<>();
+            residentMap.put("id", resident.getId());
+            residentMap.put("firstName", resident.getFirstName());
+            residentMap.put("lastName", resident.getLastName());
+
+            if (myResidentIds.contains(resident.getId())) {
+                assigned.add(residentMap);
+            } else {
+                // add assigned caregiver names for the indicator
+                List<String> caregiverNames = residentAssignments.stream()
+                        .map(a -> a.getCaregiver().getUserProfile().getFirstName() + " " + a.getCaregiver().getUserProfile().getLastName())
+                        .collect(Collectors.toList());
+                residentMap.put("assignedCaregivers", caregiverNames);
+                others.add(residentMap);
+            }
+        }
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("assigned", assigned);
+        result.put("others", others);
+        return result;
     }
 }

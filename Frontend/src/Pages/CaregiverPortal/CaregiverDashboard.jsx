@@ -8,6 +8,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { get } from '../../services/api';
 import Header from '../../Components/Header';
 import CaregiverSidebar from "../../Components/CaregiverSidebar.jsx";
+import CaregiverResidentsTab from './CResidentsTab.jsx';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 
@@ -216,7 +217,7 @@ export default function CaregiverDashboard() {
     const renderContent = () => {
         switch (activeTab) {
             case "residents":
-                return renderPlaceholder("Residents");
+                return <CaregiverResidentsTab />;
             case "profile":
                 return renderPlaceholder("Profile");
             case "messages":

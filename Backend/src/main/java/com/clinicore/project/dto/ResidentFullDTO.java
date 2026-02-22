@@ -26,6 +26,7 @@ public class ResidentFullDTO {
     private String emergencyContactName;
     private String emergencyContactNumber;
     private String residentNotes;
+    private List<AssignedCaregiverDTO> assignedCaregivers; // adding assigned caregivers to the resident dto
 
     // all the medical stuff
     private MedicalProfileDTO medicalProfile;
@@ -120,5 +121,14 @@ public class ResidentFullDTO {
         private Long residentId;
         private String diagnosis;
         private String notes;
+    }
+
+    // assigned caregiver info
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AssignedCaregiverDTO {
+        private Long caregiverId;
+        private String caregiverName;
     }
 }
