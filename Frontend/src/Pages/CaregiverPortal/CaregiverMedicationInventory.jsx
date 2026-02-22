@@ -7,7 +7,7 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { get, post, put, del } from '../../services/api';
 import Header from '../../Components/Header';
-import AdminSidebar from '../../Components/AdminSidebar';
+import CaregiverSidebar from '../../Components/CaregiverSideBar.jsx';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 import './css/CaregiverInventory.css';
@@ -86,7 +86,7 @@ export default function MedicationInventory() {
         //add links later
         switch(tab) {
             case 'dashboard':
-                navigate('/admin-dashboard');
+                navigate('/caregiver-dashboard');
                 break;
             case 'inventory':
                 navigate('/caregiver/inventory');
@@ -96,10 +96,6 @@ export default function MedicationInventory() {
                 break;
             case 'residents':
                 navigate('/residents');
-                break;
-            case 'caregivers':
-                alert('Caregivers page coming soon!');
-                // navigate('/caregivers');
                 break;
             case 'user':
                 alert('User page coming soon!');
@@ -127,6 +123,12 @@ export default function MedicationInventory() {
 
             // Calculate new quantity
             const newQuantity = Math.max(0, medication.quantity + change);
+
+            // If trying to decrease below 0, show alert and return early
+            if (medication.quantity === 0 && change < 0) {
+                alert('Quantity cannot be less than 0');
+                return;
+            }
 
             // Update medication with new quantity
             const updatedMedication = {
@@ -159,6 +161,11 @@ export default function MedicationInventory() {
     const handleSaveEdit = async () => {
         if (!editFormData.name.trim() || !editFormData.quantity) {
             alert('Please fill in all fields');
+            return;
+        }
+        const quantity = parseInt(editFormData.quantity);
+        if (quantity < 0) {
+            alert('Quantity cannot be negative. Please enter a value of 0 or greater.');
             return;
         }
 
@@ -213,6 +220,11 @@ export default function MedicationInventory() {
     const handleAddMedication = async () => {
         if (!addFormData.name.trim() || !addFormData.quantity) {
             alert('Please fill in all fields');
+            return;
+        }
+        const quantity = parseInt(addFormData.quantity);
+        if (quantity < 0) {
+            alert('Quantity cannot be negative. Please enter a value of 0 or greater.');
             return;
         }
 
@@ -336,7 +348,6 @@ export default function MedicationInventory() {
         'medication-inventory': 'Medication Inventory',
         'dashboard': 'Dashboard',
         'residents': 'Residents',
-        'caregivers': 'Caregivers',
         'user': 'User',
         'messages': 'Messages'
     };
@@ -348,7 +359,7 @@ export default function MedicationInventory() {
                 title={tabTitles[activeTab] || 'Medication Inventory'}
             />
 
-            <AdminSidebar
+            <CaregiverSidebar
                 isOpen={sidebarOpen}
                 onToggle={toggleSidebar}
                 activeTab={activeTab}

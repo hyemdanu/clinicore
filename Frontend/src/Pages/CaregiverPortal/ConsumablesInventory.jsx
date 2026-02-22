@@ -7,7 +7,7 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { get, post, put, del } from '../../services/api';
 import Header from '../../Components/Header';
-import AdminSidebar from '../../Components/AdminSidebar';
+import CaregiverSidebar from '../../Components/CaregiverSideBar.jsx';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 import './css/consumables-inventory.css';
@@ -99,17 +99,17 @@ export default function ConsumablesInventory() {
             case 'residents':
                 navigate('/residents');
                 break;
-            case 'caregivers':
-                alert('Caregivers page coming soon!');
-                break;
             case 'user':
                 alert('User page coming soon!');
+                // navigate('/user');
                 break;
             case 'messages':
                 alert('Messages page coming soon!');
+                // navigate('/messages');
                 break;
             case 'documents':
                 alert('Documents page coming soon!');
+                // navigate('/documents');
                 break;
             default:
                 break;
@@ -125,6 +125,11 @@ export default function ConsumablesInventory() {
 
             // Calculate new quantity
             const newQuantity = Math.max(0, consumable.quantity + change);
+            // If trying to decrease below 0, show alert and return early
+            if (consumable.quantity === 0 && change < 0) {
+                alert('Quantity cannot be less than 0');
+                return;
+            }
 
             // Update consumable with new quantity
             const updatedConsumable = {
@@ -157,6 +162,12 @@ export default function ConsumablesInventory() {
     const handleSaveEdit = async () => {
         if (!editFormData.name.trim() || !editFormData.quantity) {
             alert('Please fill in all fields');
+            return;
+        }
+
+        const quantity = parseInt(editFormData.quantity);
+        if (quantity < 0) {
+            alert('Quantity cannot be negative. Please enter a value of 0 or greater.');
             return;
         }
 
@@ -211,6 +222,12 @@ export default function ConsumablesInventory() {
     const handleAddConsumable = async () => {
         if (!addFormData.name.trim() || !addFormData.quantity) {
             alert('Please fill in all fields');
+            return;
+        }
+
+        const quantity = parseInt(addFormData.quantity);
+        if (quantity < 0) {
+            alert('Quantity cannot be negative. Please enter a value of 0 or greater.');
             return;
         }
 
@@ -335,7 +352,7 @@ export default function ConsumablesInventory() {
         'inventory': 'Inventory',
         'dashboard': 'Dashboard',
         'residents': 'Residents',
-        'caregivers': 'Caregivers',
+
         'user': 'User',
         'messages': 'Messages'
     };
@@ -347,7 +364,7 @@ export default function ConsumablesInventory() {
                 title={tabTitles[activeTab] || 'Medical Consumables Inventory'}
             />
 
-            <AdminSidebar
+            <CaregiverSidebar
                 isOpen={sidebarOpen}
                 onToggle={toggleSidebar}
                 activeTab={activeTab}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../Components/Header';
-import AdminSidebar from '../../Components/AdminSidebar';
+import CaregiverSidebar from '../../Components/CaregiverSideBar.jsx';
 import './css/inventory-landing.css';
 import consumablesIcon from '../../assets/icons/consumablesIcon.png';
 import medicationsIcon from '../../assets/icons/medicationsIcon.png';
@@ -43,26 +43,21 @@ export default function InventoryLanding() {
                 navigate('/caregiver/consumables-inventory');
                 break;
             case 'residents':
-                // Add link later
+                // Add later
                 navigate('/residents');
                 break;
-            case 'caregivers':
-                // Add  later
-                alert('Caregivers page coming soon!');
-                // navigate('/caregivers');
-                break;
             case 'user':
-
+                // Add later
                 alert('User page coming soon!');
                 // navigate('/user');
                 break;
             case 'messages':
-                // Add  messages route
+                // Add latere
                 alert('Messages page coming soon!');
                 // navigate('/messages');
                 break;
             case 'documents':
-                // Add  documents route
+                // Add later
                 alert('Documents page coming soon!');
                 // navigate('/documents');
                 break;
@@ -87,7 +82,7 @@ export default function InventoryLanding() {
                 title={tabTitles[activeTab] || 'Inventory'}
             />
 
-            <AdminSidebar
+            <CaregiverSidebar
                 isOpen={sidebarOpen}
                 onToggle={toggleSidebar}
                 activeTab={activeTab}
