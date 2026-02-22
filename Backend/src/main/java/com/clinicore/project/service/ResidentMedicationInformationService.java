@@ -36,6 +36,7 @@ public class ResidentMedicationInformationService {
                 .collect(Collectors.toList());
     }
 
+
     // get medication name by ID
     public String getName(Long currentUserId, Long medicationId) {
         UserProfile currentUser = getUserById(currentUserId);

@@ -41,6 +41,7 @@ public class ResidentMedicationInformationController {
         }
     }
 
+
     @GetMapping("/medications/name")
     public ResponseEntity<?> getResidentMedicationName(@RequestParam Long currentUserId, @RequestParam Long medicationId) {
         try {
