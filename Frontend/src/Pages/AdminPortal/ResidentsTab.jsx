@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { get } from '../../services/api';
-import ResidentDetailModal from './ResidentDetailModal';
-import './css/residents.css';
+import ResidentDetailModal from '../Shared/ResidentDetailModal';
+import '../Shared/css/residents.css';
 
 /*
  * the Residents tab in the admin portal

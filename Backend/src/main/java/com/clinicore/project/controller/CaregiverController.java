@@ -98,4 +98,18 @@ public class CaregiverController {
                     .body(Map.of("message", "Error switching resident: " + e.getMessage()));
         }
     }
+
+    // returns residents split into assigned to this caregiver vs everyone else
+    @GetMapping("/my-residents")
+    public ResponseEntity<?> getMyResidents(@RequestParam Long currentUserId) {
+        try {
+            return ResponseEntity.ok(caregiverService.getResidentsSplitForCaregiver(currentUserId));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Error retrieving residents: " + e.getMessage()));
+        }
+    }
 }

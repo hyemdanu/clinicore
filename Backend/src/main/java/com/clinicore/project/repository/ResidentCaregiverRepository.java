@@ -12,4 +12,6 @@ public interface ResidentCaregiverRepository extends JpaRepository<ResidentCareg
 
     // give me all residents assigned to this caregiver
     List<ResidentCaregiver> findById_CaregiverId(Long caregiverId);
+
+    List<ResidentCaregiver> findById_ResidentId(Long residentId);
 }

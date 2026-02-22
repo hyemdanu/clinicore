@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { get, post, del, put } from '../../services/api';
-import './css/residents.css';
+import '../Shared/css/residents.css';
 
 /*
  * Caregiver list tab in the admin portal.
