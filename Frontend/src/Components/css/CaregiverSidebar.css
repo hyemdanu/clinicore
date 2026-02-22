@@ -1,0 +1,63 @@
+/* css for caregiver sidebar */
+.caregiver-sidebar {
+  position: fixed;
+  left: 0;
+  top: 56px;
+  height: calc(100vh - 56px);
+  background-color: #f8fafc;
+  transition: width 0.3s ease;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.caregiver-sidebar-open {
+  width: 280px;
+}
+
+.caregiver-sidebar-closed {
+  width: 0;
+}
+
+.caregiver-sidebar-nav {
+  padding-top: 20px;
+}
+
+.caregiver-sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.caregiver-sidebar-item:hover {
+  background-color: #e8eef6;
+}
+
+.caregiver-sidebar-item-active {
+  background-color: #e1e8f5;
+  border-radius: 0 25px 25px 0;
+  margin-right: 20px;
+}
+
+.caregiver-sidebar-icon {
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.caregiver-sidebar-icon img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.caregiver-sidebar-label {
+  margin-left: 16px;
+  font-size: 16px;
+  font-weight: 400;
+  color: #333;
+}
+

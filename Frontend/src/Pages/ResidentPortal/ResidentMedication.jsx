@@ -8,7 +8,7 @@ import ResidentSidebar from "../../Components/ResidentSidebar";
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primeicons/primeicons.css";
 
-import "./css/ResidentDashboard.css"; // reuse layout styles
+import "./css/ResidentDashboard.css";
 import "./css/ResidentMedication.css";
 
 export default function ResidentMedication() {
@@ -18,7 +18,6 @@ export default function ResidentMedication() {
     const toggleSidebar = () => setSidebarOpen((s) => !s);
 
     const [resident, setResident] = useState(null);
-
     const [medications, setMedications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -29,11 +28,8 @@ export default function ResidentMedication() {
     const sortOptions = [
         { label: "Name (A-Z)", value: "medication_name", order: "asc" },
         { label: "Name (Z-A)", value: "medication_name", order: "desc" },
-        { label: "Scheduled Time", value: "scheduled_time", order: "asc" },
         { label: "Status", value: "intake_status", order: "asc" },
     ];
-
-
 
     const fetchData = async () => {
         setLoading(true);
@@ -49,36 +45,35 @@ export default function ResidentMedication() {
             const currentUser = JSON.parse(currentUserStr);
             const currentUserId = currentUser.id;
 
-            // Optional role gate (matches Dashboard)
             if (currentUser.role && currentUser.role !== "RESIDENT") {
                 navigate("/not-authorized");
                 return;
             }
 
-            const results = await Promise.allSettled([
-                get(`/residents/profile?currentUserId=${currentUserId}`),
-                get(`/residents/medications?currentUserId=${currentUserId}`),
-            ]);
+            // Fetch full resident details including medications - same pattern as ResidentDetailModal
+            const residentData = await get(`/residents/full/${currentUserId}?currentUserId=${currentUserId}`);
 
-            const val = (i, fb) => (results[i].status === "fulfilled" ? results[i].value : fb);
+            setResident(residentData);
 
-            const profile = val(0, currentUser);
-            const meds = val(1, []);
+            // Format medications from the resident data
+            const formattedMeds = (residentData.medications || []).map(med => ({
+                id: med.id,
+                medication_name: med.name,
+                dosage: med.dosage,
+                frequency: med.schedule,
+                scheduled_time: med.scheduledTime,
+                intake_status: med.intakeStatus,
+                notes: med.notes || "No notes",
+                lastAdministeredAt: med.lastAdministeredAt,
+                nextDoseTime: med.nextDoseTime,
+                isOverdue: med.isOverdue,
+                inventoryQuantity: med.inventoryQuantity
+            }));
 
-            setResident(profile);
-            setMedications(Array.isArray(meds) ? meds : []);
-
-            // Only show a user-facing error in production and only if everything failed
-            const inProd = import.meta?.env?.MODE === "production";
-            const allFailed = results.every((r) => r.status === "rejected");
-
-            if (inProd && allFailed) {
-                setError("We couldn’t load your medications. Showing sample data.");
-                loadSampleData();
-            }
+            setMedications(formattedMeds);
         } catch (e) {
-            console.error(e);
-            setError(null);
+            console.error("Error fetching medications:", e);
+            setError("Failed to load medications. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -99,20 +94,22 @@ export default function ResidentMedication() {
 
     const getStatusBadge = (status) => {
         const statusConfig = {
-            ADMINISTERED: { label: "Administered", class: "status-badge administered" },
-            WITHHELD: { label: "Withheld", class: "status-badge withheld" },
-            MISSED: { label: "Missed", class: "status-badge missed" },
+            "Administered": { label: "Administered", class: "status-badge administered" },
+            "Withheld": { label: "Withheld", class: "status-badge withheld" },
+            "Missed": { label: "Missed", class: "status-badge missed" },
+            "Pending": { label: "Pending", class: "status-badge pending" }
         };
 
-        const config = statusConfig[status] || {
-            label: "Pending",
-            class: "status-badge pending",
-        };
-
+        const config = statusConfig[status] || statusConfig["Pending"];
         return <span className={config.class}>{config.label}</span>;
     };
 
-    const getScheduleDisplay = (frequency, scheduledTime) => `${frequency} • ${scheduledTime}`;
+    const getScheduleDisplay = (frequency, scheduledTime) => {
+        if (frequency && scheduledTime) {
+            return `${frequency} • ${scheduledTime}`;
+        }
+        return frequency || scheduledTime || "Not scheduled";
+    };
 
     const sortedMedications = useMemo(() => {
         const arr = Array.isArray(medications) ? [...medications] : [];
@@ -129,12 +126,6 @@ export default function ResidentMedication() {
                 return sortOrder === "asc" ? comparison : -comparison;
             }
 
-            const aNum = Number(aValue);
-            const bNum = Number(bValue);
-            if (!Number.isNaN(aNum) && !Number.isNaN(bNum)) {
-                return sortOrder === "asc" ? aNum - bNum : bNum - aNum;
-            }
-
             return 0;
         });
     }, [medications, sortField, sortOrder]);
@@ -149,7 +140,7 @@ export default function ResidentMedication() {
             <main className={`dashboard-content ${sidebarOpen ? "content-with-sidebar" : ""}`}>
                 <div className="resident-medication-component">
                     <div className="alert-section">
-                        <h2 className="dashboard-title">Medication</h2>
+                        <h2 className="dashboard-title">My Medications</h2>
 
                         {error && (
                             <div className="error-message">
@@ -177,7 +168,7 @@ export default function ResidentMedication() {
                                 </select>
 
                                 <button className="refresh-button" onClick={handleRefresh} disabled={loading}>
-                                    Refresh
+                                    {loading ? "Loading..." : "Refresh"}
                                 </button>
                             </div>
                         </div>
@@ -193,25 +184,27 @@ export default function ResidentMedication() {
                                         <thead>
                                         <tr>
                                             <th>Medication</th>
-                                            <th>Scheduled Day and Time</th>
-                                            <th>Log Intake Status</th>
+                                            <th>Dosage</th>
+                                            <th>Schedule</th>
+                                            <th>Status</th>
                                             <th>Notes</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         {sortedMedications.length === 0 ? (
                                             <tr>
-                                                <td colSpan="4" className="empty-message">
+                                                <td colSpan="5" className="empty-message">
                                                     No medications found
                                                 </td>
                                             </tr>
                                         ) : (
                                             sortedMedications.map((medication) => (
-                                                <tr key={medication.id ?? medication.medication_name}>
+                                                <tr key={medication.id}>
                                                     <td>{medication.medication_name}</td>
+                                                    <td>{medication.dosage || "—"}</td>
                                                     <td>{getScheduleDisplay(medication.frequency, medication.scheduled_time)}</td>
                                                     <td>{getStatusBadge(medication.intake_status)}</td>
-                                                    <td>{medication.notes || "No notes"}</td>
+                                                    <td>{medication.notes}</td>
                                                 </tr>
                                             ))
                                         )}
@@ -221,7 +214,6 @@ export default function ResidentMedication() {
                             )}
                         </div>
                     </div>
-
                 </div>
             </main>
         </div>
