@@ -22,6 +22,12 @@ export default function ResidentSidebar({ isOpen, onToggle }) {
         { label: "Documents",       icon: dashboardIcon, to: "/resident/documents" }, // placeholder
     ];
 
+    // logout handler - clears user data and sends back to login
+    const handleLogout = () => {
+        localStorage.removeItem('currentUser');
+        navigate('/');
+    };
+
     return (
         <aside className={`resident-sidebar ${isOpen ? "resident-sidebar-open" : "resident-sidebar-closed"}`}>
             <div className="resident-sidebar-nav">
@@ -46,6 +52,14 @@ export default function ResidentSidebar({ isOpen, onToggle }) {
                         </div>
                     );
                 })}
+            </div>
+
+            {/* logout button at the bottom */}
+            <div className="sidebar-logout" onClick={handleLogout}>
+                <div className="resident-sidebar-icon">
+                    <i className="pi pi-sign-out" style={{ fontSize: '24px', color: '#e74c3c' }}></i>
+                </div>
+                <span className="resident-sidebar-label" style={{ color: '#e74c3c' }}>Logout</span>
             </div>
         </aside>
     );

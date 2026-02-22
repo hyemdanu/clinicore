@@ -102,7 +102,7 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-/* card title row */
+/* card title row with edit button */
 .card-title-row {
     display: flex;
     justify-content: space-between;
@@ -122,6 +122,22 @@
 }
 
 .card-title i {
+    color: #369DF7;
+}
+
+/* edit button */
+.edit-btn {
+    background: none;
+    border: none;
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #86868b;
+    transition: all 0.15s;
+}
+
+.edit-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
     color: #369DF7;
 }
 
@@ -157,6 +173,69 @@
     text-align: right;
     flex: 1;
     word-break: break-word;
+}
+
+/* edit mode input fields */
+.edit-input {
+    max-width: 300px;
+    width: 100%;
+}
+
+.edit-input input,
+.edit-input .p-inputtext {
+    width: 100%;
+    font-size: 0.95rem;
+}
+
+.edit-input .p-calendar,
+.edit-input .p-dropdown {
+    width: 100%;
+}
+
+.edit-input .p-inputtext:focus {
+    border-color: #369DF7;
+    box-shadow: 0 0 0 0.2rem rgba(54, 157, 247, 0.25);
+}
+
+/* edit action buttons */
+.edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1.5rem 2rem;
+    border-top: 2px solid #dee2e6;
+    background-color: #f8f9fa;
+}
+
+.edit-actions .p-button {
+    padding: 0.5rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* outlined cancel button */
+.edit-actions .p-button-outlined {
+    background-color: transparent;
+    border-color: #369DF7;
+    color: #369DF7;
+}
+
+.edit-actions .p-button-outlined:hover {
+    background-color: rgba(54, 157, 247, 0.1);
+    border-color: #369DF7;
+    color: #369DF7;
+}
+
+/* filled save button */
+.edit-actions .p-button:not(.p-button-outlined) {
+    background-color: #369DF7;
+    border-color: #369DF7;
+    color: white;
+}
+
+.edit-actions .p-button:not(.p-button-outlined):hover {
+    background-color: #2884d6;
+    border-color: #2884d6;
 }
 
 /* responsive design */
@@ -197,6 +276,15 @@
 
     .info-value {
         text-align: left;
+    }
+
+    .edit-input {
+        max-width: 100%;
+    }
+
+    .edit-actions {
+        padding: 1rem;
+        gap: 0.5rem;
     }
 
     .card-title-row {

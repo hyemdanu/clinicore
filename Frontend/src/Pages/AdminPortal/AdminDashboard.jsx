@@ -9,6 +9,8 @@ import AdminSidebar from '../../Components/AdminSidebar';
 import ResidentsTab from './ResidentsTab';
 import CaregiverResidentList from './CaregiverResidentList';
 import MessagesTab from './MessagesTab';
+import AccountRequests from './AccountRequests';
+import AdminProfile from './AdminProfile';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 import "./css/admin.css";
@@ -23,6 +25,7 @@ export default function AdminDashboard() {
 
     const [medicationInventory, setMedicationInventory] = useState([]);
     const [consumablesInventory, setConsumablesInventory] = useState([]);
+    const [, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const [medicationSort, setMedicationSort] = useState('quantity-asc');
@@ -54,6 +57,8 @@ export default function AdminDashboard() {
         } catch (error) {
             console.error('Error fetching inventory data:', error);
             setError('Failed to load inventory data. Please try again.');
+        } finally {
+            setLoading(false);
         }
     }, [navigate]);
 
@@ -73,6 +78,7 @@ export default function AdminDashboard() {
         inventory: 'Inventory',
         residents: 'Residents',
         caregivers: 'Caregivers',
+        'account-requests': 'Account Requests',
         user: 'User',
         messages: 'Messages'
     };
@@ -109,6 +115,7 @@ export default function AdminDashboard() {
             </div>
         );
     };
+
 
     const renderPlaceholder = (label) => (
         <div className="placeholder-content">
@@ -204,11 +211,14 @@ export default function AdminDashboard() {
                 return <ResidentsTab />;
             case 'caregivers':
                 return <CaregiverResidentList />;
+            case 'account-requests':
+                return <AccountRequests embedded={true} />;
             case 'user':
-                return renderPlaceholder('User Management');
+                return <AdminProfile />;
             case 'messages':
                 return <MessagesTab />;
             case 'inventory':
+                return renderPlaceholder('Inventory');
             case 'dashboard':
             default:
                 return renderInventoryContent();

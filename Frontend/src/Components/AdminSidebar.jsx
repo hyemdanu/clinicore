@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import './css/AdminSidebar.css';
 import dashboardIcon from '../assets/icons/dashboardicon.png';
 import residentIcon from '../assets/icons/residenticon.png';
@@ -5,11 +6,14 @@ import caregiverIcon from '../assets/icons/caregivericon.png';
 import userIcon from '../assets/icons/usericon.png';
 import messageIcon from '../assets/icons/Messageicon.png';
 import inventoryIcon from '../assets/icons/inventoryicon.png';
+import documentIcon from '../assets/icons/documentIcon.png';
 
 // Admin Sidebar Component
 // this sidebar is specific to admin users
 // caregiver and resident would have their own sidebar cus they different
-const AdminSidebar = ({ isOpen, onToggle, activeTab, onNavigate }) => {
+const AdminSidebar = ({ isOpen, activeTab, onNavigate }) => {
+  const navigate = useNavigate();
+
   // activeTab is now controlled by parent component
 
   // menu items configuration for the different tabs
@@ -17,6 +21,7 @@ const AdminSidebar = ({ isOpen, onToggle, activeTab, onNavigate }) => {
     { id: 'dashboard', label: 'Dashboard', icon: dashboardIcon },
     { id: 'residents', label: 'Residents', icon: residentIcon },
     { id: 'caregivers', label: 'Caregivers', icon: caregiverIcon },
+    { id: 'account-requests', label: 'Account Requests', icon: documentIcon },
     { id: 'user', label: 'User', icon: userIcon },
     { id: 'messages', label: 'Messages', icon: messageIcon },
     { id: 'inventory', label: 'Inventory', icon: inventoryIcon }
@@ -27,6 +32,12 @@ const AdminSidebar = ({ isOpen, onToggle, activeTab, onNavigate }) => {
     if (onNavigate) {
       onNavigate(itemId);
     }
+  };
+
+  // logout handler - clears user data and sends back to login
+  const handleLogout = () => {
+    localStorage.removeItem('currentUser');
+    navigate('/');
   };
 
   return (
@@ -46,6 +57,14 @@ const AdminSidebar = ({ isOpen, onToggle, activeTab, onNavigate }) => {
           </div>
         ))}
       </nav>
+
+      {/* logout button at the bottom */}
+      <div className="sidebar-logout" onClick={handleLogout}>
+        <div className="admin-sidebar-icon">
+          <i className="pi pi-sign-out" style={{ fontSize: '24px', color: '#e74c3c' }}></i>
+        </div>
+        {isOpen && <span className="admin-sidebar-label" style={{ color: '#e74c3c' }}>Logout</span>}
+      </div>
     </div>
   );
 };

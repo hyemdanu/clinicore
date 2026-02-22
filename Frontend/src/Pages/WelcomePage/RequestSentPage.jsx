@@ -1,8 +1,14 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./css/LoginPage.css";
 
 export default function RequestSentPage() {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // message from backend or fallback
+    const message =
+        location.state?.message ??
+        "Error: Request status unknown. Please try again later.";
 
     return (
         <div className="login-container">
@@ -11,13 +17,12 @@ export default function RequestSentPage() {
             </h1>
 
             <div className="container-box">
-                <h2>Request Sent</h2>
+                <h2>Request Status</h2>
 
                 <p style={{ marginTop: "1rem", textAlign: "center" }}>
-                    Your request has been received by the admin team.
-                    <br />
-                    They will contact you with further details about your account soon.
+                    {message}
                 </p>
+
                 <button
                     type="button"
                     className="create-btn"
