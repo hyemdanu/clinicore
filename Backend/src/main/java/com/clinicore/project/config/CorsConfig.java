@@ -22,10 +22,9 @@ public class CorsConfig {
 
         // which port origins are allowed to make requests to the API
         // we'll add our deployed frontend port here later...
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "http://localhost:5175"));
 
 
-        // allow common HTTP methods (GET/POST/PUT/PATCH/DELETE/OPTIONS for preflight)
         // OPTIONS for preflight means "can this request be made?"
         // when frontend makes a request, browser automatically sends an OPTIONS request to check if the request is valid
         // preflight is triggered when request uses other HTTP methods or cross-origin reqs (which wes doing)
