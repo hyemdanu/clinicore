@@ -75,6 +75,33 @@
     gap: 24px;
 }
 
+.caregiver-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 30px 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    color: #555;
+}
+
+.caregiver-spinner {
+    font-size: 2rem;
+    color: #369DF7;
+}
+
+.caregiver-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 16px 20px;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+    font-size: 14px;
+}
+
 .progress-card {
     background: #ffffff;
     border-radius: 12px;

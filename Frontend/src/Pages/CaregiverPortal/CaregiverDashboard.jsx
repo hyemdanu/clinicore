@@ -18,9 +18,6 @@ export default function CaregiverDashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [activeTab, setActiveTab] = useState("dashboard");
 
-    //TODO: fetch patient info and display in table
-    //TODO: fetch patient medication tasks and display in table
-
     // store patient medication tasks, and patient info for display in table
     const [residents, setResidents] = useState([]);
 
@@ -113,13 +110,41 @@ export default function CaregiverDashboard() {
 
             const data = await get(`/user/residents/list?currentUserId=${currentUserId}`);
 
-            const mapped = (data || []).map((r) => ({
-                id: r.id,
-                name: `${r.firstName} ${r.lastName}`.trim(),
-                tasks: []
-            }));
+            const residentsWithTasks = await Promise.all(
+                (data || []).map(async (r) => {
+                    const medications = await get(
+                        `/user/residents/medication/list?currentUserId=${currentUserId}&residentId=${r.id}`
+                    );
 
-            setResidents(mapped);
+                    const counts = {
+                        ADMINISTERED: 0,
+                        PENDING: 0,
+                        MISSED: 0,
+                        WITHHELD: 0
+                    };
+
+                    (medications || []).forEach((med) => {
+                        const status = med.intakeStatus || "PENDING";
+                        if (counts[status] !== undefined) {
+                            counts[status] += 1;
+                        }
+                    });
+
+                    return {
+                        id: r.id,
+                        name: `${r.firstName} ${r.lastName}`.trim(),
+                        counts,
+                        tasks: [
+                            { label: `Taken ${counts.ADMINISTERED}`, color: "#2ecc71" },
+                            { label: `Pending ${counts.PENDING}`, color: "#f1c40f" },
+                            { label: `Missed ${counts.MISSED}`, color: "#e74c3c" },
+                            { label: `Withheld ${counts.WITHHELD}`, color: "#8e44ad" }
+                        ]
+                    };
+                })
+            );
+
+            setResidents(residentsWithTasks);
         } catch (err) {
             console.error("Error fetching residents:", err);
             setError("Failed to load residents. Please try again.");
@@ -132,30 +157,52 @@ export default function CaregiverDashboard() {
         fetchResidents();
     }, [fetchResidents]);
 
-    const totalTasks = residents.reduce((sum, r) => sum + (r.tasks ? r.tasks.length : 0), 0);
-    const completedTasks = 0;
+    const totalTasks = residents.reduce((sum, r) => {
+        if (!r.counts) return sum;
+        return sum + r.counts.ADMINISTERED + r.counts.PENDING + r.counts.MISSED + r.counts.WITHHELD;
+    }, 0);
+    const completedTasks = residents.reduce((sum, r) => {
+        if (!r.counts) return sum;
+        return sum + r.counts.ADMINISTERED;
+    }, 0);
     const progressPercent = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
 
     const renderDashboardContent = () => (
         <div className="caregiver-dashboard-content">
             <MedicationProgressCard percent={progressPercent} />
 
-            <section className="residents-section">
-                <div className="section-header">
-                    <h3>Residents</h3>
+            {loading && (
+                <div className="caregiver-loading">
+                    <i className="pi pi-spin pi-spinner caregiver-spinner"></i>
+                    <span>Loading dashboard...</span>
                 </div>
-                <DataTable
-                    value={residents}
-                    loading={loading}
-                    className="residents-table"
-                    emptyMessage="No residents found"
-                >
-                    <Column
-                        header="Resident"
-                        body={(rowData) => <ResidentRow resident={rowData} />}
-                    />
-                </DataTable>
-            </section>
+            )}
+
+            {error && (
+                <div className="caregiver-error">
+                    {error}
+                </div>
+            )}
+
+            {!loading && !error && (
+                <>
+                    <section className="residents-section">
+                        <div className="section-header">
+                            <h3>Residents</h3>
+                        </div>
+                        <DataTable
+                            value={residents}
+                            className="residents-table"
+                            emptyMessage="No residents found"
+                        >
+                            <Column
+                                header="Resident"
+                                body={(rowData) => <ResidentRow resident={rowData} />}
+                            />
+                        </DataTable>
+                    </section>
+                </>
+            )}
         </div>
     );
 
