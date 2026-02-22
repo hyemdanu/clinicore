@@ -1,231 +1,147 @@
-/* Page background */
-.caregiver-page {
-    min-height: 100vh;
-    margin: 0;
-    padding: 24px;
-    box-sizing: border-box;
-    background: #f3f4f8;
+.dashboard-container {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+    height: 100vh;
+    background-color: #f5f6f8;
 }
 
-/* Main container (Figma-style card) */
-.box {
-    position: relative;
-    width: 100%;
-    max-width: 1100px;
-    min-height: 650px;
-    background: #ffffff;
-    border-radius: 24px;
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
-    padding: 0 40px 40px;
-    box-sizing: border-box;
-    overflow: hidden;
-}
-
-.rectangle {
-    position: absolute;
-    inset-inline: 0;
-    top: 0;
-    height: 80px;
-    background: #369df7;
-
-    display: flex;
-    align-items: center;
-    padding-left: 40px;
-
-    z-index: 2;
-}
-
-
-
-/* Dashboard title */
-.caregiver-page .caregiver-dashboard-title {
-    position: relative;
-    z-index: 3;
-    color: #ffffff !important;
-    font-family: Poppins, sans-serif;
-    font-size: 24px;
-    font-weight: 700;
-}
-
-.text-wrapper {
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-}
-
-.subtitle {
-    margin-top: 4px;
-    font-size: 14px;
-    font-weight: 400;
-    opacity: 0.9;
-}
-
-/* Medication section card */
-.medication-section {
-    position: relative;
-    margin-top: 150px;
-    background: #f9fafb;
-    border-radius: 20px;
-    padding: 24px 24px 28px;
-    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-}
-
-/* Header row inside medication section */
-.medication-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
-}
-
-.medication-label {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 700;
-    color: #111827;
-}
-
-.medication-subtitle {
-    margin: 4px 0 0;
-    font-size: 13px;
-    color: #6b7280;
-}
-
-/* Progress summary on the right */
-.progress-summary {
+.main-content {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
+    margin-top: 56px;
+    margin-left: 0;
+    padding: 40px;
+    transition: margin-left 0.3s ease;
+    min-height: calc(100vh - 56px);
+    background-color: #f5f6f8;
 }
 
-.progress-title {
-    font-size: 13px;
-    color: #6b7280;
+.main-content.content-with-sidebar {
+    margin-left: 280px;
 }
 
-.progress-value {
-    font-size: 18px;
-    font-weight: 700;
-    color: #2563eb;
-}
-
-/* Progress bar container (white background) */
-.medication-progress-container {
-    margin-top: 16px;
+.progress-bar {
     width: 100%;
-    height: 10px;
-    background: #ffffff;
-    border-radius: 999px;
-    overflow: hidden;
-    border: 1px solid #d1d5db;
-}
-
-/* Progress bar fill (blue) */
-/* Progress bar container (white background) */
-.medication-progress {
-    position: relative;
-    height: 20px;
-    width: 200%;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    height: 14px;
+    background: #e0e0e0;
+    border-radius: 10px;
     overflow: hidden;
 }
 
-/* Blue progress fill (¼ full) */
-.medication-progress::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
+.progress-fill {
     height: 100%;
-    width: 25%;
-    background-color: #369df7;
-    border-radius: 8px 0 0 8px;
+    background: #2e86de;
+    border-radius: 10px;
+    transition: width 0.3s ease;
 }
 
-
-/* Task list card */
-.medication-box {
-    margin-top: 20px;
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 16px 20px;
-    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
-    box-sizing: border-box;
+.resident-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #eee;
 }
 
-/* Each row: person + task chip */
-.row {
+.resident-info {
     display: flex;
     align-items: center;
+    gap: 10px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background: #ccc;
+    border-radius: 50%;
+}
+
+.task-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.task-badge {
+    padding: 8px 18px;
+    border-radius: 20px;
+    color: white;
+    font-weight: 500;
+}
+
+.caregiver-dashboard-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.progress-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.progress-card h3 {
+    margin: 0 0 14px 0;
+    font-size: 20px;
+    color: #333;
+}
+
+.progress-header {
+    display: flex;
     justify-content: space-between;
-    gap: 16px;
-    padding: 8px 0;
-}
-
-.person-name {
+    margin-bottom: 10px;
+    color: #666;
     font-size: 14px;
     font-weight: 500;
-    color: #111827;
 }
 
-/* Task pill */
-.task-rectangle {
-    padding: 6px 14px;
-    background: #eff6ff;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #1d4ed8;
-    border: 1px solid #bfdbfe;
-    white-space: nowrap;
+.progress-card .date {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #888;
 }
 
-/* Divider line between rows */
-.line {
-    height: 1px;
-    width: 100%;
-    background: #e5e7eb;
+.residents-section {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* Responsive tweaks */
-@media (max-width: 768px) {
-    .box {
-        padding-inline: 20px;
-    }
-
-    .medication-section {
-        padding: 18px 16px 22px;
-    }
-
-    .medication-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .progress-summary {
-        align-items: flex-start;
-    }
-
-    .task-rectangle {
-        max-width: 60%;
-        text-align: right;
-    }
+.section-header h3 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    color: #333;
 }
 
-.progress-date {
-    margin-top: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #6b7280;
-    font-family: Poppins, sans-serif;
-    text-align: right;
+.residents-table .p-datatable-thead > tr > th {
+    border: none;
+    background: #ffffff;
+    padding: 0 0 12px 0;
 }
 
+.residents-table .p-datatable-tbody > tr > td {
+    border: none;
+    padding: 0;
+}
+
+.residents-table .p-datatable-tbody > tr {
+    border-bottom: 1px solid #eef0f3;
+}
+
+.residents-table .p-datatable-tbody > tr:last-child {
+    border-bottom: none;
+}
+
+.placeholder-content h2 {
+    margin: 0 0 10px 0;
+    font-size: 28px;
+    color: #333;
+}
+
+.placeholder-content p {
+    margin: 0;
+    color: #666;
+}

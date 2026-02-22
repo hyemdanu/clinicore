@@ -22,12 +22,25 @@ export default function CaregiverDashboard() {
     //TODO: fetch patient medication tasks and display in table
 
     // store patient medication tasks, and patient info for display in table
-    const [patientTasks, setPatientTasks] = useState([]);
-    const [patientInfo, setPatientInfo] = useState({});
+    const [residents, setResidents] = useState([]);
 
     // loading and error states for data fetching
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    const tabTitles = {
+        dashboard: "Dashboard",
+        residents: "Residents",
+        profile: "Profile",
+        messages: "Messages",
+        documents: "Documents",
+        inventory: "Inventory"
+    };
+
+    // toggle sidebar open/closed when hamburger is clicked
+    const toggleSidebar = () => {
+        setSidebarOpen(!sidebarOpen);
+    };
 
     // medication progression card to track how many medications are pending, taken, or missed
     const MedicationProgressCard = ({percent}) => {
@@ -63,6 +76,7 @@ export default function CaregiverDashboard() {
 
     // resident rows in the table
     const ResidentRow = ({ resident }) => {
+        const tasks = resident.tasks || [];
         return (
             <div className="resident-row">
                 <div className="resident-info">
@@ -71,7 +85,7 @@ export default function CaregiverDashboard() {
                 </div>
 
                 <div className="task-container">
-                    {resident.tasks.map((task, index) => (
+                    {tasks.map((task, index) => (
                         <TaskBadge
                             key={index}
                             label={task.label}
@@ -83,5 +97,107 @@ export default function CaregiverDashboard() {
         );
     };
 
-}
+    const fetchResidents = useCallback(async () => {
+        setLoading(true);
+        setError(null);
 
+        try {
+            const currentUserStr = localStorage.getItem("currentUser");
+            if (!currentUserStr) {
+                navigate("/");
+                return;
+            }
+
+            const currentUser = JSON.parse(currentUserStr);
+            const currentUserId = currentUser.id;
+
+            const data = await get(`/user/residents/list?currentUserId=${currentUserId}`);
+
+            const mapped = (data || []).map((r) => ({
+                id: r.id,
+                name: `${r.firstName} ${r.lastName}`.trim(),
+                tasks: []
+            }));
+
+            setResidents(mapped);
+        } catch (err) {
+            console.error("Error fetching residents:", err);
+            setError("Failed to load residents. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    }, [navigate]);
+
+    useEffect(() => {
+        fetchResidents();
+    }, [fetchResidents]);
+
+    const totalTasks = residents.reduce((sum, r) => sum + (r.tasks ? r.tasks.length : 0), 0);
+    const completedTasks = 0;
+    const progressPercent = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+
+    const renderDashboardContent = () => (
+        <div className="caregiver-dashboard-content">
+            <MedicationProgressCard percent={progressPercent} />
+
+            <section className="residents-section">
+                <div className="section-header">
+                    <h3>Residents</h3>
+                </div>
+                <DataTable
+                    value={residents}
+                    loading={loading}
+                    className="residents-table"
+                    emptyMessage="No residents found"
+                >
+                    <Column
+                        header="Resident"
+                        body={(rowData) => <ResidentRow resident={rowData} />}
+                    />
+                </DataTable>
+            </section>
+        </div>
+    );
+
+    const renderPlaceholder = (label) => (
+        <div className="placeholder-content">
+            <h2>{label}</h2>
+            <p>Content coming soon.</p>
+        </div>
+    );
+
+    const renderContent = () => {
+        switch (activeTab) {
+            case "residents":
+                return renderPlaceholder("Residents");
+            case "profile":
+                return renderPlaceholder("Profile");
+            case "messages":
+                return renderPlaceholder("Messages");
+            case "documents":
+                return renderPlaceholder("Documents");
+            case "inventory":
+                return renderPlaceholder("Inventory");
+            case "dashboard":
+            default:
+                return renderDashboardContent();
+        }
+    };
+
+    return (
+        <div className="dashboard-container">
+            <Header onToggleSidebar={toggleSidebar} title={tabTitles[activeTab] || "Dashboard"} />
+
+            <CaregiverSidebar
+                isOpen={sidebarOpen}
+                onToggle={toggleSidebar}
+                activeTab={activeTab}
+                onNavigate={setActiveTab}
+            />
+
+            <main className={`main-content ${sidebarOpen ? "content-with-sidebar" : ""}`}>
+                {renderContent()}
+            </main>
+        </div>
+    );
+}
