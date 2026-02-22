@@ -1,0 +1,425 @@
+/* Medication Inventory Styles */
+
+.medication-inventory-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f0f2f5;
+}
+
+.inventory-content {
+    margin-left: 250px;
+    padding: 2rem;
+    transition: margin-left 0.3s ease;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.inventory-content.content-with-sidebar {
+    margin-left: 250px;
+}
+
+/* When sidebar is closed */
+.inventory-content:not(.content-with-sidebar) {
+    margin-left: 0;
+}
+
+/* Header Section */
+.inventory-header-section {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.header-icon-wrapper {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.75rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    object-fit: contain;
+}
+
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0;
+    color: white;
+}
+
+/* Error Message */
+.error-message {
+    background-color: #fee;
+    border: 1px solid #fcc;
+    color: #c33;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.error-message i {
+    font-size: 1.25rem;
+}
+
+/* Table Wrapper */
+.inventory-table-wrapper {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+/* Table Header */
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    gap: 1rem;
+    border-bottom: 2px solid #f0f2f5;
+}
+
+.search-container {
+    flex: 1;
+    max-width: 500px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s;
+
+}
+
+.search-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+/* Adjust search icon position */
+.search-container .p-input-icon-left > i {
+    position: absolute;
+    left: 14px;
+    top: 15px;
+    transform: none;
+}
+
+.add-medication-btn {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(139, 92, 246, 0.3);
+    transition: all 0.2s;
+    color: white;
+}
+
+.add-medication-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+}
+
+.add-medication-btn:focus {
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+}
+
+/* Medication Table */
+.medication-table {
+    border: none;
+}
+
+.medication-table .p-datatable-header {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.medication-table .p-datatable-thead > tr > th {
+    background-color: #f9fafb;
+    color: #374151;
+    font-weight: 600;
+    padding: 1rem 1.25rem;
+    border: none;
+    border-bottom: 2px solid #e5e7eb;
+    font-size: 0.95rem;
+    text-transform: capitalize;
+}
+
+.medication-table .p-datatable-tbody > tr {
+    transition: background-color 0.2s;
+}
+
+.medication-table .p-datatable-tbody > tr:hover {
+    background-color: #f9fafb;
+}
+
+.medication-table .p-datatable-tbody > tr > td {
+    padding: 1.25rem;
+    border-bottom: 1px solid #f3f4f6;
+    color: #1f2937;
+    font-size: 0.95rem;
+}
+
+/* Quantity Cell */
+.quantity-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.quantity-cell.low-stock {
+    color: #dc2626;
+}
+
+.quantity-cell .warning-icon {
+    color: #f59e0b;
+    font-size: 1.1rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.action-buttons .btn {
+    padding: 0.5rem 1.25rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 50px;
+    height: 40px;
+}
+
+.action-buttons .btn-add {
+    background-color: #22c55e;
+    color: white;
+}
+
+.action-buttons .btn-add:hover {
+    background-color: #16a34a;
+    transform: translateY(-1px);
+}
+
+.action-buttons .btn-add:active {
+    transform: translateY(0);
+}
+
+.action-buttons .btn-remove {
+    background-color: #ef4444;
+    color: white;
+}
+
+.action-buttons .btn-remove:hover {
+    background-color: #dc2626;
+    transform: translateY(-1px);
+}
+
+.action-buttons .btn-remove:active {
+    transform: translateY(0);
+}
+
+.action-buttons .btn-remove:disabled {
+    background-color: #fca5a5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Menu Buttons */
+.menu-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.menu-buttons .menu-button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: transform 0.2s;
+    border-radius: 4px;
+}
+
+.menu-buttons .menu-button:hover {
+    transform: scale(1.2);
+    background-color: #f3f4f6;
+}
+
+.menu-buttons .delete-button:hover {
+    background-color: #fee;
+}
+
+/* Dialog Styles */
+.dialog-content {
+    padding: 1rem 0;
+}
+
+.dialog-content .field {
+    margin-bottom: 1.5rem;
+}
+
+.dialog-content .field:last-child {
+    margin-bottom: 0;
+}
+
+.dialog-content label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.dialog-content .p-inputtext {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.dialog-content .p-inputtext:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Loading State */
+.custom-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    gap: 1rem;
+}
+
+.custom-spinner {
+    font-size: 2rem;
+    color: #3b82f6;
+}
+
+.custom-loading span {
+    color: #6b7280;
+    font-size: 1rem;
+}
+
+/* Pagination */
+.medication-table .p-paginator {
+    background: transparent;
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    padding: 1rem;
+}
+
+.medication-table .p-paginator .p-paginator-pages .p-paginator-page {
+    color: #374151;
+    border-radius: 6px;
+    min-width: 2.5rem;
+    height: 2.5rem;
+}
+
+.medication-table .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .inventory-content {
+        margin-left: 0;
+        padding: 1rem;
+    }
+
+    .inventory-header-section {
+        padding: 1rem;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+    }
+
+    .table-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .search-container {
+        max-width: 100%;
+    }
+
+    .add-medication-btn {
+        width: 100%;
+    }
+
+    .action-buttons {
+        gap: 0.5rem;
+    }
+
+    .action-buttons .p-button {
+        width: 2rem;
+        height: 2rem;
+    }
+}
+
+/* Utility Classes */
+.w-full {
+    width: 100%;
+}
+
+/* PrimeReact Dialog Override */
+.p-dialog .p-dialog-header {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    padding: 1.25rem 1.5rem;
+}
+
+.p-dialog .p-dialog-header .p-dialog-title {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.p-dialog .p-dialog-header .p-dialog-header-icon {
+    color: white;
+}
+
+.p-dialog .p-dialog-content {
+    padding: 1.5rem;
+}
+
+.p-dialog .p-dialog-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.p-dialog .p-dialog-footer button {
+    margin-left: 0.5rem;
+}

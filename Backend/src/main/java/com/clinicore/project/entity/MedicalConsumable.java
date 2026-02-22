@@ -20,4 +20,7 @@ public class MedicalConsumable {
     @MapsId
     @JoinColumn(name = "id")
     private Item item;
+ //Double check with team if this is needed
+    public void setUserProfile(UserProfile currentUser) {
+    }
 }

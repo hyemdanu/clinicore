@@ -29,4 +29,7 @@ public class MedicationInventory {
     // Inverse side - medications that reference this inventory item
     @OneToMany(mappedBy = "medicationInventory", fetch = FetchType.LAZY)
     private List<Medication> medications = new ArrayList<>();
+
+    public void setUserProfile(UserProfile currentUser) {
+    }
 }

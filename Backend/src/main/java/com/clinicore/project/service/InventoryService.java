@@ -57,6 +57,7 @@ public class InventoryService {
      * Get medication inventory items with low stock
     */
 
+
     public List<MedicationInventoryDTO> getLowStockMedications(Long currentUserId, Integer threshold) {
         validateAdminOrCaregiver(currentUserId);
 
@@ -73,6 +74,7 @@ public class InventoryService {
                 .map(MedicationInventoryDTO::fromEntity)
                 .collect(Collectors.toList());
     }
+
 
     /**
      * Get all medical consumables inventory items
@@ -137,6 +139,114 @@ public class InventoryService {
                 .orElseThrow(() -> new IllegalArgumentException("Medical consumable inventory item not found with ID: " + itemId));
 
         return MedicalConsumableDTO.fromEntity(consumable);
+    }
+
+    /**
+     * Create a new medication inventory item
+     * NEW METHOD
+     */
+    public MedicationInventoryDTO createMedicationInventory(Long currentUserId, MedicationInventoryDTO medicationDTO) {
+        validateAdminOrCaregiver(currentUserId);
+
+        UserProfile currentUser = getUserById(currentUserId);
+
+        // Create new medication entity from DTO
+        MedicationInventory medication = medicationDTO.toEntity();
+        medication.setUserProfile(currentUser);
+
+        // Save to database
+        MedicationInventory saved = medicationInventoryRepository.save(medication);
+
+        return MedicationInventoryDTO.fromEntity(saved);
+    }
+
+    /**
+     * Update an existing medication inventory item
+     * NEW METHOD
+     */
+    public MedicationInventoryDTO updateMedicationInventory(Long currentUserId, Long itemId, MedicationInventoryDTO medicationDTO) {
+        validateAdminOrCaregiver(currentUserId);
+
+        // Find existing medication
+        MedicationInventory medication = medicationInventoryRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("Medication inventory item not found with ID: " + itemId));
+
+        // Update the medication with new data from DTO
+        medicationDTO.updateEntity(medication);
+
+        // Save updated medication
+        MedicationInventory updated = medicationInventoryRepository.save(medication);
+
+        return MedicationInventoryDTO.fromEntity(updated);
+    }
+
+    /**
+     * Delete a medication inventory item
+     * NEW METHOD
+     */
+    public void deleteMedicationInventory(Long currentUserId, Long itemId) {
+        validateAdminOrCaregiver(currentUserId);
+
+        // Find medication to delete
+        MedicationInventory medication = medicationInventoryRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("Medication inventory item not found with ID: " + itemId));
+
+        // Delete from database
+        medicationInventoryRepository.delete(medication);
+    }
+
+    /**
+     * Create a new consumable inventory item
+     * NEW METHOD
+     */
+    public MedicalConsumableDTO createConsumableInventory(Long currentUserId, MedicalConsumableDTO consumableDTO) {
+        validateAdminOrCaregiver(currentUserId);
+
+        UserProfile currentUser = getUserById(currentUserId);
+
+        // Create new consumable entity from DTO
+        MedicalConsumable consumable = consumableDTO.toEntity();
+        consumable.setUserProfile(currentUser);
+
+        // Save to database
+        MedicalConsumable saved = medicalConsumableRepository.save(consumable);
+
+        return MedicalConsumableDTO.fromEntity(saved);
+    }
+
+    /**
+     * Update an existing consumable inventory item
+     * NEW METHOD
+     */
+    public MedicalConsumableDTO updateConsumableInventory(Long currentUserId, Long itemId, MedicalConsumableDTO consumableDTO) {
+        validateAdminOrCaregiver(currentUserId);
+
+        // Find existing consumable
+        MedicalConsumable consumable = medicalConsumableRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("Medical consumable inventory item not found with ID: " + itemId));
+
+        // Update the consumable with new data from DTO
+        consumableDTO.updateEntity(consumable);
+
+        // Save updated consumable
+        MedicalConsumable updated = medicalConsumableRepository.save(consumable);
+
+        return MedicalConsumableDTO.fromEntity(updated);
+    }
+
+    /**
+     * Delete a consumable inventory item
+     * NEW METHOD
+     */
+    public void deleteConsumableInventory(Long currentUserId, Long itemId) {
+        validateAdminOrCaregiver(currentUserId);
+
+        // Find consumable to delete
+        MedicalConsumable consumable = medicalConsumableRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("Medical consumable inventory item not found with ID: " + itemId));
+
+        // Delete from database
+        medicalConsumableRepository.delete(consumable);
     }
 
 
