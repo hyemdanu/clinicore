@@ -45,6 +45,118 @@ public class InventoryController {
         }
     }
 
+    @PostMapping("/medication")
+    public ResponseEntity<?> createMedicationInventory(@RequestParam Long currentUserId,
+                                                       @RequestBody MedicationInventoryDTO medicationDTO) {
+        try {
+            MedicationInventoryDTO created = inventoryService.createMedicationInventory(currentUserId, medicationDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+
+        } catch (IllegalArgumentException e) {
+            return createErrorResponse(HttpStatus.FORBIDDEN, e.getMessage(), currentUserId);
+
+        } catch (Exception e) {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error creating medication inventory item: " + e.getMessage(), currentUserId);
+        }
+    }
+
+    @PutMapping("/medication/{itemId}")
+    public ResponseEntity<?> updateMedicationInventory(@RequestParam Long currentUserId,
+                                                       @PathVariable Long itemId,
+                                                       @RequestBody MedicationInventoryDTO medicationDTO) {
+        try {
+            MedicationInventoryDTO updated = inventoryService.updateMedicationInventory(currentUserId, itemId, medicationDTO);
+            return ResponseEntity.ok(updated);
+
+        } catch (IllegalArgumentException e) {
+            return createErrorResponse(HttpStatus.FORBIDDEN, e.getMessage(), currentUserId);
+
+        } catch (Exception e) {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error updating medication inventory item: " + e.getMessage(), currentUserId);
+        }
+    }
+
+    @DeleteMapping("/medication/{itemId}")
+    public ResponseEntity<?> deleteMedicationInventory(@RequestParam Long currentUserId,
+                                                       @PathVariable Long itemId) {
+        try {
+            inventoryService.deleteMedicationInventory(currentUserId, itemId);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Medication inventory item deleted successfully",
+                    "itemId", itemId
+            ));
+
+        } catch (IllegalArgumentException e) {
+            return createErrorResponse(HttpStatus.FORBIDDEN, e.getMessage(), currentUserId);
+
+        } catch (Exception e) {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error deleting medication inventory item: " + e.getMessage(), currentUserId);
+        }
+    }
+
+    /**
+            * CREATE - Add a new consumable inventory item
+ */
+    @PostMapping("/consumables")
+    public ResponseEntity<?> createConsumableInventory(@RequestParam Long currentUserId,
+                                                       @RequestBody MedicalConsumableDTO consumableDTO) {
+        try {
+            MedicalConsumableDTO created = inventoryService.createConsumableInventory(currentUserId, consumableDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+
+        } catch (IllegalArgumentException e) {
+            return createErrorResponse(HttpStatus.FORBIDDEN, e.getMessage(), currentUserId);
+
+        } catch (Exception e) {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error creating consumable inventory item: " + e.getMessage(), currentUserId);
+        }
+    }
+
+    /**
+     * UPDATE - Update an existing consumable inventory item
+     */
+    @PutMapping("/consumables/{itemId}")
+    public ResponseEntity<?> updateConsumableInventory(@RequestParam Long currentUserId,
+                                                       @PathVariable Long itemId,
+                                                       @RequestBody MedicalConsumableDTO consumableDTO) {
+        try {
+            MedicalConsumableDTO updated = inventoryService.updateConsumableInventory(currentUserId, itemId, consumableDTO);
+            return ResponseEntity.ok(updated);
+
+        } catch (IllegalArgumentException e) {
+            return createErrorResponse(HttpStatus.FORBIDDEN, e.getMessage(), currentUserId);
+
+        } catch (Exception e) {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error updating consumable inventory item: " + e.getMessage(), currentUserId);
+        }
+    }
+
+    /**
+     * DELETE - Delete a consumable inventory item
+     */
+    @DeleteMapping("/consumables/{itemId}")
+    public ResponseEntity<?> deleteConsumableInventory(@RequestParam Long currentUserId,
+                                                       @PathVariable Long itemId) {
+        try {
+            inventoryService.deleteConsumableInventory(currentUserId, itemId);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Consumable inventory item deleted successfully",
+                    "itemId", itemId
+            ));
+
+        } catch (IllegalArgumentException e) {
+            return createErrorResponse(HttpStatus.FORBIDDEN, e.getMessage(), currentUserId);
+
+        } catch (Exception e) {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error deleting consumable inventory item: " + e.getMessage(), currentUserId);
+        }
+    }
     /**
      * Get medication inventory items with low stock
      * Filters medications where quantity <= threshold

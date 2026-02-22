@@ -26,6 +26,8 @@ const AdminSidebar = ({ isOpen, onToggle, activeTab, onNavigate }) => {
   const handleItemClick = (itemId) => {
     if (onNavigate) {
       onNavigate(itemId);
+
+
     }
   };
 

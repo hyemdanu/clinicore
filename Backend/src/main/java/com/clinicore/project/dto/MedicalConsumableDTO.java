@@ -1,5 +1,6 @@
 package com.clinicore.project.dto;
 
+import com.clinicore.project.entity.Item;
 import com.clinicore.project.entity.MedicalConsumable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,4 +36,32 @@ public class MedicalConsumableDTO {
             medicalConsumable.getItem().getUpdated_at()
         );
     }
+    /**
+     * Convert DTO to Entity
+     */
+    public MedicalConsumable toEntity() {
+        MedicalConsumable consumable = new MedicalConsumable();
+
+        if (consumable.getItem() == null) {
+            consumable.setItem(new Item());
+        }
+
+        consumable.getItem().setName(this.name);
+        consumable.getItem().setQuantity(this.quantity);
+
+        return consumable;
+    }
+
+    /**
+     * Update an existing entity
+     */
+    public void updateEntity(MedicalConsumable consumable) {
+        if (consumable.getItem() == null) {
+            consumable.setItem(new Item());
+        }
+
+        consumable.getItem().setName(this.name);
+        consumable.getItem().setQuantity(this.quantity);
+    }
+
 }
