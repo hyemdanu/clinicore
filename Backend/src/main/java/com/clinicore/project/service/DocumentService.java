@@ -3,9 +3,10 @@ package com.clinicore.project.service;
 import com.clinicore.project.entity.*;
 import com.clinicore.project.repository.*;
 import org.springframework.stereotype.Service;
-import java.util.*;
-import java.io.IOException;
 import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.util.*;
+import java.util.Base64;
 
 @Service
 public class DocumentService {
@@ -19,14 +20,18 @@ public class DocumentService {
         this.userProfileRepository = userProfileRepository;
     }
 
-    //Uploading Document (Only by caregiver/admin)
-    public Map<String, Object> uploadDocument(Long currentUserId, Long residentId, String title, String type, MultipartFile file) throws IOException {
+    // Upload document
+    public Map<String, Object> uploadDocument(Long currentUserId,
+                                              Long residentId,
+                                              String title,
+                                              String type,
+                                              MultipartFile file) throws IOException {
 
-        UserProfile currentUser = getUserById(currentUserId);
+        UserProfile currentUser = userProfileRepository.findById(currentUserId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + currentUserId));
 
-        //if caregiver/admin
-        if (currentUser.getRole() != UserProfile.Role.CAREGIVER &&
-                currentUser.getRole() != UserProfile.Role.ADMIN) {
+        if (currentUser.getRole() == UserProfile.Role.RESIDENT &&
+                !currentUser.getId().equals(residentId)) {
             throw new IllegalArgumentException("You do not have permission to upload documents");
         }
 
@@ -43,81 +48,52 @@ public class DocumentService {
         );
     }
 
-    //Get ALL documents (if caregiver/admin) Get OWN documents (residents)
-    public List<Map<String, Object>> getDocuments(Long currentUserId) {
-    UserProfile currentUser = getUserById(currentUserId);
-    List<Document> documents;
+    // Get ALL documents for a resident (or all if admin/caregiver)
+    public List<Map<String, Object>> getDocuments(Long userId) {
+        UserProfile currentUser = userProfileRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
 
-    // Admins and caregivers see all
-    if (currentUser.getRole() == UserProfile.Role.ADMIN ||
-            currentUser.getRole() == UserProfile.Role.CAREGIVER) {
-        documents = documentsRepository.findAll();
-    }
-    // Residents see only their own
-        else if (currentUser.getRole() == UserProfile.Role.RESIDENT) {
-        documents = documentsRepository.findByResidentId(currentUser.getId());
-    }
-    // Everyone else — denied !!!!
-        else {
-        throw new IllegalArgumentException("You do not have permission to view documents");
-    }
+        List<Document> documents;
+        if (currentUser.getRole() == UserProfile.Role.ADMIN || currentUser.getRole() == UserProfile.Role.CAREGIVER) {
+            documents = documentsRepository.findAll();
+        } else {
+            documents = documentsRepository.findByResidentId(currentUser.getId());
+        }
 
-    List<Map<String, Object>> result = new ArrayList<>();
+        List<Map<String, Object>> result = new ArrayList<>();
         for (Document doc : documents) {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put("id", doc.getId());
-        map.put("title", doc.getTitle());
-        map.put("type", doc.getType());
-        map.put("residentId", doc.getResidentId());
-        map.put("uploaded_at", doc.getUploaded_at());
-        result.add(map);
-    }
-
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("id", doc.getId());
+            map.put("title", doc.getTitle());
+            map.put("type", doc.getType());
+            map.put("residentId", doc.getResidentId());
+            map.put("uploaded_at", doc.getUploaded_at());
+            result.add(map);
+        }
         return result;
-
     }
 
-    //Get Single Document (by ID)
-    public Map<String, Object> getDocumentById(Long currentUserId, Long documentId) {
-        UserProfile currentUser = getUserById(currentUserId);
+    // Get Single Document (by ID)
+    public Map<String, Object> getDocumentById(Long userId, Long documentId) {
+        UserProfile currentUser = userProfileRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+
         Document document = documentsRepository.findById(documentId)
                 .orElseThrow(() -> new IllegalArgumentException("Document not found"));
 
-        //Role validation
-        if (currentUser.getRole() == UserProfile.Role.ADMIN ||
-                currentUser.getRole() == UserProfile.Role.CAREGIVER ||
-                (currentUser.getRole() == UserProfile.Role.RESIDENT &&
-                        document.getResidentId().equals(currentUser.getId()))) {
-            Map<String, Object> map = new LinkedHashMap<>();
-            map.put("id", document.getId());
-            map.put("title", document.getTitle());
-            map.put("type", document.getType());
-            map.put("residentId", document.getResidentId());
-            map.put("uploaded_at", document.getUploaded_at());
-            map.put("content", Base64.getEncoder().encodeToString(document.getDocument()));
-
-            return map;
-        } else {
-            throw new IllegalArgumentException("You do not have permission to view this document");
-        }
-    }
-
-    //Delete Documents (only for caregiver/admin)
-    public Map<String, Object> deleteDocumentsByResident(Long currentUserId, Long residentId) {
-        UserProfile currentUser = getUserById(currentUserId);
-
-        if (currentUser.getRole() != UserProfile.Role.ADMIN &&
-                currentUser.getRole() != UserProfile.Role.CAREGIVER) {
-            throw new IllegalArgumentException("You do not have permission to delete documents");
+        // Role validation
+        if (currentUser.getRole() == UserProfile.Role.RESIDENT &&
+                !document.getResidentId().equals(currentUser.getId())) {
+            throw new IllegalArgumentException("You cannot view this document");
         }
 
-        documentsRepository.deleteByResidentId(residentId);
-        return Map.of("message", "All documents deleted for resident " + residentId);
-    }
-
-    //Helpers
-    private UserProfile getUserById(Long userId) {
-        return userProfileRepository.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("id", document.getId());
+        map.put("title", document.getTitle());
+        map.put("type", document.getType());
+        map.put("residentId", document.getResidentId());
+        map.put("uploaded_at", document.getUploaded_at());
+        map.put("content", Base64.getEncoder().encodeToString(document.getDocument()));
+        return map;
     }
 }
