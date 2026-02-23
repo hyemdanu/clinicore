@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { get, post, patch, del } from "../../services/api";
 import './css/ResidentMedicalProfile.css';
+import ResidentSidebar from "../../Components/ResidentSidebar";
+import Header from "../../Components/Header";
 
 export default function ResidentMedicalProfile() {
     const navigate = useNavigate();
@@ -15,6 +17,10 @@ export default function ResidentMedicalProfile() {
 
     const [showAddDiagnosis, setShowAddDiagnosis] = useState(false);
     const [newDiagnosis, setNewDiagnosis] = useState("");
+
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+
+    const toggleSidebar = () => setSidebarOpen((s) => !s);
 
     // Load resident
     useEffect(() => {
@@ -167,9 +173,9 @@ export default function ResidentMedicalProfile() {
     // -----------------------------
     return (
         <div className="admin-dashboard-container">
-
+            <Header onToggleSidebar={toggleSidebar} title="Dashboard" />
+            <ResidentSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
             <main className="dashboard-content">
-
                 <div className="alert-section">
                     <h2 className="dashboard-title">
                         Medical Profile — {resident.firstName} {resident.lastName}
@@ -178,98 +184,137 @@ export default function ResidentMedicalProfile() {
 
                 {error && <div className="error-message">{error}</div>}
 
-                {/* ALLERGIES */}
-                <section className="inventory-section">
-                    <div className="inventory-header">
-                        <h3>Allergies</h3>
-                        <button className="action-btn" onClick={() => setShowAddAllergy(true)}>
-                            <i className="pi pi-plus"></i> Add
-                        </button>
+                {/* TWO COLUMN LAYOUT */}
+                <div className="medical-profile-grid">
+
+                    {/* LEFT COLUMN */}
+                    <div className="profile-column">
+                        {/* INSURANCE */}
+                        <section className="inventory-section">
+                            <div className="inventory-header">
+                                <h3>Insurance</h3>
+                            </div>
+                        </section>
+
+                        {/* MEDICAL SERVICES */}
+                        <section className="inventory-section">
+                            <div className="inventory-header">
+                                <h3>Medical Services</h3>
+                            </div>
+
+                            <div className="medical-services-list">
+                                <div className="service-item">
+                                    <span className="service-label">DNR / POLST</span>
+                                </div>
+
+                                <div className="service-item">
+                                    <span className="service-label">On Hospice</span>
+                                </div>
+
+                                <div className="service-item">
+                                    <span className="service-label">Hospice Agency</span>
+                                </div>
+
+                                <div className="service-item">
+                                    <span className="service-label">Preferred Hospital</span>
+                                </div>
+
+                                <div className="service-item">
+                                    <span className="service-label">Preferred Pharmacy</span>
+                                </div>
+
+                                <div className="service-item">
+                                    <span className="service-label">On Home Health</span>
+                                </div>
+
+                                <div className="service-item">
+                                    <span className="service-label">Home Health Agency</span>
+                                </div>
+
+                                <div className="service-item">
+                                    <span className="service-label">Mortuary</span>
+                                </div>
+
+                                <div className="service-item">
+                                    <span className="service-label">Mortuary Health</span>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* MEDICAL HISTORY */}
+                        <section className="inventory-section">
+                            <div className="inventory-header">
+                                <h3>Medical Services</h3>
+                            </div>
+
+                            <div className="medical-services-list">
+                                <div className="service-item">
+                                    <span className="service-label">Stroke</span>
+                                </div>
+
+                                <div className="service-item">
+                                    <span className="service-label">Heart Attack</span>
+                                </div>
+                            </div>
+                        </section>
                     </div>
 
-                    {allergies.length === 0 && (
-                        <div className="custom-loading">
-                            <span>No allergies recorded</span>
-                        </div>
-                    )}
-
-                    {allergies.map((a) => (
-                        <div key={a.id} className="inventory-row">
-                            <span>{a.allergyType}</span>
-
-                            <div className="row-actions">
-                                <button
-                                    className="pi pi-pencil"
-                                    onClick={() => {
-                                        const value = prompt("Rename allergy:", a.allergyType);
-                                        if (value) handleRenameItem("allergy", a.id, value);
-                                    }}
-                                />
-                                <button
-                                    className="pi pi-trash"
-                                    onClick={() => handleDeleteAllergy(a.id)}
-                                />
+                    {/* RIGHT COLUMN */}
+                    <div className="profile-column">
+                        {/* CAPABILITIES */}
+                        <section className="inventory-section">
+                            <div className="inventory-header">
+                                <h3>Capabilities</h3>
                             </div>
-                        </div>
-                    ))}
+                        </section>
 
-                    {showAddAllergy && (
-                        <div className="add-form">
-                            <input
-                                value={newAllergy}
-                                onChange={(e) => setNewAllergy(e.target.value)}
-                                placeholder="Enter allergy"
-                            />
-                            <button onClick={handleAddAllergy}>Add</button>
-                            <button onClick={() => setShowAddAllergy(false)}>Cancel</button>
-                        </div>
-                    )}
-                </section>
+                        {/* DIAGNOSES */}
+                        <section className="inventory-section">
+                            <div className="inventory-header">
+                                <h3>Diagnoses</h3>
+                                <button className="action-btn" onClick={() => setShowAddDiagnosis(true)}>
+                                    <i className="pi pi-plus"></i> Add
+                                </button>
+                            </div>
+                            {diagnoses.length === 0 && (
+                                <div className="custom-loading"><span>No diagnoses recorded</span></div>
+                            )}
+                            {diagnoses.map((d) => (
+                                <div key={d.id} className="inventory-row">
+                                    <span>{d.diagnosis}</span>
+                                    <div className="row-actions">
+                                        <button className="pi pi-pencil" onClick={() => {
+                                            const value = prompt("Rename diagnosis:", d.diagnosis);
+                                            if (value) handleRenameItem("diagnosis", d.id, value);
+                                        }} />
+                                    </div>
+                                </div>
+                            ))}
+                        </section>
 
-                {/* DIAGNOSES */}
-                <section className="inventory-section">
-                    <div className="inventory-header">
-                        <h3>Diagnoses</h3>
-                        <button className="action-btn" onClick={() => setShowAddDiagnosis(true)}>
-                            <i className="pi pi-plus"></i> Add
-                        </button>
+                        {/* ALLERGIES (Moved to right as requested) */}
+                        <section className="inventory-section">
+                            <div className="inventory-header">
+                                <h3>Allergies</h3>
+                                <button className="action-btn" onClick={() => setShowAddAllergy(true)}>
+                                    <i className="pi pi-plus"></i> Add
+                                </button>
+                            </div>
+                            {allergies.length === 0 && (
+                                <div className="custom-loading"><span>No allergies recorded</span></div>
+                            )}
+                            {allergies.map((a) => (
+                                <div key={a.id} className="inventory-row">
+                                    <span>{a.allergyType}</span>
+                                    <div className="row-actions">
+                                        <button className="pi pi-trash" onClick={() => handleDeleteAllergy(a.id)} />
+                                    </div>
+                                </div>
+                            ))}
+                        </section>
                     </div>
-
-                    {diagnoses.length === 0 && (
-                        <div className="custom-loading">
-                            <span>No diagnoses recorded</span>
-                        </div>
-                    )}
-
-                    {diagnoses.map((d) => (
-                        <div key={d.id} className="inventory-row">
-                            <span>{d.diagnosis}</span>
-
-                            <div className="row-actions">
-                                <button
-                                    className="pi pi-pencil"
-                                    onClick={() => {
-                                        const value = prompt("Rename diagnosis:", d.diagnosis);
-                                        if (value) handleRenameItem("diagnosis", d.id, value);
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    ))}
-
-                    {showAddDiagnosis && (
-                        <div className="add-form">
-                            <input
-                                value={newDiagnosis}
-                                onChange={(e) => setNewDiagnosis(e.target.value)}
-                                placeholder="Enter diagnosis"
-                            />
-                            <button onClick={handleAddDiagnosis}>Add</button>
-                            <button onClick={() => setShowAddDiagnosis(false)}>Cancel</button>
-                        </div>
-                    )}
-                </section>
-
+                </div>
+                {/* --- END WRAPPER --- */}
             </main>
         </div>
     );
