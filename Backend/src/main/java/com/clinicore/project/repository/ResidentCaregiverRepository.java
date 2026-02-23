@@ -14,4 +14,7 @@ public interface ResidentCaregiverRepository extends JpaRepository<ResidentCareg
     List<ResidentCaregiver> findById_CaregiverId(Long caregiverId);
 
     List<ResidentCaregiver> findById_ResidentId(Long residentId);
+
+    boolean existsByIdCaregiverIdAndIdResidentId(Long caregiverId, Long residentId);
+
 }

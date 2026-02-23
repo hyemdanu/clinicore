@@ -13,11 +13,14 @@ public class DocumentService {
 
     private final DocumentsRepository documentsRepository;
     private final UserProfileRepository userProfileRepository;
+    private final ResidentCaregiverRepository residentCaregiverRepository;
 
     public DocumentService(DocumentsRepository documentsRepository,
-                           UserProfileRepository userProfileRepository) {
+                           UserProfileRepository userProfileRepository,
+                           ResidentCaregiverRepository residentCaregiverRepository) {
         this.documentsRepository = documentsRepository;
         this.userProfileRepository = userProfileRepository;
+        this.residentCaregiverRepository = residentCaregiverRepository;
     }
 
     // Upload document
@@ -95,5 +98,53 @@ public class DocumentService {
         map.put("uploaded_at", document.getUploaded_at());
         map.put("content", Base64.getEncoder().encodeToString(document.getDocument()));
         return map;
+    }
+
+    public List<Map<String, Object>> getDocumentsForResident(Long userId, Long residentId) {
+
+        UserProfile currentUser = userProfileRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        List<Document> docs;
+
+        if (currentUser.getRole() == UserProfile.Role.ADMIN) {
+            docs = documentsRepository.findByResidentId(residentId);
+        }
+        else if (currentUser.getRole() == UserProfile.Role.CAREGIVER) {
+
+            boolean assigned = residentCaregiverRepository
+                    .existsByIdCaregiverIdAndIdResidentId(userId, residentId);
+
+            if (!assigned) {
+                throw new IllegalArgumentException("You are not assigned to this resident");
+            }
+
+            docs = documentsRepository.findByResidentId(residentId);
+        }
+        else if (currentUser.getRole() == UserProfile.Role.RESIDENT) {
+
+            if (!currentUser.getId().equals(residentId)) {
+                throw new IllegalArgumentException("You cannot view this resident's documents");
+            }
+
+            docs = documentsRepository.findByResidentId(residentId);
+        }
+        else {
+            throw new IllegalArgumentException("Invalid role");
+        }
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Document doc : docs) {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("id", doc.getId());
+            map.put("title", doc.getTitle());
+            map.put("type", doc.getType());
+            map.put("residentId", doc.getResidentId());
+            map.put("uploaded_at", doc.getUploaded_at());
+            result.add(map);
+        }
+
+        return result;
     }
 }
