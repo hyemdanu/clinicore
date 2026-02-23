@@ -5,7 +5,7 @@ import ResidentDocuments from "./Pages/ResidentPortal/ResidentDocuments";
 import ResidentUserProfile from "./Pages/ResidentPortal/ResidentUserProfile";
 import ResidentMedication from "./Pages/ResidentPortal/ResidentMedication";
 import CaregiverDashboard from "./Pages/CaregiverPortal/CaregiverDashboard";
-import CaregiverDocument from "./Pages/CaregiverPortal/CaregiverDocument";
+import CaregiverDocument from "./Pages/CaregiverPortal/CaregiverDocument.jsx";
 import AdminDashboard from "./Pages/AdminPortal/AdminDashboard";
 import AccountRequests from "./Pages/AdminPortal/AccountRequests";
 import ForgotUserIdPage from "./Pages/WelcomePage/ForgotUserIdPage";
@@ -47,6 +47,7 @@ export default function App() {
                 <Route path="/caregiver/medication-inventory" element={<CaregiverMedicationInventory />} /> //change MedicationInventory later
                 <Route path="/caregiver/inventory" element={<InventoryLanding />} />
                 <Route path="/caregiver/consumables-inventory" element={<CaregiverMedicalConsumablesInventory />} />
+                <Route path="/caregiver/document" element={<CaregiverDocument />} />
             </Routes>
         </BrowserRouter>
     );

@@ -31,7 +31,7 @@ export default function InventoryLanding() {
         // Navigate to different routes based on tab (update later)
         switch(tab) {
             case 'dashboard':
-                navigate('/admin-dashboard');
+                navigate('/caregiver');
                 break;
             case 'inventory':
                 navigate('/caregiver/inventory');
@@ -58,8 +58,8 @@ export default function InventoryLanding() {
                 break;
             case 'documents':
                 // Add later
-                alert('Documents page coming soon!');
-                // navigate('/documents');
+                //alert('Documents page coming soon!');
+                navigate('/caregiver/document');
                 break;
             default:
                 break;

@@ -86,7 +86,7 @@ export default function MedicationInventory() {
         //add links later
         switch(tab) {
             case 'dashboard':
-                navigate('/caregiver-dashboard');
+                navigate('/caregiver');
                 break;
             case 'inventory':
                 navigate('/caregiver/inventory');
@@ -106,8 +106,8 @@ export default function MedicationInventory() {
                 // navigate('/messages');
                 break;
             case 'documents':
-                alert('Documents page coming soon!');
-                // navigate('/documents');
+                //alert('Documents page coming soon!');
+                navigate('/caregiver/document');
                 break;
             default:
                 break;
