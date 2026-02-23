@@ -9,6 +9,9 @@ import Header from '../../Components/Header';
 import CaregiverSidebar from "../../Components/CaregiverSidebar.jsx";
 import CaregiverResidentsTab from './CResidentsTab.jsx';
 import CaregiverProfile from "./CaregiverProfile";
+import InventoryLanding from '../Shared/InventoryLanding.jsx';
+import MedicationInventory from '../Shared/CaregiverMedicationInventory.jsx';
+import ConsumablesInventory from '../Shared/ConsumablesInventory.jsx';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 
@@ -32,7 +35,9 @@ export default function CaregiverDashboard() {
         profile: "User",
         messages: "Messages",
         documents: "Documents",
-        inventory: "Inventory"
+        inventory: "Inventory",
+        'medication-inventory': "Medication Inventory",
+        'consumables-inventory': "Medical Consumables Inventory"
     };
 
     // toggle the sidebar
@@ -225,7 +230,11 @@ export default function CaregiverDashboard() {
             case "documents":
                 return renderPlaceholder("Documents");
             case "inventory":
-                return renderPlaceholder("Inventory");
+                return <InventoryLanding onNavigate={setActiveTab} />;
+            case "medication-inventory":
+                return <MedicationInventory />;
+            case "consumables-inventory":
+                return <ConsumablesInventory />;
             case "dashboard":
             default:
                 return renderDashboardContent();
