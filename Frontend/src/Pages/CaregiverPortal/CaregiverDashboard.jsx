@@ -9,6 +9,7 @@ import Header from '../../Components/Header';
 import CaregiverSidebar from "../../Components/CaregiverSidebar.jsx";
 import CaregiverResidentsTab from './CResidentsTab.jsx';
 import CaregiverProfile from "./CaregiverProfile";
+import CaregiverDocument from "./CaregiverDocument";
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 
@@ -223,7 +224,7 @@ export default function CaregiverDashboard() {
             case "messages":
                 return renderPlaceholder("Messages");
             case "documents":
-                return renderPlaceholder("Documents");
+                return <CaregiverDocument />;
             case "inventory":
                 return renderPlaceholder("Inventory");
             case "dashboard":
