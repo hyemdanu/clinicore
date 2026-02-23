@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import './css/AdminSidebar.css';
 import dashboardIcon from '../assets/icons/dashboardicon.png';
 import residentIcon from '../assets/icons/residenticon.png';
@@ -7,6 +8,8 @@ import documentsIcon from '../assets/icons/documentsicon.png';
 import inventoryIcon from '../assets/icons/inventoryicon.png';
 
 const CaregiverSidebar = ({ isOpen, activeTab, onNavigate }) => {
+    const navigate = useNavigate();
+
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: dashboardIcon },
         { id: 'residents', label: 'Residents', icon: residentIcon },
@@ -20,6 +23,11 @@ const CaregiverSidebar = ({ isOpen, activeTab, onNavigate }) => {
         if (onNavigate) {
             onNavigate(itemId);
         }
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('currentUser');
+        navigate('/');
     };
 
     return (
@@ -38,6 +46,14 @@ const CaregiverSidebar = ({ isOpen, activeTab, onNavigate }) => {
                     </div>
                 ))}
             </nav>
+
+            {/* logout button at the bottom */}
+            <div className="sidebar-logout" onClick={handleLogout}>
+                <div className="admin-sidebar-icon">
+                    <i className="pi pi-sign-out" style={{ fontSize: '24px', color: '#e74c3c' }}></i>
+                </div>
+                {isOpen && <span className="admin-sidebar-label" style={{ color: '#e74c3c' }}>Logout</span>}
+            </div>
         </div>
     );
 };

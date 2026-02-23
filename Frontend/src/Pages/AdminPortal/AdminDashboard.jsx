@@ -11,6 +11,9 @@ import CaregiverResidentList from './CaregiverResidentList';
 import MessagesTab from './MessagesTab';
 import AccountRequests from './AccountRequests';
 import AdminProfile from './AdminProfile';
+import InventoryLanding from '../Shared/InventoryLanding.jsx';
+import MedicationInventory from '../Shared/CaregiverMedicationInventory.jsx';
+import ConsumablesInventory from '../Shared/ConsumablesInventory.jsx';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 import "./css/admin.css";
@@ -80,7 +83,9 @@ export default function AdminDashboard() {
         caregivers: 'Caregivers',
         'account-requests': 'Account Requests',
         user: 'User',
-        messages: 'Messages'
+        messages: 'Messages',
+        'medication-inventory': 'Medication Inventory',
+        'consumables-inventory': 'Medical Consumables Inventory'
     };
 
     const sortData = (data, sortKey) => {
@@ -218,7 +223,11 @@ export default function AdminDashboard() {
             case 'messages':
                 return <MessagesTab />;
             case 'inventory':
-                return renderPlaceholder('Inventory');
+                return <InventoryLanding onNavigate={handleNavigate} />;
+            case 'medication-inventory':
+                return <MedicationInventory />;
+            case 'consumables-inventory':
+                return <ConsumablesInventory />;
             case 'dashboard':
             default:
                 return renderInventoryContent();
