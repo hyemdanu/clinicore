@@ -9,6 +9,7 @@ import Header from '../../Components/Header';
 import CaregiverSidebar from "../../Components/CaregiverSidebar.jsx";
 import CaregiverResidentsTab from './CResidentsTab.jsx';
 import CaregiverProfile from "./CaregiverProfile";
+import CaregiverDocument from "./CaregiverDocument";
 import InventoryLanding from '../Shared/InventoryLanding.jsx';
 import MedicationInventory from '../Shared/CaregiverMedicationInventory.jsx';
 import ConsumablesInventory from '../Shared/ConsumablesInventory.jsx';
@@ -228,7 +229,7 @@ export default function CaregiverDashboard() {
             case "messages":
                 return renderPlaceholder("Messages");
             case "documents":
-                return renderPlaceholder("Documents");
+                return <CaregiverDocument />;
             case "inventory":
                 return <InventoryLanding onNavigate={setActiveTab} />;
             case "medication-inventory":

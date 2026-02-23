@@ -62,4 +62,27 @@ public class DocumentsController {
                     .body(Map.of("message", "Error fetching document: " + e.getMessage()));
         }
     }
+
+    @GetMapping("/resident/{residentId}")
+    public ResponseEntity<?> getDocumentsForResident(
+            @PathVariable Long residentId,
+            @RequestParam Long userId) {
+
+        try {
+            List<Map<String, Object>> docs =
+                    documentService.getDocumentsForResident(userId, residentId);
+
+            return ResponseEntity.ok(docs);
+
+        } catch (IllegalArgumentException e) {
+            // Permission or validation error → 403 or 400
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", e.getMessage()));
+
+        } catch (Exception e) {
+            // Real unexpected server error → 500
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Unexpected server error"));
+        }
+    }
 }

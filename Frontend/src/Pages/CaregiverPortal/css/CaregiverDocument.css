@@ -1,3 +1,19 @@
+
+.main-content {
+    flex: 1;
+    margin-left: 0;
+    margin-top: 40px;
+    padding: 0px 40px 40px 40px;
+    transition: margin-left 0.3s ease;
+    min-height: 100px;
+    background-color: #f5f6f8;
+    overflow-y: auto;
+}
+
+.main-content.content-with-sidebar {
+    margin-left: 280px;
+}
+
 .documents-search {
     position: relative;
     margin-bottom: 20px;
@@ -9,6 +25,13 @@
     border-radius: 6px;
     border: 1px solid #e0e0e0;
     font-size: 14px;
+    font-family: inherit;
+    background-color: #fff;
+}
+
+.documents-search input:focus {
+    border-color: #369DF7;
+    outline: none;
 }
 
 .search-icon {
@@ -22,16 +45,17 @@
 }
 
 .documents-box {
-    background: white;
+    background: #fff;
     border-radius: 8px;
     border: 1px solid #e0e0e0;
+    overflow: hidden;
 }
 
 .document-row {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 16px;
+    padding: 16px 20px;
     border-bottom: 1px solid #f0f0f0;
 }
 
@@ -42,15 +66,18 @@
 .document-icon {
     width: 32px;
     height: 32px;
+    object-fit: cover;
 }
 
 .document-name {
     font-size: 14px;
     font-weight: 600;
     color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Floating Action Button */
 .documents-fab {
     position: fixed;
     bottom: 32px;
@@ -64,6 +91,18 @@
     font-size: 28px;
     cursor: pointer;
     box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.documents-fab:hover {
+    background-color: #2a85d9;
+}
+
+.dashboard-title {
+    margin: 0 0 16px 0;
+    padding-top: 0;
 }
 
 
