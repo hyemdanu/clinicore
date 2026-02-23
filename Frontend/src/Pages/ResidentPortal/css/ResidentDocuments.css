@@ -7,7 +7,7 @@ body, html {
 
 main.dashboard-content {
     display: block;
-    margin-left: 250px; /* width of sidebar */
+    margin-left: 250px;
     padding: 20px;
 }
 
