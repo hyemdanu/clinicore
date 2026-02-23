@@ -12,12 +12,10 @@ import ForgotUserIdPage from "./Pages/WelcomePage/ForgotUserIdPage";
 import ForgotPasswordPage from "./Pages/WelcomePage/ForgotPasswordPage";
 import CreateAccountPage from "./Pages/WelcomePage/CreateAccountPage";
 import RequestSentPage from "./Pages/WelcomePage/RequestSentPage";
-import RecoveryEmailSentPage from "./Pages/WelcomePage/RecoveryEmailSentPage.jsx"
-import CompleteAccountCreation from "./Pages/WelcomePage/CompleteAccountCreation.jsx";
-import ResidentMedicalProfile from "./Pages/ResidentPortal/ResidentMedicalProfile";
-import ResetPasswordPage from "./Pages/WelcomePage/ResetPasswordPage.jsx";
 import RecoveryEmailSentPage from "./Pages/WelcomePage/RecoveryEmailSentPage.jsx";
+import CompleteAccountCreation from "./Pages/WelcomePage/CompleteAccountCreation.jsx";
 import ResidentMedicalProfile from "./Pages/ResidentPortal/ResidentMedicalProfile.jsx";
+import ResetPasswordPage from "./Pages/WelcomePage/ResetPasswordPage.jsx";
 import CaregiverMedicationInventory from './Pages/CaregiverPortal/CaregiverMedicationInventory.jsx';
 import InventoryLanding from './Pages/CaregiverPortal/InventoryLanding.jsx';
 //import MedicationInventory from './Pages/CaregiverPortal/MedicationInventory';
