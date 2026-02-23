@@ -11,6 +11,7 @@ import CaregiverResidentsTab from './CResidentsTab.jsx';
 import CaregiverProfile from "./CaregiverProfile";
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
+import InventoryLanding from "./InventoryLanding.jsx";
 
 export default function CaregiverDashboard() {
     const navigate = useNavigate();
@@ -225,7 +226,7 @@ export default function CaregiverDashboard() {
             case "documents":
                 return renderPlaceholder("Documents");
             case "inventory":
-                return renderPlaceholder("Inventory");
+                return <InventoryLanding />;
             case "dashboard":
             default:
                 return renderDashboardContent();
