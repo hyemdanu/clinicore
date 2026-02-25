@@ -13,7 +13,7 @@ const CaregiverSidebar = ({ isOpen, activeTab, onNavigate }) => {
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: dashboardIcon },
         { id: 'residents', label: 'Residents', icon: residentIcon },
-        { id: 'user', label: 'User', icon: userIcon },
+        { id: 'profile', label: 'User', icon: userIcon },
         { id: 'messages', label: 'Messages', icon: messageIcon },
         { id: 'documents', label: 'Documents', icon: documentsIcon },
         { id: 'inventory', label: 'Inventory', icon: inventoryIcon }
