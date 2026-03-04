@@ -2,9 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { get } from '../../services/api';
 import './css/messages.css';
 
-// conversation list - left panel
-// shows all conversations with preview and unread count
-// has new chat button to start messaging someone
 export default function ConversationList({
     conversations,
     selectedConversation,
@@ -31,19 +28,16 @@ export default function ConversationList({
         }
     }, [currentUserId]);
 
-    // fetch users when modal opens
     useEffect(() => {
         if (showNewChatModal) {
             fetchAvailableUsers();
         }
     }, [showNewChatModal, fetchAvailableUsers]);
 
-    // filter users by search
     const filteredUsers = availableUsers.filter(user =>
         user.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // format time
     const formatTime = (dateString) => {
         if (!dateString) return '';
 
@@ -52,20 +46,16 @@ export default function ConversationList({
         const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
 
         if (diffDays === 0) {
-            // today
             return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         } else if (diffDays === 1) {
             return 'Yesterday';
         } else if (diffDays < 7) {
-            // this week
             return date.toLocaleDateString([], { weekday: 'short' });
         } else {
-            // older
             return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
         }
     };
 
-    // get message preview text
     const getMessagePreview = (conversation) => {
         if (!conversation.lastMessage) return 'No messages yet';
 
@@ -75,7 +65,6 @@ export default function ConversationList({
             return '📎 File';
         }
 
-        // truncate if too long
         const maxLength = 30;
         if (conversation.lastMessage.length > maxLength) {
             return conversation.lastMessage.substring(0, maxLength) + '...';
@@ -83,7 +72,6 @@ export default function ConversationList({
         return conversation.lastMessage;
     };
 
-    // start new chat with user
     const handleUserClick = (user) => {
         onStartNewChat(user.id, user.name, user.role);
         setShowNewChatModal(false);
@@ -103,7 +91,6 @@ export default function ConversationList({
                 </button>
             </div>
 
-            {/* search bar */}
             <div className="conversation-search">
                 <i className="pi pi-search"></i>
                 <input
@@ -114,7 +101,6 @@ export default function ConversationList({
                 />
             </div>
 
-            {/* conversation list */}
             <div className="conversations">
                 {loading ? (
                     <div className="conversations-loading">
@@ -160,7 +146,6 @@ export default function ConversationList({
                 )}
             </div>
 
-            {/* new chat modal */}
             {showNewChatModal && (
                 <div className="modal-overlay" onClick={() => setShowNewChatModal(false)}>
                     <div className="new-chat-modal" onClick={e => e.stopPropagation()}>

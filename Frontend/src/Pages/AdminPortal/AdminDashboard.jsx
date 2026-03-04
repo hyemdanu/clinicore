@@ -8,7 +8,7 @@ import Header from '../../Components/Header';
 import AdminSidebar from '../../Components/AdminSidebar';
 import ResidentsTab from './ResidentsTab';
 import CaregiverResidentList from './CaregiverResidentList';
-import MessagesTab from './MessagesTab';
+import MessagesTab from '../Shared/MessagesTab';
 import AccountRequests from './AccountRequests';
 import AdminProfile from './AdminProfile';
 import InventoryLanding from '../Shared/InventoryLanding.jsx';
@@ -21,7 +21,7 @@ import "./css/admin.css";
 export default function AdminDashboard() {
     const navigate = useNavigate();
 
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
     const [activeTab, setActiveTab] = useState(
         () => localStorage.getItem('adminActiveTab') || 'dashboard'
     );
@@ -103,7 +103,6 @@ export default function AdminDashboard() {
     const sortedMedications = sortData(medicationInventory, medicationSort);
     const sortedConsumables = sortData(consumablesInventory, consumablesSort);
 
-    // items with quantity <= 10
     const lowStockItems = [
         ...medicationInventory.map(item => ({ ...item, category: 'Medication' })),
         ...consumablesInventory.map(item => ({ ...item, category: 'Consumable' }))
@@ -121,13 +120,6 @@ export default function AdminDashboard() {
         );
     };
 
-
-    const renderPlaceholder = (label) => (
-        <div className="placeholder-content">
-            <h2>{label}</h2>
-            <p>Content coming soon.</p>
-        </div>
-    );
 
     const renderInventoryContent = () => (
         <>

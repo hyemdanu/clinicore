@@ -10,7 +10,7 @@ import documentIcon from "../../assets/icons/documentIcon.png";
 const API_BASE_URL = "http://localhost:8080/api/documents";
 
 export default function ResidentDocuments() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
   const [documents, setDocuments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentUserId, setCurrentUserId] = useState(null);
@@ -50,8 +50,9 @@ export default function ResidentDocuments() {
         );
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || "Failed to fetch documents");
+          console.error("Failed to fetch documents:", response.status);
+          setDocuments([]);
+          return;
         }
 
         const data = await response.json();
@@ -80,12 +81,13 @@ export default function ResidentDocuments() {
     }
 
     const formData = new FormData();
-    formData.append("currentUserId", storedUser.id); // 🔥 REQUIRED
+    formData.append("currentUserId", storedUser.id);
     formData.append("residentId", storedUser.id);
     formData.append("title", docTitle);
     formData.append("type", docType);
     formData.append("file", selectedFile);
 
+    setUploading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/upload`, {
         method: "POST",
@@ -93,7 +95,10 @@ export default function ResidentDocuments() {
       });
 
       const result = await response.json();
-      if (!response.ok) throw new Error(result.message || "Upload failed");
+      if (!response.ok) {
+        alert("Upload failed: " + (result.message || "Unknown error"));
+        return;
+      }
 
       alert(result.message);
 
@@ -109,6 +114,8 @@ export default function ResidentDocuments() {
 
     } catch (err) {
       alert("Upload failed: " + err.message);
+    } finally {
+      setUploading(false);
     }
   };
 

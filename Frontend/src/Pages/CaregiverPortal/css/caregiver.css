@@ -161,6 +161,34 @@
     border-bottom: none;
 }
 
+.dashboard-container.messages-active {
+    overflow: hidden;
+    height: 100vh;
+    max-height: 100vh;
+    background-color: #fff;
+}
+
+.main-content.messages-content {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    background-color: #fff;
+    transition: left 0.3s ease;
+}
+
+.main-content.messages-content.content-with-sidebar {
+    left: 280px;
+    margin-left: 0;
+}
+
 .placeholder-content h2 {
     margin: 0 0 10px 0;
     font-size: 28px;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { get, post, patch, del } from "../../services/api";
 import './css/ResidentMedicalProfile.css';
@@ -18,16 +18,11 @@ export default function ResidentMedicalProfile() {
     const [showAddDiagnosis, setShowAddDiagnosis] = useState(false);
     const [newDiagnosis, setNewDiagnosis] = useState("");
 
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
 
     const toggleSidebar = () => setSidebarOpen((s) => !s);
 
-    // Load resident
-    useEffect(() => {
-        loadResident();
-    }, []);
-
-    const loadResident = async () => {
+    const loadResident = useCallback(async () => {
         setLoading(true);
         setError(null);
 
@@ -54,7 +49,11 @@ export default function ResidentMedicalProfile() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [navigate]);
+
+    useEffect(() => {
+        loadResident();
+    }, [loadResident]);
 
     const refreshResident = async () => {
         const currentUserId = JSON.parse(localStorage.getItem("currentUser")).id;
@@ -276,6 +275,18 @@ export default function ResidentMedicalProfile() {
                                     <i className="pi pi-plus"></i> Add
                                 </button>
                             </div>
+                            {showAddDiagnosis && (
+                                <div className="add-form" style={{ display: "flex", gap: "0.5rem", padding: "0.5rem" }}>
+                                    <input
+                                        value={newDiagnosis}
+                                        onChange={(e) => setNewDiagnosis(e.target.value)}
+                                        placeholder="Diagnosis"
+                                        style={{ flex: 1, padding: "0.4rem" }}
+                                    />
+                                    <button className="action-btn" onClick={handleAddDiagnosis}>Save</button>
+                                    <button className="action-btn" onClick={() => setShowAddDiagnosis(false)}>Cancel</button>
+                                </div>
+                            )}
                             {diagnoses.length === 0 && (
                                 <div className="custom-loading"><span>No diagnoses recorded</span></div>
                             )}
@@ -300,6 +311,18 @@ export default function ResidentMedicalProfile() {
                                     <i className="pi pi-plus"></i> Add
                                 </button>
                             </div>
+                            {showAddAllergy && (
+                                <div className="add-form" style={{ display: "flex", gap: "0.5rem", padding: "0.5rem" }}>
+                                    <input
+                                        value={newAllergy}
+                                        onChange={(e) => setNewAllergy(e.target.value)}
+                                        placeholder="Allergy type"
+                                        style={{ flex: 1, padding: "0.4rem" }}
+                                    />
+                                    <button className="action-btn" onClick={handleAddAllergy}>Save</button>
+                                    <button className="action-btn" onClick={() => setShowAddAllergy(false)}>Cancel</button>
+                                </div>
+                            )}
                             {allergies.length === 0 && (
                                 <div className="custom-loading"><span>No allergies recorded</span></div>
                             )}
