@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/messages")
-@CrossOrigin(origins = "*") // Adjust based on frontend URL
+@CrossOrigin(origins = "*")
 public class MessagesController {
 
     @Autowired
@@ -27,9 +27,6 @@ public class MessagesController {
     @Autowired
     private MessageService messageService;
 
-    /**
-     * Get all messages
-     */
     @GetMapping
     public ResponseEntity<List<CommunicationPortal>> getAllMessages() {
         try {
@@ -40,9 +37,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * Get message by ID
-     */
     @GetMapping("/{id}")
     public ResponseEntity<CommunicationPortal> getMessageById(@PathVariable Long id) {
         try {
@@ -54,9 +48,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * Create a new message
-     */
     @PostMapping
     public ResponseEntity<CommunicationPortal> createMessage(@RequestBody CommunicationPortal message) {
         try {
@@ -67,9 +58,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * Update an existing message
-     */
     @PutMapping("/{id}")
     public ResponseEntity<CommunicationPortal> updateMessage(@PathVariable Long id,
                                                              @RequestBody CommunicationPortal messageDetails) {
@@ -106,9 +94,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * Delete a message
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMessage(@PathVariable Long id) {
         try {
@@ -122,9 +107,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * Get all messages by sender
-     */
     @GetMapping("/sender/{senderId}")
     public ResponseEntity<List<CommunicationPortal>> getMessagesBySender(@PathVariable Long senderId) {
         try {
@@ -135,9 +117,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * Get all messages by recipient
-     */
     @GetMapping("/recipient/{recipientId}")
     public ResponseEntity<List<CommunicationPortal>> getMessagesByRecipient(@PathVariable Long recipientId) {
         try {
@@ -148,9 +127,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * Get messages by sender role
-     */
     @GetMapping("/sender-role/{senderRole}")
     public ResponseEntity<List<CommunicationPortal>> getMessagesBySenderRole(@PathVariable CommunicationPortal.UserRole senderRole) {
         try {
@@ -161,9 +137,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * Get messages between sender and recipient
-     */
     @GetMapping("/between/{senderId}/{recipientId}")
     public ResponseEntity<List<CommunicationPortal>> getMessagesBetweenUsers(@PathVariable Long senderId,
                                                                              @PathVariable Long recipientId) {
@@ -175,9 +148,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * Get messages for recipient with specific role
-     */
     @GetMapping("/recipient/{recipientId}/role/{recipientRole}")
     public ResponseEntity<List<CommunicationPortal>> getMessagesByRecipientAndRole(@PathVariable Long recipientId,
                                                                                    @PathVariable CommunicationPortal.UserRole recipientRole) {
@@ -189,9 +159,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * Get full conversation between two users
-     */
     @GetMapping("/conversation/{user1Id}/{user2Id}")
     public ResponseEntity<List<CommunicationPortal>> getConversation(@PathVariable Long user1Id,
                                                                      @PathVariable Long user2Id) {
@@ -203,9 +170,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * Get unread messages for recipient
-     */
     @GetMapping("/recipient/{recipientId}/unread")
     public ResponseEntity<List<CommunicationPortal>> getUnreadMessages(@PathVariable Long recipientId) {
         try {
@@ -216,9 +180,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * Get unread messages ordered by sent date
-     */
     @GetMapping("/recipient/{recipientId}/unread/ordered")
     public ResponseEntity<List<CommunicationPortal>> getUnreadMessagesOrdered(@PathVariable Long recipientId) {
         try {
@@ -229,9 +190,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * Mark message as read
-     */
     @PatchMapping("/{id}/read")
     public ResponseEntity<CommunicationPortal> markAsRead(@PathVariable Long id) {
         try {
@@ -249,9 +207,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * Mark multiple messages as read
-     */
     @PatchMapping("/mark-read")
     public ResponseEntity<Void> markMultipleAsRead(@RequestBody List<Long> messageIds) {
         try {
@@ -270,10 +225,7 @@ public class MessagesController {
         }
     }
 
-    /**
-     * get all conversations for a user
-     * so basically show all conversations with latest message on top like a normal messaging system
-     */
+    // all conversations for a user, latest on top
     @GetMapping("/chat/conversations")
     public ResponseEntity<?> getUserConversations(@RequestParam Long userId) {
         try {
@@ -285,12 +237,8 @@ public class MessagesController {
         }
     }
 
-    /**
-     * get all messages from a convo
-     */
     @GetMapping("/chat/conversation/{conversationId}")
-    public ResponseEntity<?> getConversationMessages(@PathVariable String conversationId,
-                                                      @RequestParam Long userId) {
+    public ResponseEntity<?> getConversationMessages(@PathVariable String conversationId) {
         try {
             List<MessageDTO> messages = messageService.getConversationMessages(conversationId);
             return ResponseEntity.ok(messages);
@@ -300,9 +248,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * send a text message
-     */
     @PostMapping("/chat/send")
     public ResponseEntity<?> sendMessage(@RequestBody Map<String, Object> request) {
         try {
@@ -323,9 +268,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * send a message with file/image
-     */
     @PostMapping("/chat/send-with-attachment")
     public ResponseEntity<?> sendMessageWithAttachment(@RequestBody Map<String, Object> request) {
         try {
@@ -336,7 +278,6 @@ public class MessagesController {
             String attachmentUrl = (String) request.get("attachmentUrl");
             String attachmentName = (String) request.get("attachmentName");
 
-            // default to FILE if not specified
             CommunicationPortal.MessageType messageType = CommunicationPortal.MessageType.FILE;
             if (messageTypeStr != null) {
                 messageType = CommunicationPortal.MessageType.valueOf(messageTypeStr.toUpperCase());
@@ -352,9 +293,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * mark messages as read
-     */
     @PatchMapping("/chat/conversation/{conversationId}/read")
     public ResponseEntity<?> markConversationAsRead(@PathVariable String conversationId,
                                                      @RequestParam Long userId) {
@@ -367,9 +305,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * unread count noti
-     */
     @GetMapping("/chat/unread-count")
     public ResponseEntity<?> getUnreadCount(@RequestParam Long userId) {
         try {
@@ -381,15 +316,11 @@ public class MessagesController {
         }
     }
 
-    /**
-     * get list of users to chat
-     */
     @GetMapping("/chat/available-users")
     public ResponseEntity<?> getAvailableUsers(@RequestParam Long currentUserId) {
         try {
             List<UserProfile> users = messageService.getAvailableUsers(currentUserId);
 
-            // map to simpler response (don't send full UserProfile)
             List<Map<String, Object>> userList = users.stream()
                     .map(user -> Map.of(
                             "id", (Object) user.getId(),
@@ -405,9 +336,6 @@ public class MessagesController {
         }
     }
 
-    /**
-     * start or get existing conversation with a user
-     */
     @GetMapping("/chat/start/{otherUserId}")
     public ResponseEntity<?> startConversation(@PathVariable Long otherUserId,
                                                 @RequestParam Long currentUserId) {
