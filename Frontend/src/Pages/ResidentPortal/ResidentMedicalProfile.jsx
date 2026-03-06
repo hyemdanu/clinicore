@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { get, post, patch, del } from "../../services/api";
+import { get } from "../../services/api";
 import './css/ResidentMedicalProfile.css';
 import ResidentSidebar from "../../Components/ResidentSidebar";
 import Header from "../../Components/Header";
@@ -12,17 +12,10 @@ export default function ResidentMedicalProfile() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const [showAddAllergy, setShowAddAllergy] = useState(false);
-    const [newAllergy, setNewAllergy] = useState("");
-
-    const [showAddDiagnosis, setShowAddDiagnosis] = useState(false);
-    const [newDiagnosis, setNewDiagnosis] = useState("");
-
     const [sidebarOpen, setSidebarOpen] = useState(true);
 
     const toggleSidebar = () => setSidebarOpen((s) => !s);
 
-    // Load resident
     useEffect(() => {
         loadResident();
     }, []);
@@ -41,9 +34,7 @@ export default function ResidentMedicalProfile() {
             const currentUser = JSON.parse(currentUserStr);
             const currentUserId = currentUser.id;
 
-            // If admin opened resident
             const openResidentId = localStorage.getItem("openResidentId");
-
             const residentId = openResidentId || currentUserId;
 
             const data = await get(`/residents/full/${residentId}?currentUserId=${currentUserId}`);
@@ -56,15 +47,9 @@ export default function ResidentMedicalProfile() {
         }
     };
 
-    // -----------------------------
-    // DATA
-    // -----------------------------
     const allergies = resident?.medicalRecord?.allergyDetails || [];
     const diagnoses = resident?.medicalRecord?.diagnosisDetails || [];
 
-    // -----------------------------
-    // UI STATES
-    // -----------------------------
     if (loading) {
         return (
             <div className="loading-state">
@@ -82,9 +67,6 @@ export default function ResidentMedicalProfile() {
         return <div>No resident loaded.</div>;
     }
 
-    // -----------------------------
-    // UI RENDER
-    // -----------------------------
     return (
         <div className="admin-dashboard-container">
             <Header onToggleSidebar={toggleSidebar} title="Dashboard" />
@@ -92,28 +74,21 @@ export default function ResidentMedicalProfile() {
             <main className="dashboard-content">
                 <div className="alert-section">
                     <h2 className="dashboard-title">
-                        Medical Profile — {resident.firstName} {resident.lastName}
+                        Medical Profile — {resident.firstName || 'Unknown'} {resident.lastName || ''}
                     </h2>
                 </div>
 
-                {error && <div className="error-message">{error}</div>}
-
-                {/* TWO COLUMN LAYOUT */}
                 <div className="medical-profile-grid">
-
-                    {/* LEFT COLUMN */}
                     <div className="profile-column">
-                        {/* INSURANCE */}
                         <section className="inventory-section">
                             <div className="inventory-header">
                                 <h3>Insurance</h3>
                             </div>
                             <div className="service-item">
-                                <span className="service-label">{resident.medicalProfile.insurance}</span>
+                                <span className="service-label">{resident.medicalProfile?.insurance || 'No insurance recorded'}</span>
                             </div>
                         </section>
 
-                        {/* MEDICAL SERVICES */}
                         <section className="inventory-section">
                             <div className="inventory-header">
                                 <h3>Medical Services</h3>
@@ -121,93 +96,91 @@ export default function ResidentMedicalProfile() {
                             <div className="medical-services-list">
                                 <div className="service-item">
                                     <span className="service-label">DNR / POLST</span>
-                                    {resident.medicalServices.dnrPolst ? "Yes" : "No"}
+                                    {resident.medicalServices?.dnrPolst ? "Yes" : "No"}
                                 </div>
                                 <div className="service-item">
                                     <span className="service-label">On Hospice</span>
-                                    {resident.medicalServices.hospice ? "Yes" : "No"}
+                                    {resident.medicalServices?.hospice ? "Yes" : "No"}
                                 </div>
                                 <div className="service-item">
                                     <span className="service-label">Hospice Agency</span>
-                                    {resident.medicalServices.hospiceAgency}
+                                    {resident.medicalServices?.hospiceAgency || 'N/A'}
                                 </div>
                                 <div className="service-item">
                                     <span className="service-label">Preferred Hospital</span>
-                                    {resident.medicalServices.preferredHospital}
+                                    {resident.medicalServices?.preferredHospital || 'N/A'}
                                 </div>
                                 <div className="service-item">
                                     <span className="service-label">Preferred Pharmacy</span>
-                                    {resident.medicalServices.preferredPharmacy}
+                                    {resident.medicalServices?.preferredPharmacy || 'N/A'}
                                 </div>
                                 <div className="service-item">
                                     <span className="service-label">On Home Health</span>
-                                    {resident.medicalServices.homeHealth ? "Yes" : "No"}
+                                    {resident.medicalServices?.homeHealth ? "Yes" : "No"}
                                 </div>
                                 <div className="service-item">
                                     <span className="service-label">Home Health Agency</span>
-                                    {resident.medicalServices.homeHealthAgency}
+                                    {resident.medicalServices?.homeHealthAgency || 'N/A'}
                                 </div>
                                 <div className="service-item">
                                     <span className="service-label">Mortuary</span>
-                                    {resident.medicalServices.mortuary}
+                                    {resident.medicalServices?.mortuary || 'N/A'}
                                 </div>
                             </div>
                         </section>
                     </div>
 
-                    {/* RIGHT COLUMN */}
                     <div className="profile-column">
-                        {/* CAPABILITIES */}
                         <section className="inventory-section">
                             <div className="inventory-header">
                                 <h3>Capabilities</h3>
                             </div>
                             <div className="service-item">
                                 <span className="service-label">Mobility Status:</span>
-                                {resident.capability.mobilityStatus}
+                                {resident.capability?.mobilityStatus || 'Unknown'}
                             </div>
                             <div className="service-item">
                                 <span className="service-label">Incontinence Status:</span>
-                                {resident.capability.incontinenceStatus}
+                                {resident.capability?.incontinenceStatus || 'Unknown'}
                             </div>
                             <div className="service-item">
                                 <span className="service-label">Self-Medicates:</span>
-                                {resident.capability.selfMedicates ? "Yes" : "No"}
+                                {resident.capability?.selfMedicates ? "Yes" : "No"}
                             </div>
                             <div className="service-item">
                                 <span className="service-label">Verbal:</span>
-                                {resident.capability.verbal ? "Yes" : "No"}
+                                {resident.capability?.verbal ? "Yes" : "No"}
                             </div>
                         </section>
 
-                        {/* DIAGNOSES */}
                         <section className="inventory-section">
                             <div className="inventory-header">
                                 <h3>Diagnoses</h3>
                             </div>
-                            {diagnoses.length === 0 && (
+                            {diagnoses.length === 0 ? (
                                 <div className="custom-loading"><span>No diagnoses recorded</span></div>
+                            ) : (
+                                diagnoses.map((d) => (
+                                    <div key={d.id} className="inventory-row">
+                                        <span>{d.diagnosis || 'Unknown diagnosis'}</span>
+                                    </div>
+                                ))
                             )}
-                            {diagnoses.map((d) => (
-                                <div key={d.id} className="inventory-row">
-                                    <span>{d.diagnosis}</span>
-                                </div>
-                            ))}
                         </section>
 
-                        {/* ALLERGIES */}
                         <section className="inventory-section">
                             <div className="inventory-header">
                                 <h3>Allergies</h3>
                             </div>
-                            {allergies.length === 0 && (
+                            {allergies.length === 0 ? (
                                 <div className="custom-loading"><span>No allergies recorded</span></div>
+                            ) : (
+                                allergies.map((a) => (
+                                    <div key={a.id} className="inventory-row">
+                                        <span>{a.allergyType || 'Unknown allergy'}</span>
+                                    </div>
+                                ))
                             )}
-                            {allergies.map((a) => (
-                                <div key={a.id} className="inventory-row">
-                                    <span>{a.allergyType}</span>
-                                </div>
-                            ))}
                         </section>
                     </div>
                 </div>
