@@ -8,6 +8,7 @@ import CaregiverDashboard from "./Pages/CaregiverPortal/CaregiverDashboard";
 import CaregiverDocument from "./Pages/CaregiverPortal/CaregiverDocument";
 import AdminDashboard from "./Pages/AdminPortal/AdminDashboard";
 import AccountRequests from "./Pages/AdminPortal/AccountRequests";
+import AdminDocuments from "./Pages/AdminPortal/AdminDocument";
 import ForgotUserIdPage from "./Pages/WelcomePage/ForgotUserIdPage";
 import ForgotPasswordPage from "./Pages/WelcomePage/ForgotPasswordPage";
 import CreateAccountPage from "./Pages/WelcomePage/CreateAccountPage";
@@ -31,6 +32,7 @@ export default function App() {
                 <Route path="/caregiver/caregiver-documents" element={<CaregiverDocument/>} />
                 <Route path="/admin" element={<AdminDashboard/>} />
                 <Route path="/admin/account-requests" element={<AccountRequests/>} />
+                <Route path="/admin/documents" element={<AdminDocuments/>} />
                 <Route path="/forgot-userid" element={<ForgotUserIdPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/create-account" element={<CreateAccountPage />} />
