@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { get } from "../../services/api";
 import "./css/AdminDocument.css";
 import "../Shared/css/residents.css";
+import searchIcon from "../../assets/icons/magnifying-glass.png";
 
 export default function AdminDocuments({ sidebarOpen }) {
     const navigate = useNavigate();
@@ -13,6 +14,13 @@ export default function AdminDocuments({ sidebarOpen }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
+    // Upload states
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [docTitle, setDocTitle] = useState("");
+    const [docType, setDocType] = useState("");
+    const [uploading, setUploading] = useState(false);
+    const [showUploadForm, setShowUploadForm] = useState(false);
 
     useEffect(() => {
         fetchResidents();
@@ -66,6 +74,49 @@ export default function AdminDocuments({ sidebarOpen }) {
         setSelectedResident(null);
         setDocuments([]);
         setSearchQuery("");
+        setShowUploadForm(false);
+    };
+
+    const handleUpload = async () => {
+        if (!selectedResident) return alert("Select a resident first");
+        if (!selectedFile || !docTitle || !docType)
+            return alert("Please select a file and enter title/type");
+
+        setUploading(true);
+
+        try {
+            const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+            const formData = new FormData();
+            formData.append("currentUserId", currentUser.id);
+            formData.append("residentId", selectedResident.id);
+            formData.append("title", docTitle);
+            formData.append("type", docType);
+            formData.append("file", selectedFile);
+
+            const response = await fetch(`http://localhost:8080/api/documents/upload`, {
+                method: "POST",
+                body: formData,
+            });
+
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || "Upload failed");
+
+            alert(result.message);
+
+            // refresh documents
+            fetchDocuments(selectedResident);
+
+            // reset upload form
+            setSelectedFile(null);
+            setDocTitle("");
+            setDocType("");
+            setShowUploadForm(false);
+        } catch (err) {
+            alert("Upload failed: " + err.message);
+            console.error(err);
+        } finally {
+            setUploading(false);
+        }
     };
 
     const filteredDocuments = documents.filter(doc =>
@@ -74,10 +125,9 @@ export default function AdminDocuments({ sidebarOpen }) {
 
     return (
         <div className="documents-page">
-
-            {/* Main page title */}
             <h2 className="dashboard-title">Documents</h2>
 
+            {/* Search */}
             <div className="search-container">
                 <i className="pi pi-search search-icon"></i>
                 <input
@@ -98,40 +148,69 @@ export default function AdminDocuments({ sidebarOpen }) {
                 </div>
             ) : (
                 <div className="residents-list">
-
-                    {!selectedResident ? (
-                        filteredResidents.map(resident => (
+                    {!selectedResident
+                        ? filteredResidents.map(resident => (
                             <div
                                 key={resident.id}
                                 className="resident-item"
                                 onClick={() => fetchDocuments(resident)}
                             >
                                 <div className="resident-avatar"><i className="pi pi-folder"></i></div>
-                                <span className="resident-name">
-                                    {resident.firstName} {resident.lastName}
-                                </span>
+                                <span className="resident-name">{resident.firstName} {resident.lastName}</span>
                             </div>
                         ))
-                    ) : (
-                        <>
-                            <div className="documents-header">
-                                <h3>{selectedResident.firstName}'s Documents</h3>
-                                <button className="back-button" onClick={goBack}>← Back</button>
-                            </div>
+                        : (
+                            <>
+                                {/* Document header + back button */}
+                                <div className="documents-header">
+                                    <h3>{selectedResident.firstName}'s Documents</h3>
+                                    <button className="back-button" onClick={goBack}>← Back</button>
+                                </div>
 
-                            {filteredDocuments.length === 0 ? (
-                                <div className="no-residents">No documents found</div>
-                            ) : (
-                                filteredDocuments.map(doc => (
-                                    <div key={doc.id} className="resident-item">
-                                        <div className="resident-avatar"><i className="pi pi-file"></i></div>
-                                        <span className="resident-name">{doc.title}</span>
+                                {/* Floating Add button */}
+                                <button
+                                    className="documents-fab"
+                                    onClick={() => setShowUploadForm(true)}
+                                    title="Add Document"
+                                >
+                                    +
+                                </button>
+
+                                {/* Upload form (only shows after clicking +) */}
+                                {showUploadForm && (
+                                    <div className="upload-section">
+                                        <input type="file" onChange={(e) => setSelectedFile(e.target.files[0])} />
+                                        <input
+                                            type="text"
+                                            placeholder="Document Title"
+                                            value={docTitle}
+                                            onChange={(e) => setDocTitle(e.target.value)}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Document Type"
+                                            value={docType}
+                                            onChange={(e) => setDocType(e.target.value)}
+                                        />
+                                        <button onClick={handleUpload} disabled={uploading}>
+                                            {uploading ? "Uploading..." : "Upload"}
+                                        </button>
+                                        <button onClick={() => setShowUploadForm(false)}>Cancel</button>
                                     </div>
-                                ))
-                            )}
-                        </>
-                    )}
+                                )}
 
+                                {/* Document list */}
+                                {filteredDocuments.length === 0
+                                    ? <div className="no-residents">No documents found</div>
+                                    : filteredDocuments.map(doc => (
+                                        <div key={doc.id} className="resident-item">
+                                            <div className="resident-avatar"><i className="pi pi-file"></i></div>
+                                            <span className="resident-name">{doc.title}</span>
+                                        </div>
+                                    ))
+                                }
+                            </>
+                        )}
                 </div>
             )}
         </div>
