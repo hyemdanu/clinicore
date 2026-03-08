@@ -13,8 +13,8 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
     const fileInputRef = useRef(null);
     const isFirstLoad = useRef(true);
     const lastSentAt = useRef(0);
-    const isFetching = useRef(false);
     const prevMessageCount = useRef(0);
+    const activeConversationId = useRef(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -23,20 +23,19 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
     const fetchMessages = useCallback(async () => {
         if (!conversation) return;
 
-        if (isFetching.current) return;
         if (!isFirstLoad.current && Date.now() - lastSentAt.current < 5000) return;
 
-        isFetching.current = true;
+        const fetchingConversationId = conversation.conversationId;
         if (isFirstLoad.current) setLoadingChat(true);
         try {
             const data = await get(
-                `/messages/chat/conversation/${conversation.conversationId}?userId=${currentUser.id}`
+                `/messages/chat/conversation/${fetchingConversationId}?userId=${currentUser.id}`
             );
+            if (activeConversationId.current !== fetchingConversationId) return;
             setMessages(prev => (isFirstLoad.current || data.length >= prev.length) ? data : prev);
         } catch (err) {
             console.error('Error fetching messages:', err);
         } finally {
-            isFetching.current = false;
             isFirstLoad.current = false;
             setLoadingChat(false);
         }
@@ -56,8 +55,8 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
 
     useEffect(() => {
         if (conversation) {
+            activeConversationId.current = conversation.conversationId;
             isFirstLoad.current = true;
-            isFetching.current = false;
             prevMessageCount.current = 0;
             setMessages([]);
             fetchMessages();
