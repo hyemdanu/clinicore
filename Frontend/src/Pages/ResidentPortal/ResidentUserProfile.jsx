@@ -11,7 +11,7 @@ import "./css/ResidentUserProfile.css";
 export default function ResidentUserProfile() {
     const navigate = useNavigate();
 
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
     const [loading, setLoading] = useState(true);
     const [resident, setResident] = useState(null);
 
