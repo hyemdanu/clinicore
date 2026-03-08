@@ -5,9 +5,6 @@ import ConversationList from './ConversationList';
 import ChatWindow from './ChatWindow';
 import './css/messages.css';
 
-// messages tab
-// left side: list of conversations
-// right side: active chat window
 export default function MessagesTab() {
     const navigate = useNavigate();
 
@@ -17,10 +14,9 @@ export default function MessagesTab() {
     const [initialLoading, setInitialLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // track if this is first load or a refresh
     const isFirstLoad = useRef(true);
+    const isFetching = useRef(false);
 
-    // get current user from localStorage
     useEffect(() => {
         const userStr = localStorage.getItem('currentUser');
         if (!userStr) {
@@ -33,13 +29,13 @@ export default function MessagesTab() {
 
     const fetchConversations = useCallback(async () => {
         if (!currentUser) return;
-
-        // show loading only on first load
+        if (isFetching.current) return;
         if (isFirstLoad.current) {
             setInitialLoading(true);
         }
         setError(null);
 
+        isFetching.current = true;
         try {
             const data = await get(`/messages/chat/conversations?userId=${currentUser.id}`);
             setConversations(data);
@@ -49,39 +45,37 @@ export default function MessagesTab() {
                 setError('Failed to load conversations');
             }
         } finally {
+            isFetching.current = false;
             setInitialLoading(false);
             isFirstLoad.current = false;
         }
     }, [currentUser]);
 
-    // fetch conversations when user is loaded
     useEffect(() => {
         if (currentUser) {
             fetchConversations();
+
+            const interval = setInterval(fetchConversations, 5000);
+            return () => clearInterval(interval);
         }
     }, [currentUser, fetchConversations]);
 
-    // select a conversation
     const handleSelectConversation = (conversation) => {
         setSelectedConversation(conversation);
     };
 
-    // go back to conversation list for smaller screen like mobile
     const handleBackToList = () => {
         setSelectedConversation(null);
     };
 
-    // refresh conversations
     const handleConversationUpdated = () => {
         fetchConversations();
     };
 
-    // start a new chat with someone
     const handleStartNewChat = async (otherUserId, otherUserName, otherUserRole) => {
         try {
             const data = await get(`/messages/chat/start/${otherUserId}?currentUserId=${currentUser.id}`);
 
-            // create a temporary conversation object for the new chat
             const newConversation = {
                 conversationId: data.conversationId,
                 otherUserId: otherUserId,
@@ -93,7 +87,7 @@ export default function MessagesTab() {
             };
 
             setSelectedConversation(newConversation);
-            fetchConversations(); // refresh without loading
+            fetchConversations();
         } catch (err) {
             console.error('Error starting conversation:', err);
         }
@@ -106,7 +100,6 @@ export default function MessagesTab() {
     return (
         <div className="messages-tab">
             <div className={`messages-container ${selectedConversation ? 'chat-active' : ''}`}>
-                {/* conversation list */}
                 <ConversationList
                     conversations={conversations}
                     selectedConversation={selectedConversation}
@@ -117,7 +110,6 @@ export default function MessagesTab() {
                     error={error}
                 />
 
-                {/* chat window */}
                 <ChatWindow
                     conversation={selectedConversation}
                     currentUser={currentUser}

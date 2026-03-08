@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { get } from "../../services/api";
@@ -14,10 +14,9 @@ import "./css/ResidentMedication.css";
 export default function ResidentMedication() {
     const navigate = useNavigate();
 
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
     const toggleSidebar = () => setSidebarOpen((s) => !s);
 
-    const [resident, setResident] = useState(null);
     const [medications, setMedications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -31,7 +30,7 @@ export default function ResidentMedication() {
         { label: "Status", value: "intake_status", order: "asc" },
     ];
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
         setError(null);
 
@@ -52,8 +51,6 @@ export default function ResidentMedication() {
 
             // Fetch full resident details including medications - same pattern as ResidentDetailModal
             const residentData = await get(`/residents/full/${currentUserId}?currentUserId=${currentUserId}`);
-
-            setResident(residentData);
 
             // Format medications from the resident data
             const formattedMeds = (residentData.medications || []).map(med => ({
@@ -77,11 +74,11 @@ export default function ResidentMedication() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [navigate]);
 
     useEffect(() => {
         fetchData();
-    }, [navigate]);
+    }, [fetchData]);
 
     const handleSortChange = (e) => {
         const value = e.target.value;

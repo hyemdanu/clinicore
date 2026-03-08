@@ -16,6 +16,7 @@ import RequestSentPage from "./Pages/WelcomePage/RequestSentPage";
 import RecoveryEmailSentPage from "./Pages/WelcomePage/RecoveryEmailSentPage.jsx";
 import CompleteAccountCreation from "./Pages/WelcomePage/CompleteAccountCreation.jsx";
 import ResidentMedicalProfile from "./Pages/ResidentPortal/ResidentMedicalProfile.jsx";
+import ResidentMessages from "./Pages/ResidentPortal/ResidentMessages.jsx";
 import ResetPasswordPage from "./Pages/WelcomePage/ResetPasswordPage.jsx";
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
                 <Route path="/resident/profile" element={<ResidentUserProfile/>} />
                 <Route path="/resident/medications" element={<ResidentMedication/>} />
                 <Route path="/resident/medical-profile" element={<ResidentMedicalProfile/>} />
+                <Route path="/resident/messages" element={<ResidentMessages/>} />
                 <Route path="/caregiver" element={<CaregiverDashboard/>} />
                 <Route path="/caregiver/caregiver-documents" element={<CaregiverDocument/>} />
                 <Route path="/admin" element={<AdminDashboard/>} />
