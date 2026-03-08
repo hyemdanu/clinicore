@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { get } from "../../services/api";
 import './css/ResidentMedicalProfile.css';
@@ -12,15 +12,10 @@ export default function ResidentMedicalProfile() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const [sidebarOpen, setSidebarOpen] = useState(true);
-
+    const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
     const toggleSidebar = () => setSidebarOpen((s) => !s);
-
-    useEffect(() => {
-        loadResident();
-    }, []);
-
-    const loadResident = async () => {
+  
+      const loadResident = useCallback(async () => {
         setLoading(true);
         setError(null);
 
@@ -45,7 +40,11 @@ export default function ResidentMedicalProfile() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [navigate]);
+
+    useEffect(() => {
+        loadResident();
+    }, [loadResident]);
 
     const allergies = resident?.medicalRecord?.allergyDetails || [];
     const diagnoses = resident?.medicalRecord?.diagnosisDetails || [];
@@ -172,7 +171,7 @@ export default function ResidentMedicalProfile() {
                             <div className="inventory-header">
                                 <h3>Allergies</h3>
                             </div>
-                            {allergies.length === 0 ? (
+                           {allergies.length === 0 ? (
                                 <div className="custom-loading"><span>No allergies recorded</span></div>
                             ) : (
                                 allergies.map((a) => (
