@@ -9,12 +9,17 @@
     min-height: 100vh;
 }
 
+.dashboard-title {
+    margin-left: 25px;
+}
+
+
 .medical-profile-grid {
     display: flex;
     gap: 2rem;
     align-items: flex-start;
     width: 100%;
-    margin-top: 100px;
+    margin-left: 20px;
     max-width: 1200px;
 }
 
@@ -230,27 +235,3 @@
 .row-actions button:hover {
     color: #369DF7;
 }
-
-.add-form {
-    display: flex;
-    gap: 10px;
-    margin-top: 12px;
-}
-
-.add-form input {
-    flex: 1;
-    padding: 8px 10px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-}
-
-.add-form button {
-    padding: 8px 14px;
-    border-radius: 6px;
-    border: none;
-    background-color: #369DF7;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-}
-
