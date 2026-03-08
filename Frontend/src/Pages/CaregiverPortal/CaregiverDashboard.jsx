@@ -233,7 +233,6 @@ export default function CaregiverDashboard() {
 
             <CaregiverSidebar
                 isOpen={sidebarOpen}
-                onToggle={toggleSidebar}
                 activeTab={activeTab}
                 onNavigate={setActiveTab}
             />
