@@ -120,8 +120,8 @@
 }
 
 .back-button {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     padding: 0;
     border-radius: 50%;
     margin-left: 8px;
@@ -145,8 +145,10 @@
 }
 
 .back-arrow {
-    font-size: 18px;
+    font-size: 16px;
     line-height: 1;
+    position: relative;
+    top: -2px;
 }
 
 

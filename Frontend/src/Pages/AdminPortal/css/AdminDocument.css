@@ -120,8 +120,8 @@
 }
 
 .back-button {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     padding: 0;
     border-radius: 50%;
     margin-left: 8px;
@@ -145,8 +145,10 @@
 }
 
 .back-arrow {
-    font-size: 18px;
+    font-size: 16px;
     line-height: 1;
+    position: relative;
+    top: -2px;
 }
 
 .resident-documents-title {
@@ -170,13 +172,24 @@
     border: 1px solid #d7dde7;
     background: #fff;
     font-size: 14px;
+    margin-left: 8px;
 }
 
-.upload-button,
+.upload-button{
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    margin-left: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
 .cancel-button {
     border: none;
     border-radius: 8px;
     padding: 8px 14px;
+    margin-left: 4px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;

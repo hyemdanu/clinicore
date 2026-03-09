@@ -181,36 +181,6 @@ export default function ResidentDocuments() {
               style={{ display: "none" }}
               onChange={(e) => setSelectedFile(e.target.files[0])}
             />
-
-            {/* Add button */}
-            <button
-              className="documents-fab"
-              onClick={() => document.getElementById("fileInput").click()}
-            >
-              +
-            </button>
-
-            {/* Upload form */}
-            {selectedFile && (
-              <div className="upload-form">
-                <input
-                  type="text"
-                  placeholder="Document Title"
-                  value={docTitle}
-                  onChange={(e) => setDocTitle(e.target.value)}
-                />
-                <input
-                  type="text"
-                  placeholder="Document Type"
-                  value={docType}
-                  onChange={(e) => setDocType(e.target.value)}
-                />
-                <button onClick={handleUpload} disabled={uploading}>
-                  {uploading ? "Uploading..." : "Upload"}
-                </button>
-                <button onClick={() => setSelectedFile(null)}>Cancel</button>
-              </div>
-            )}
           </div>
         </div>
       </main>
