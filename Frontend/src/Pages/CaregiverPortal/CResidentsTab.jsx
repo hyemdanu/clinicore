@@ -20,6 +20,7 @@ export default function CaregiverResidentsTab() {
     const [selectedResident, setSelectedResident] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [loadingResident, setLoadingResident] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
         if (showModal) {
@@ -34,8 +35,12 @@ export default function CaregiverResidentsTab() {
         fetchResidents();
     }, []);
 
-    const fetchResidents = async () => {
-        setLoading(true);
+    const fetchResidents = async (background = false) => {
+        if (background) {
+            setRefreshing(true);
+        } else {
+            setLoading(true);
+        }
         setError(null);
         try {
             const currentUserStr = localStorage.getItem('currentUser');
@@ -47,7 +52,6 @@ export default function CaregiverResidentsTab() {
             const currentUser = JSON.parse(currentUserStr);
             const currentUserId = currentUser.id;
 
-            // use the caregiver-specific endpoint that returns pre-split data
             const data = await get(`/caregivers/my-residents?currentUserId=${currentUserId}`);
 
             setAssignedResidents(data.assigned || []);
@@ -57,6 +61,7 @@ export default function CaregiverResidentsTab() {
             setError('Failed to load residents. Please try again.');
         } finally {
             setLoading(false);
+            setRefreshing(false);
         }
     };
 
@@ -78,6 +83,21 @@ export default function CaregiverResidentsTab() {
     const handleCloseModal = () => {
         setShowModal(false);
         setSelectedResident(null);
+    };
+
+    const handleResidentUpdated = async () => {
+        fetchResidents(true); // background refresh — won't trigger full-page loading screen
+
+        if (selectedResident) {
+            try {
+                const currentUserStr = localStorage.getItem('currentUser');
+                const currentUserId = JSON.parse(currentUserStr).id;
+                const fullResident = await get(`/residents/full/${selectedResident.id}?currentUserId=${currentUserId}`);
+                setSelectedResident(fullResident);
+            } catch (err) {
+                console.error('Error refreshing resident details:', err);
+            }
+        }
     };
 
     if (loading) {
@@ -168,7 +188,7 @@ export default function CaregiverResidentsTab() {
                 <ResidentDetailModal
                     resident={selectedResident}
                     onClose={handleCloseModal}
-                    onResidentUpdated={fetchResidents}
+                    onResidentUpdated={handleResidentUpdated}
                 />
             )}
         </div>

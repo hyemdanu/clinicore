@@ -18,7 +18,7 @@ import 'primereact/resources/primereact.min.css'; // Add this if missing
 
 // filters for status dropdown
 const STATUS_OPTIONS = [
-    { label: 'All Statuses', value: '' },
+    { label: 'All Statuses', value: 'ALL' },
     { label: 'Pending', value: 'PENDING' },
     { label: 'Approved', value: 'APPROVED' },
     { label: 'Denied', value: 'DENIED' },
@@ -166,12 +166,9 @@ export default function AccountRequests({ embedded = false }) {
     };
 
     // filter requests based on selected status filter
-    const filteredRequests = selectedStatus
-
-        // if status selected, filter requests to only show matching status
-        ? requests.filter(req => req.status === selectedStatus)
-        // if no status selected (empty string = "All"), return all requests
-        : requests;
+    const filteredRequests = selectedStatus === 'ALL'
+        ? requests
+        : requests.filter(req => req.status === selectedStatus);
 
     // handle opening and closing of edit form
     const handleEditRequest = (request, isClosing = false) => {
