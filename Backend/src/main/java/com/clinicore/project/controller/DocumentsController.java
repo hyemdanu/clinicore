@@ -85,4 +85,39 @@ public class DocumentsController {
                     .body(Map.of("message", "Unexpected server error"));
         }
     }
+    @GetMapping("/file/{documentId}")
+    public ResponseEntity<byte[]> viewDocument(
+            @PathVariable Long documentId,
+            @RequestParam Long userId) {
+
+        try {
+            // Get the document bytes
+            byte[] fileBytes = documentService.getDocumentFile(documentId, userId);
+
+            // Fetch document metadata to get the type and title
+            Map<String, Object> docMeta = documentService.getDocumentById(userId, documentId);
+            String type = ((String) docMeta.get("type")).toLowerCase();
+            String title = (String) docMeta.get("title");
+
+            // Determine the content type
+            String contentType;
+            switch (type) {
+                case "pdf": contentType = "application/pdf"; break;
+                case "png": contentType = "image/png"; break;
+                case "jpg":
+                case "jpeg": contentType = "image/jpeg"; break;
+                default: contentType = "application/octet-stream"; // fallback
+            }
+
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "inline; filename=\"" + title + "\"")
+                    .header("Content-Type", contentType)
+                    .body(fileBytes);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 }

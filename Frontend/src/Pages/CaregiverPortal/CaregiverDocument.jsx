@@ -12,6 +12,12 @@ export default function CaregiverDocument({ sidebarOpen }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [docTitle, setDocTitle] = useState("");
+    const [docType, setDocType] = useState("");
+    const [uploading, setUploading] = useState(false);
+    const [showUploadForm, setShowUploadForm] = useState(false);
+
     useEffect(() => {
         fetchAssignedResidents();
     }, []);
@@ -76,9 +82,61 @@ export default function CaregiverDocument({ sidebarOpen }) {
         setError(null);
     };
 
+    const handleUpload = async () => {
+        if (!selectedResident) return alert("Select a resident first");
+        if (!selectedFile || !docTitle || !docType)
+            return alert("Please select a file and enter title/type");
+
+        setUploading(true);
+
+        try {
+            const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+            const formData = new FormData();
+            formData.append("currentUserId", currentUser.id);
+            formData.append("residentId", selectedResident.id);
+            formData.append("title", docTitle);
+            formData.append("type", docType);
+            formData.append("file", selectedFile);
+
+            const response = await fetch(
+                "http://localhost:8080/api/documents/upload",
+                {
+                    method: "POST",
+                    body: formData,
+                }
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) throw new Error(result.message || "Upload failed");
+
+            alert(result.message);
+
+            fetchDocuments(selectedResident.id);
+
+            setSelectedFile(null);
+            setDocTitle("");
+            setDocType("");
+            setShowUploadForm(false);
+
+        } catch (err) {
+            console.error(err);
+            alert("Upload failed: " + err.message);
+        } finally {
+            setUploading(false);
+        }
+    };
+
     const filteredDocuments = documents.filter((d) =>
         d.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const openDocument = (docId) => {
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        const url = `http://localhost:8080/api/documents/file/${docId}?userId=${currentUser.id}`;
+        window.open(url, "_blank");
+    };
 
     return (
         <div className="dashboard-container">
@@ -146,11 +204,50 @@ export default function CaregiverDocument({ sidebarOpen }) {
                                         {selectedResident.lastName}
                                     </div>
                                 </div>
+                                {showUploadForm && (
+                                    <div className="upload-section">
+                                        <input
+                                            type="file"
+                                            onChange={(e) => setSelectedFile(e.target.files[0])}
+                                        />
+
+                                        <input
+                                            type="text"
+                                            placeholder="Document Title"
+                                            value={docTitle}
+                                            onChange={(e) => setDocTitle(e.target.value)}
+                                        />
+
+                                        <input
+                                            type="text"
+                                            placeholder="Document Type"
+                                            value={docType}
+                                            onChange={(e) => setDocType(e.target.value)}
+                                        />
+
+                                        <button
+                                            className="upload-button"
+                                            onClick={handleUpload}
+                                            disabled={uploading}
+                                        >
+                                            {uploading ? "Uploading..." : "Upload"}
+                                        </button>
+
+                                        <button
+                                            className="cancel-button"
+                                            onClick={() => setShowUploadForm(false)}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                )}
                                 {filteredDocuments.length > 0 ? (
                                     filteredDocuments.map((doc) => (
                                         <div
                                             key={doc.id}
                                             className="document-row"
+                                            style={{ cursor: "pointer" }}
+                                            onClick={() => openDocument(doc.id)}
                                         >
                                             <i
                                                 className="pi pi-file"
@@ -174,7 +271,14 @@ export default function CaregiverDocument({ sidebarOpen }) {
                         )}
                 </div>
                 {/* Floating Action Button */}
-                <button className="documents-fab">+</button>
+                {selectedResident && (
+                    <button
+                        className="documents-fab"
+                        onClick={() => setShowUploadForm(true)}
+                    >
+                        +
+                    </button>
+                )}
 
             </main>
         </div>
