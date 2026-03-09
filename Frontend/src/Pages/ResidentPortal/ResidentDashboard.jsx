@@ -18,7 +18,7 @@ import documentsIcon from "../../assets/icons/dashboardicon.png";   // placehold
 export default function ResidentDashboard() {
     const navigate = useNavigate();
 
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
 
     const [resident, setResident] = useState(null);
     const [unreadCount, setUnreadCount] = useState(0);

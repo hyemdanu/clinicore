@@ -105,6 +105,52 @@
     padding-top: 0;
 }
 
+.documents-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.resident-documents-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.back-button {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+    margin-left: 8px;
+    border: none;
+    background: #2f80ed;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 6px 14px rgba(47, 128, 237, 0.25);
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.back-button:hover {
+    background: #276dd1;
+}
+
+.back-button:active {
+    transform: scale(0.97);
+}
+
+.back-arrow {
+    font-size: 16px;
+    line-height: 1;
+    position: relative;
+    top: -2px;
+}
+
 
 
 

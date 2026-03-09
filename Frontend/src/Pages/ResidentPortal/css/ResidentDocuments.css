@@ -45,6 +45,20 @@ main.dashboard-content {
     border: 1px solid #e0e0e0;
 }
 
+.documents-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    color: #666;
+}
+
+.documents-loading i {
+    font-size: 18px;
+    color: #369DF7;
+}
+
 .document-row {
     display: flex;
     align-items: center;

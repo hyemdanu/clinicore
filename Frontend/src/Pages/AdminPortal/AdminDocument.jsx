@@ -124,57 +124,67 @@ export default function AdminDocuments({ sidebarOpen }) {
     );
 
     return (
-        <div className="documents-page">
-            <h2 className="dashboard-title">Documents</h2>
-
-            {/* Search */}
-            <div className="search-container">
-                <i className="pi pi-search search-icon"></i>
-                <input
-                    type="text"
-                    className="search-input"
-                    placeholder={selectedResident ? "Search documents..." : "Search residents..."}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
-            </div>
-
-            {error && <div className="error-message">{error}</div>}
-
-            {loading ? (
-                <div className="residents-loading">
-                    <i className="pi pi-spin pi-spinner"></i>
-                    <span>Loading...</span>
+        <div className="dashboard-container">
+            <main
+                className={`admin-documents-content ${
+                    sidebarOpen ? "content-with-sidebar" : ""
+                }`}
+            >
+                <h2 className="dashboard-title">Documents</h2>
+                {/* Search */}
+                <div className="documents-search">
+                    <img src={searchIcon} alt="Search" className="search-icon" />
+                    <input
+                        type="text"
+                        placeholder="Search Document Name or Code"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
                 </div>
-            ) : (
-                <div className="residents-list">
+
+                {!selectedResident && (
+                    <div className="residents-section-label">
+                        All Residents
+                    </div>
+                )}
+
+                <div className="documents-box">
+                    {error && <div style={{ color: "red" }}>{error}</div>}
+
+                    {loading && (
+                        <div className="residents-loading">
+                            <i className="pi pi-spin pi-spinner"></i>
+                            <span>Loading...</span>
+                        </div>
+                    )}
+
                     {!selectedResident
-                        ? filteredResidents.map(resident => (
+                        ? filteredResidents.map((resident) => (
                             <div
                                 key={resident.id}
-                                className="resident-item"
+                                className="document-row"
                                 onClick={() => fetchDocuments(resident)}
+                                style={{ cursor: "pointer" }}
                             >
-                                <div className="resident-avatar"><i className="pi pi-folder"></i></div>
-                                <span className="resident-name">{resident.firstName} {resident.lastName}</span>
+                                <div className="resident-avatar">
+                                    <i className="pi pi-user"></i>
+                                </div>
+                                <span className="document-name">
+                                    {resident.firstName} {resident.lastName}
+                                </span>
                             </div>
                         ))
-                        : (
+                        : !loading &&
+                        !error && (
                             <>
-                                {/* Document header + back button */}
                                 <div className="documents-header">
-                                    <h3>{selectedResident.firstName}'s Documents</h3>
-                                    <button className="back-button" onClick={goBack}>← Back</button>
+                                    <button className="back-button" onClick={goBack} aria-label="Back">
+                                        <span className="back-arrow">←</span>
+                                    </button>
+                                    <div className="resident-documents-title">
+                                        {selectedResident.firstName} {selectedResident.lastName}
+                                    </div>
                                 </div>
-
-                                {/* Floating Add button */}
-                                <button
-                                    className="documents-fab"
-                                    onClick={() => setShowUploadForm(true)}
-                                    title="Add Document"
-                                >
-                                    +
-                                </button>
 
                                 {/* Upload form (only shows after clicking +) */}
                                 {showUploadForm && (
@@ -192,27 +202,53 @@ export default function AdminDocuments({ sidebarOpen }) {
                                             value={docType}
                                             onChange={(e) => setDocType(e.target.value)}
                                         />
-                                        <button onClick={handleUpload} disabled={uploading}>
-                                            {uploading ? "Uploading..." : "Upload"}
+                                        <button className="upload-button" onClick={handleUpload} disabled={uploading}>
+                                            <span>{uploading ? "Uploading..." : "Upload"}</span>
                                         </button>
-                                        <button onClick={() => setShowUploadForm(false)}>Cancel</button>
+                                        <button className="cancel-button" onClick={() => setShowUploadForm(false)}>
+                                            <span>Cancel</span>
+                                        </button>
                                     </div>
                                 )}
 
-                                {/* Document list */}
-                                {filteredDocuments.length === 0
-                                    ? <div className="no-residents">No documents found</div>
-                                    : filteredDocuments.map(doc => (
-                                        <div key={doc.id} className="resident-item">
-                                            <div className="resident-avatar"><i className="pi pi-file"></i></div>
-                                            <span className="resident-name">{doc.title}</span>
+                                {filteredDocuments.length > 0 ? (
+                                    filteredDocuments.map((doc) => (
+                                        <div
+                                            key={doc.id}
+                                            className="document-row"
+                                        >
+                                            <i
+                                                className="pi pi-file"
+                                                style={{
+                                                    fontSize: "16px",
+                                                    marginRight: "12px",
+                                                }}
+                                            ></i>
+                                            <span className="document-name">
+                                                {doc.title}
+                                            </span>
                                         </div>
                                     ))
-                                }
+                                ) : (
+                                    <div>
+                                        No documents found for{" "}
+                                        {selectedResident.firstName}.
+                                    </div>
+                                )}
                             </>
                         )}
                 </div>
-            )}
+
+                {selectedResident && (
+                    <button
+                        className="documents-fab"
+                        onClick={() => setShowUploadForm(true)}
+                        title="Add Document"
+                    >
+                        +
+                    </button>
+                )}
+            </main>
         </div>
     );
 }

@@ -10,6 +10,7 @@ import CaregiverSidebar from "../../Components/CaregiverSidebar.jsx";
 import CaregiverResidentsTab from './CResidentsTab.jsx';
 import CaregiverProfile from "./CaregiverProfile";
 import CaregiverDocument from "./CaregiverDocument";
+import MessagesTab from '../Shared/MessagesTab';
 import InventoryLanding from '../Shared/InventoryLanding.jsx';
 import MedicationInventory from '../Shared/CaregiverMedicationInventory.jsx';
 import ConsumablesInventory from '../Shared/ConsumablesInventory.jsx';
@@ -19,14 +20,9 @@ import 'primeicons/primeicons.css';
 export default function CaregiverDashboard() {
     const navigate = useNavigate();
 
-    // sidebar and tab state
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
     const [activeTab, setActiveTab] = useState("dashboard");
-
-    // data for displaying in the table
     const [residents, setResidents] = useState([]);
-
-    // loading and error states
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -41,12 +37,10 @@ export default function CaregiverDashboard() {
         'consumables-inventory': "Medical Consumables Inventory"
     };
 
-    // toggle the sidebar
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
 
-    // medication progress card
     const MedicationProgressCard = ({percent}) => {
         return (
             <div className="progress-card">
@@ -69,7 +63,6 @@ export default function CaregiverDashboard() {
         );
     };
 
-    // resident task cards
     const TaskBadge = ({ label, color }) => {
         return (
             <div className="task-badge" style={{ backgroundColor: color }}>
@@ -78,7 +71,6 @@ export default function CaregiverDashboard() {
         );
     };
 
-    // table rows
     const ResidentRow = ({ resident }) => {
         const tasks = resident.tasks || [];
         return (
@@ -213,13 +205,6 @@ export default function CaregiverDashboard() {
         </div>
     );
 
-    const renderPlaceholder = (label) => (
-        <div className="placeholder-content">
-            <h2>{label}</h2>
-            <p>Content coming soon.</p>
-        </div>
-    );
-
     const renderContent = () => {
         switch (activeTab) {
             case "residents":
@@ -227,7 +212,7 @@ export default function CaregiverDashboard() {
             case "profile":
                 return <CaregiverProfile />;
             case "messages":
-                return renderPlaceholder("Messages");
+                return <MessagesTab />;
             case "documents":
                 return <CaregiverDocument />;
             case "inventory":
@@ -243,17 +228,16 @@ export default function CaregiverDashboard() {
     };
 
     return (
-        <div className="dashboard-container">
+        <div className={`dashboard-container ${activeTab === 'messages' ? 'messages-active' : ''}`}>
             <Header onToggleSidebar={toggleSidebar} title={tabTitles[activeTab] || "Dashboard"} />
 
             <CaregiverSidebar
                 isOpen={sidebarOpen}
-                onToggle={toggleSidebar}
                 activeTab={activeTab}
                 onNavigate={setActiveTab}
             />
 
-            <main className={`main-content ${sidebarOpen ? "content-with-sidebar" : ""}`}>
+            <main className={`main-content ${sidebarOpen ? "content-with-sidebar" : ""} ${activeTab === 'messages' ? 'messages-content' : ''}`}>
                 {renderContent()}
             </main>
         </div>
