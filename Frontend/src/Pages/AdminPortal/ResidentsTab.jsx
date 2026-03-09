@@ -103,22 +103,6 @@ export default function ResidentsTab() {
         setSelectedResident(null);
     };
 
-    const handleResidentUpdated = async () => {
-        fetchResidents(); // refresh the summary lists
-
-        // also re-fetch the full resident detail so the open modal reflects changes
-        if (selectedResident) {
-            try {
-                const currentUserStr = localStorage.getItem('currentUser');
-                const currentUserId = JSON.parse(currentUserStr).id;
-                const fullResident = await get(`/residents/full/${selectedResident.id}?currentUserId=${currentUserId}`);
-                setSelectedResident(fullResident);
-            } catch (err) {
-                console.error('Error refreshing resident details:', err);
-            }
-        }
-    };
-
     const toggleSort = () => {
         setSortBy(prev => prev === 'firstName' ? 'lastName' : 'firstName');
     };
