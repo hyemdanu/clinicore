@@ -1,5 +1,11 @@
 
-.main-content {
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    background-color: #f5f6f8;
+}
+
+.admin-documents-content {
     flex: 1;
     margin-left: 0;
     margin-top: 40px;
@@ -10,8 +16,8 @@
     overflow-y: auto;
 }
 
-.main-content.content-with-sidebar {
-    margin-left: 280px;
+.admin-documents-content.content-with-sidebar {
+    margin-left: 20px;
 }
 
 .documents-search {
@@ -113,12 +119,6 @@
     margin-top: 12px;
 }
 
-.resident-documents-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
-}
-
 .back-button {
     width: 32px;
     height: 32px;
@@ -151,8 +151,78 @@
     top: -2px;
 }
 
+.resident-documents-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
 
+.upload-section {
+    margin: 12px 0 16px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
 
+.upload-section input[type="text"],
+.upload-section input[type="file"] {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #d7dde7;
+    background: #fff;
+    font-size: 14px;
+    margin-left: 8px;
+}
 
+.upload-button{
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    margin-left: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+.cancel-button {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    margin-left: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
 
+.upload-button {
+    background: #2f80ed;
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(47, 128, 237, 0.25);
+}
 
+.upload-button:hover {
+    background: #276dd1;
+}
+
+.upload-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    box-shadow: none;
+}
+
+.cancel-button {
+    background: #f1f4f9;
+    color: #2b3a55;
+    border: 1px solid #d7dde7;
+}
+
+.cancel-button:hover {
+    background: #e7edf6;
+}
+
+.upload-button:active,
+.cancel-button:active {
+    transform: scale(0.98);
+}

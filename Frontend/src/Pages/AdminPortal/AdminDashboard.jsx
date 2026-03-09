@@ -11,6 +11,7 @@ import CaregiverResidentList from './CaregiverResidentList';
 import MessagesTab from '../Shared/MessagesTab';
 import AccountRequests from './AccountRequests';
 import AdminProfile from './AdminProfile';
+import AdminDocuments from './AdminDocument';
 import InventoryLanding from '../Shared/InventoryLanding.jsx';
 import MedicationInventory from '../Shared/CaregiverMedicationInventory.jsx';
 import ConsumablesInventory from '../Shared/ConsumablesInventory.jsx';
@@ -83,6 +84,7 @@ export default function AdminDashboard() {
         caregivers: 'Caregivers',
         'account-requests': 'Account Requests',
         user: 'User',
+        documents: 'Documents',
         messages: 'Messages',
         'medication-inventory': 'Medication Inventory',
         'consumables-inventory': 'Medical Consumables Inventory'
@@ -212,6 +214,8 @@ export default function AdminDashboard() {
                 return <AccountRequests embedded={true} />;
             case 'user':
                 return <AdminProfile />;
+            case 'documents':
+                return <AdminDocuments sidebarOpen={sidebarOpen} />
             case 'messages':
                 return <MessagesTab />;
             case 'inventory':

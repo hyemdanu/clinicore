@@ -14,6 +14,8 @@ export default function ResidentDocuments() {
   const [documents, setDocuments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Upload states
   const [selectedFile, setSelectedFile] = useState(null);
@@ -44,6 +46,8 @@ export default function ResidentDocuments() {
     if (!currentUserId) return;
 
     async function fetchDocuments() {
+      setLoading(true);
+      setError(null);
       try {
         const response = await fetch(
             `${API_BASE_URL}/list?userId=${currentUserId}` // <-- use "userId"
@@ -52,6 +56,7 @@ export default function ResidentDocuments() {
         if (!response.ok) {
           console.error("Failed to fetch documents:", response.status);
           setDocuments([]);
+          setError("Failed to load documents");
           return;
         }
 
@@ -60,6 +65,9 @@ export default function ResidentDocuments() {
       } catch (err) {
         console.error("Error fetching documents:", err);
         setDocuments([]);
+        setError("Failed to load documents");
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -147,7 +155,14 @@ export default function ResidentDocuments() {
 
             {/* Document list */}
             <div className="documents-box">
-              {filteredDocuments.length === 0 ? (
+              {loading ? (
+                <div className="documents-loading">
+                  <i className="pi pi-spin pi-spinner"></i>
+                  <span>Loading...</span>
+                </div>
+              ) : error ? (
+                <div className="no-documents">{error}</div>
+              ) : filteredDocuments.length === 0 ? (
                 <div className="no-documents">No documents found</div>
               ) : (
                 filteredDocuments.map((doc) => (
@@ -166,36 +181,6 @@ export default function ResidentDocuments() {
               style={{ display: "none" }}
               onChange={(e) => setSelectedFile(e.target.files[0])}
             />
-
-            {/* Add button */}
-            <button
-              className="documents-fab"
-              onClick={() => document.getElementById("fileInput").click()}
-            >
-              +
-            </button>
-
-            {/* Upload form */}
-            {selectedFile && (
-              <div className="upload-form">
-                <input
-                  type="text"
-                  placeholder="Document Title"
-                  value={docTitle}
-                  onChange={(e) => setDocTitle(e.target.value)}
-                />
-                <input
-                  type="text"
-                  placeholder="Document Type"
-                  value={docType}
-                  onChange={(e) => setDocType(e.target.value)}
-                />
-                <button onClick={handleUpload} disabled={uploading}>
-                  {uploading ? "Uploading..." : "Upload"}
-                </button>
-                <button onClick={() => setSelectedFile(null)}>Cancel</button>
-              </div>
-            )}
           </div>
         </div>
       </main>

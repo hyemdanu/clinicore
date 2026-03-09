@@ -547,3 +547,14 @@
 .dialog-actions--right .p-button.p-button-secondary {
     min-width: 160px;
 }
+
+.main-content {
+    flex: 1;
+    margin-top: 56px;
+    margin-left: 0;
+    padding: 40px;
+    transition: margin-left 0.3s ease;
+    min-height: calc(100vh - 56px);
+    background-color: #f5f6f8;
+    overflow-y: auto;
+}

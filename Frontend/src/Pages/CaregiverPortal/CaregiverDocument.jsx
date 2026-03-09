@@ -107,7 +107,12 @@ export default function CaregiverDocument({ sidebarOpen }) {
                 {/* Document List */}
                 <div className="documents-box">
                     {error && <div style={{ color: "red" }}>{error}</div>}
-                    {loading && <div>Loading...</div>}
+                    {loading && (
+                        <div className="residents-loading">
+                            <i className="pi pi-spin pi-spinner"></i>
+                            <span>Loading...</span>
+                        </div>
+                    )}
 
                     {!selectedResident
                         ? assignedResidents.map((resident) => (
@@ -130,46 +135,47 @@ export default function CaregiverDocument({ sidebarOpen }) {
                         ))
                         : !loading &&
                         !error &&
-                        (filteredDocuments.length > 0 ? (
-                            filteredDocuments.map((doc) => (
-                                <div
-                                    key={doc.id}
-                                    className="document-row"
-                                >
-                                    <i
-                                        className="pi pi-file"
-                                        style={{
-                                            fontSize: "16px",
-                                            marginRight: "12px",
-                                        }}
-                                    ></i>
-                                    <span className="document-name">
-                                          {doc.title}
-                                      </span>
+                        (
+                            <>
+                                <div className="documents-header">
+                                    <button className="back-button" onClick={handleBack} aria-label="Back">
+                                        <span className="back-arrow">←</span>
+                                    </button>
+                                    <div className="resident-documents-title">
+                                        {selectedResident.firstName}{" "}
+                                        {selectedResident.lastName}
+                                    </div>
                                 </div>
-                            ))
-                        ) : (
-                            <div>
-                                No documents found for{" "}
-                                {selectedResident.firstName}.
-                            </div>
-                        ))}
+                                {filteredDocuments.length > 0 ? (
+                                    filteredDocuments.map((doc) => (
+                                        <div
+                                            key={doc.id}
+                                            className="document-row"
+                                        >
+                                            <i
+                                                className="pi pi-file"
+                                                style={{
+                                                    fontSize: "16px",
+                                                    marginRight: "12px",
+                                                }}
+                                            ></i>
+                                            <span className="document-name">
+                                                {doc.title}
+                                            </span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div>
+                                        No documents found for{" "}
+                                        {selectedResident.firstName}.
+                                    </div>
+                                )}
+                            </>
+                        )}
                 </div>
                 {/* Floating Action Button */}
                 <button className="documents-fab">+</button>
 
-                {selectedResident && (
-                    <div
-                        style={{
-                            marginTop: "12px",
-                            cursor: "pointer",
-                            color: "#369DF7",
-                        }}
-                        onClick={handleBack}
-                    >
-                        ← Back to Residents
-                    </div>
-                )}
             </main>
         </div>
     );
