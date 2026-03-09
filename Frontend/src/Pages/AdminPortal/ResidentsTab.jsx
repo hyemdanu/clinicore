@@ -82,7 +82,7 @@ export default function ResidentsTab() {
             const currentUser = JSON.parse(currentUserStr);
             const currentUserId = currentUser.id;
 
-            // fetch resgit diff master -- Frontend/src/Components/CaregiverSidebar.jsxidents list with full details
+
             const residentsData = await get(`/residents/full?currentUserId=${currentUserId}`);
             setResidents(residentsData);
         } catch (error) {
