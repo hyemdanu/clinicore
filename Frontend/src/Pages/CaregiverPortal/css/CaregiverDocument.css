@@ -105,6 +105,48 @@
     padding-top: 0;
 }
 
+.documents-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.resident-documents-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.back-button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid #d9e3f0;
+    background: #f4f8ff;
+    color: #1f4f8a;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+}
+
+.back-button:hover {
+    background: #e7f0ff;
+    border-color: #c6d9f7;
+}
+
+.back-button:active {
+    transform: scale(0.97);
+}
+
+.back-arrow {
+    font-size: 18px;
+    line-height: 1;
+}
+
 
 
 

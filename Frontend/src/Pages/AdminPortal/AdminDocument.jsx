@@ -161,10 +161,12 @@ export default function AdminDocuments({ sidebarOpen }) {
                         ))
                         : (
                             <>
-                                {/* Document header + back button */}
+                                {/* Document header */}
                                 <div className="documents-header">
+                                    <button className="back-button" onClick={goBack} aria-label="Back">
+                                        <span className="back-arrow">←</span>
+                                    </button>
                                     <h3>{selectedResident.firstName}'s Documents</h3>
-                                    <button className="back-button" onClick={goBack}>← Back</button>
                                 </div>
 
                                 {/* Floating Add button */}
@@ -192,10 +194,12 @@ export default function AdminDocuments({ sidebarOpen }) {
                                             value={docType}
                                             onChange={(e) => setDocType(e.target.value)}
                                         />
-                                        <button onClick={handleUpload} disabled={uploading}>
-                                            {uploading ? "Uploading..." : "Upload"}
+                                        <button className="upload-button" onClick={handleUpload} disabled={uploading}>
+                                            <span>{uploading ? "Uploading..." : "Upload"}</span>
                                         </button>
-                                        <button onClick={() => setShowUploadForm(false)}>Cancel</button>
+                                        <button className="cancel-button" onClick={() => setShowUploadForm(false)}>
+                                            <span>Cancel</span>
+                                        </button>
                                     </div>
                                 )}
 
