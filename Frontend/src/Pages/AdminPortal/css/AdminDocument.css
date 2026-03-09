@@ -5,7 +5,7 @@
     background-color: #f5f6f8;
 }
 
-.main-content {
+.admin-documents-content {
     flex: 1;
     margin-left: 0;
     margin-top: 40px;
@@ -16,8 +16,8 @@
     overflow-y: auto;
 }
 
-.main-content.content-with-sidebar {
-    margin-left: 280px;
+.admin-documents-content.content-with-sidebar {
+    margin-left: 20px;
 }
 
 .documents-search {

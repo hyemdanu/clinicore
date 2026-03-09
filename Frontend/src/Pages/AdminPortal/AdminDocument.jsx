@@ -126,7 +126,7 @@ export default function AdminDocuments({ sidebarOpen }) {
     return (
         <div className="dashboard-container">
             <main
-                className={`main-content ${
+                className={`admin-documents-content ${
                     sidebarOpen ? "content-with-sidebar" : ""
                 }`}
             >
