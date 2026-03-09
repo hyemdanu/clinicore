@@ -167,7 +167,10 @@ export default function ResidentDocuments() {
               ) : (
                 filteredDocuments.map((doc) => (
                   <div key={doc.id} className="document-row">
-                    <img src={documentIcon} alt="Document" className="document-icon" />
+                    <i
+                        className="pi pi-file"
+                        style={{ fontSize: "16px", marginRight: "12px" }}
+                    ></i>
                     <span className="document-name">{doc.title}</span>
                   </div>
                 ))

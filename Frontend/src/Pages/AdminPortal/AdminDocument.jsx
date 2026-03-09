@@ -123,6 +123,12 @@ export default function AdminDocuments({ sidebarOpen }) {
         (doc.title || "").toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const openDocument = (docId) => {
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        const url = `http://localhost:8080/api/documents/file/${docId}?userId=${currentUser.id}`;
+        window.open(url, "_blank");
+    };
+
     return (
         <div className="dashboard-container">
             <main
@@ -216,6 +222,8 @@ export default function AdminDocuments({ sidebarOpen }) {
                                         <div
                                             key={doc.id}
                                             className="document-row"
+                                            style={{ cursor: "pointer" }}
+                                            onClick={() => openDocument(doc.id)}
                                         >
                                             <i
                                                 className="pi pi-file"
