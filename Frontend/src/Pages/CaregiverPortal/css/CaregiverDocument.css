@@ -122,20 +122,22 @@
 .back-button {
     width: 36px;
     height: 36px;
+    padding: 0;
     border-radius: 50%;
-    border: 1px solid #d9e3f0;
-    background: #f4f8ff;
-    color: #1f4f8a;
+    margin-left: 8px;
+    border: none;
+    background: #2f80ed;
+    color: #fff;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 6px 14px rgba(47, 128, 237, 0.25);
+    transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 .back-button:hover {
-    background: #e7f0ff;
-    border-color: #c6d9f7;
+    background: #276dd1;
 }
 
 .back-button:active {
