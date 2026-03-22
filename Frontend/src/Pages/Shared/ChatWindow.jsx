@@ -1,6 +1,19 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { get, post, patch, uploadFile } from '../../services/api';
 import './css/messages.css';
+import CryptoJS from 'crypto-js';
+
+// Temporary value
+const sharedKey = 'Key';
+
+const encryptMessage = (message) => {
+    return CryptoJS.AES.encrypt(message, sharedKey).toString();
+};
+
+const decryptMessage = (encryptedMessage) => {
+    const bytes = CryptoJS.AES.decrypt(encryptedMessage, sharedKey);
+    return bytes.toString(CryptoJS.enc.Utf8);
+};
 
 export default function ChatWindow({ conversation, currentUser, onMessageSent, onBack }) {
     const [messages, setMessages] = useState([]);
@@ -32,14 +45,20 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
                 `/messages/chat/conversation/${fetchingConversationId}?userId=${currentUser.id}`
             );
             if (activeConversationId.current !== fetchingConversationId) return;
-            setMessages(prev => (isFirstLoad.current || data.length >= prev.length) ? data : prev);
+
+            const decryptedMessages = data.map(msg => ({
+                ...msg,
+                message: decryptMessage(msg.message),
+            }));
+
+            setMessages(prev => (isFirstLoad.current || decryptedMessages.length >= prev.length) ? decryptedMessages : prev);
         } catch (err) {
             console.error('Error fetching messages:', err);
         } finally {
             isFirstLoad.current = false;
             setLoadingChat(false);
         }
-    }, [conversation, currentUser.id]);
+    }, [conversation, currentUser.id])
 
     const markAsRead = useCallback(async () => {
         if (!conversation) return;
@@ -84,13 +103,16 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
 
         setSending(true);
         lastSentAt.current = Date.now();
+        const encryptedMessage = encryptMessage(newMessage.trim()); // Encrypt the message
         try {
             const sentMessage = await post('/messages/chat/send', {
                 senderId: currentUser.id,
                 recipientId: conversation.otherUserId,
-                message: newMessage.trim()
+                message: encryptedMessage, // Send encrypted message
             });
 
+            // Decrypt the sent message for immediate display
+            sentMessage.message = decryptMessage(sentMessage.message);
             setMessages(prev => [...prev, sentMessage]);
             setNewMessage('');
             lastSentAt.current = Date.now();
