@@ -24,44 +24,56 @@ public class AccountCredentialService {
     private final AccountCredentialRepository accountCredentialRepository;
     private final UserProfileRepository userProfileRepository;
     private final EmailService emailService;
-    private final PasswordService passwordService;  // ← ADD THIS
+    private final PasswordService passwordService;
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
-    // ===== UPDATED CONSTRUCTOR - ADD PasswordService =====
+
     public AccountCredentialService(AccountCredentialRepository accountCredentialRepository,
                                     UserProfileRepository userProfileRepository,
                                     EmailService emailService,
-                                    PasswordService passwordService) {  // ← ADD THIS PARAMETER
+                                    PasswordService passwordService) {
         this.accountCredentialRepository = accountCredentialRepository;
         this.userProfileRepository = userProfileRepository;
         this.emailService = emailService;
         this.passwordService = passwordService;  // ← ADD THIS LINE
     }
-    // ===== END CONSTRUCTOR UPDATE =====
 
-    // ===== UPDATED: authenticate user with username and password using ARGON2 =====
+
+    // authenticate user with username and password using ARGON2
     public Map<String, Object> authenticateUser(String username, String plainPassword) {
 
-        // Find user by username only (not by password!)
-        UserProfile userProfile = userProfileRepository.findByUsername(username)
-                .orElse(null);
+        UserProfile userProfile = userProfileRepository.findByUsername(username).orElse(null);
 
         if (userProfile == null) {
             throw new IllegalArgumentException("Invalid username or password");
         }
 
-        // ===== VERIFY PASSWORD WITH ARGON2 =====
-        boolean isValidPassword = passwordService.verifyPassword(
-                plainPassword,                  // Plain text password from login form
-                userProfile.getPasswordHash()   // Hashed password from database
-        );
+        String storedPassword = userProfile.getPasswordHash();
+        boolean isValidPassword = false;
+
+        //Support multiple password formats
+        if (storedPassword.startsWith("$argon2") || storedPassword.startsWith("{argon2}")) {
+            // Argon2 hash - verify properly
+            isValidPassword = passwordService.verifyPassword(plainPassword, storedPassword);
+        } else {
+            // Plain text - compare directly (fingers crossed)
+            isValidPassword = plainPassword.equals(storedPassword);
+
+            // Auto-upgrade to Argon2 on successful login
+            if (isValidPassword) {
+                String hashed = passwordService.hashPassword(plainPassword);
+                userProfile.setPasswordHash(hashed);
+                userProfileRepository.save(userProfile);
+            }
+        }
+        //
 
         if (!isValidPassword) {
             throw new IllegalArgumentException("Invalid username or password");
         }
-        // ===== END PASSWORD VERIFICATION =====
+
 
         // Optional: Check if password needs rehashing (if algorithm parameters changed)
         if (passwordService.needsRehash(userProfile.getPasswordHash())) {
@@ -78,7 +90,7 @@ public class AccountCredentialService {
 
         return response;
     }
-    // ===== END AUTHENTICATION UPDATE =====
+
 
     // is role string a valid enum type? If yes, return enum role
     public UserProfile.Role validateRole(String roleString) {
@@ -122,17 +134,17 @@ public class AccountCredentialService {
         emailService.sendPasswordResetLink(email, resetLink);
     }
 
-    // ===== UPDATED: Reset password with ARGON2 hashing =====
+    //  Reset password with ARGON2 hashing
     public void resetPassword(String email, String newPassword) {
         UserProfile user = userProfileRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Email not found"));
 
-        // ===== HASH NEW PASSWORD WITH ARGON2 =====
+        //HASH NEW PASSWORD WITH ARGON2
         String hashedPassword = passwordService.hashPassword(newPassword);
         user.setPasswordHash(hashedPassword);
-        // ===== END PASSWORD HASHING =====
+
 
         userProfileRepository.save(user);
     }
-    // ===== END RESET PASSWORD UPDATE =====
+
 }

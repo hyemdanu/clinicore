@@ -7,10 +7,6 @@ import org.springframework.stereotype.Service;
 /**
  * Password Service
  * Handles all password hashing and verification using Argon2
- *
- * This service provides a clean interface for password operations
- * and should be used throughout the application whenever working
- * with passwords.
  */
 @Service
 public class PasswordService {
@@ -24,12 +20,7 @@ public class PasswordService {
 
     /**
      * Hash a plain text password using Argon2
-     *
-     * Example:
-     * String plainPassword = "MyPassword123!";
-     * String hashed = passwordService.hashPassword(plainPassword);
-     * // Result: "$argon2id$v=19$m=65536,t=3,p=1$..."
-     *
+
      * @param plainPassword The plain text password to hash
      * @return The hashed password (safe to store in database)
      * @throws IllegalArgumentException if plainPassword is null or empty
@@ -44,13 +35,7 @@ public class PasswordService {
 
     /**
      * Verify a plain text password against a hashed password
-     *
-     * Example:
-     * String plainPassword = "MyPassword123!";
-     * String hashedPassword = "$argon2id$v=19$m=65536,t=3,p=1$...";
-     * boolean matches = passwordService.verifyPassword(plainPassword, hashedPassword);
-     * // Result: true if passwords match, false otherwise
-     *
+
      * @param plainPassword The plain text password to check
      * @param hashedPassword The hashed password from database
      * @return true if passwords match, false otherwise
@@ -70,16 +55,6 @@ public class PasswordService {
 
     /**
      * Check if a password needs to be rehashed
-     *
-     * This is useful when you upgrade the hashing algorithm parameters.
-     * If this returns true, you should rehash the password on next login.
-     *
-     * Example:
-     * if (passwordService.needsRehash(user.getPassword())) {
-     *     String newHash = passwordService.hashPassword(plainPassword);
-     *     user.setPassword(newHash);
-     *     userRepository.save(user);
-     * }
      *
      * @param hashedPassword The hashed password to check
      * @return true if password should be rehashed with new parameters
