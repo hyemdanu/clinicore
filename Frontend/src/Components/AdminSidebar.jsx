@@ -7,6 +7,7 @@ import userIcon from '../assets/icons/usericon.png';
 import messageIcon from '../assets/icons/Messageicon.png';
 import inventoryIcon from '../assets/icons/inventoryicon.png';
 import documentIcon from '../assets/icons/documentIcon.png';
+import accountRequestIcon from '../assets/icons/accountRequest.png';
 
 
 const AdminSidebar = ({ isOpen, activeTab, onNavigate, onToggle }) => {
@@ -16,7 +17,7 @@ const AdminSidebar = ({ isOpen, activeTab, onNavigate, onToggle }) => {
     { id: 'dashboard', label: 'Dashboard', icon: dashboardIcon },
     { id: 'residents', label: 'Residents', icon: residentIcon },
     { id: 'caregivers', label: 'Caregivers', icon: caregiverIcon },
-    { id: 'account-requests', label: 'Account Requests', icon: documentIcon },
+    { id: 'account-requests', label: 'Account Requests', icon: accountRequestIcon },
     { id: 'user', label: 'User', icon: userIcon },
     { id: 'documents', label: 'Documents', icon: documentIcon },
     { id: 'messages', label: 'Messages', icon: messageIcon },

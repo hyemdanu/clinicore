@@ -7,6 +7,7 @@ import userIcon from "../assets/icons/usericon.png";
 import residentIcon from "../assets/icons/residenticon.png";
 import messagesIcon from "../assets/icons/Messageicon.png";
 import inventoryIcon from "../assets/icons/inventoryicon.png";
+import documentIcon from '../assets/icons/documentIcon.png';
 
 export default function ResidentSidebar({ isOpen, onToggle }) {
     const navigate = useNavigate();
@@ -18,7 +19,7 @@ export default function ResidentSidebar({ isOpen, onToggle }) {
         { label: "Medical Profile", icon: residentIcon, to: "/resident/medical-profile" },
         { label: "Medication", icon: inventoryIcon, to: "/resident/medications" },
         { label: "Messages", icon: messagesIcon, to: "/resident/messages" },
-        { label: "Documents", icon: dashboardIcon, to: "/resident/documents" },
+        { label: "Documents", icon: documentIcon, to: "/resident/documents" },
     ];
 
     const handleLogout = () => {

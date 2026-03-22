@@ -1,22 +1,16 @@
-:root{
-    --resident-sidebar-bg:#f5f5f5;
-    --resident-sidebar-hover:#e0e0e0;
-    --resident-sidebar-active:#d6ebf5;
-    --resident-sidebar-width:280px;
-    --resident-navbar-height:56px;
-    --resident-text:#333;
-}
-
 .resident-sidebar{
     position:fixed;
-    left:0; top:var(--resident-navbar-height);
-    height:calc(100vh - var(--resident-navbar-height));
-    background-color:var(--resident-sidebar-bg);
+    left:0;
+    top:56px;
+    height:calc(100vh - 56px);
+    background-color:#ffffff;
     transition:width .3s ease;
-    z-index:100; overflow:hidden;
-    display:flex; flex-direction:column;
+    z-index:100;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
 }
-.resident-sidebar-open{ width:var(--resident-sidebar-width); }
+.resident-sidebar-open{ width:280px; }
 .resident-sidebar-closed{ width:0; }
 
 .resident-sidebar-nav{ padding-top:20px; flex:1; overflow-y:auto; }
@@ -26,12 +20,12 @@
     padding:16px 24px; cursor:pointer;
     transition:background-color .2s ease;
     white-space:nowrap;
+    width:100%;
 }
-.resident-sidebar-item:hover{ background-color:var(--resident-sidebar-hover); }
+.resident-sidebar-item:hover{ background-color:#e0e0e0; }
 .resident-sidebar-item-active{
-    background-color:var(--resident-sidebar-active);
-    border-radius:0 25px 25px 0;
-    margin-right:20px;
+    background-color:#e3f2fd;
+    border-left:4px solid #369df7;
 }
 
 .resident-sidebar-icon{
@@ -41,7 +35,7 @@
     width:28px; height:28px; object-fit:contain;
 }
 .resident-sidebar-label{
-    margin-left:16px; font-size:16px; font-weight:400; color:var(--resident-text);
+    margin-left:16px; font-size:16px; font-weight:400; color:#333;
 }
 
 .sidebar-logout{
@@ -51,6 +45,7 @@
     white-space:nowrap;
     border-top:1px solid #e0e0e0;
     margin-top:auto;
+    width:100%;
 }
 .sidebar-logout:hover{ background-color:#ffe5e5; }
 
@@ -67,7 +62,7 @@
         display: block;
         position: fixed;
         inset: 0;
-        top: var(--resident-navbar-height);
+        top: 56px;
         background: rgba(0, 0, 0, 0.4);
         z-index: 99;
     }
