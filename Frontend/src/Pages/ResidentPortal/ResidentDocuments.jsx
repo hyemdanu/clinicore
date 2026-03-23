@@ -10,10 +10,12 @@ import documentIcon from "../../assets/icons/documentIcon.png";
 const API_BASE_URL = "http://localhost:8080/api/documents";
 
 export default function ResidentDocuments() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
   const [documents, setDocuments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Upload states
   const [selectedFile, setSelectedFile] = useState(null);
@@ -44,14 +46,18 @@ export default function ResidentDocuments() {
     if (!currentUserId) return;
 
     async function fetchDocuments() {
+      setLoading(true);
+      setError(null);
       try {
         const response = await fetch(
             `${API_BASE_URL}/list?userId=${currentUserId}` // <-- use "userId"
         );
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || "Failed to fetch documents");
+          console.error("Failed to fetch documents:", response.status);
+          setDocuments([]);
+          setError("Failed to load documents");
+          return;
         }
 
         const data = await response.json();
@@ -59,6 +65,9 @@ export default function ResidentDocuments() {
       } catch (err) {
         console.error("Error fetching documents:", err);
         setDocuments([]);
+        setError("Failed to load documents");
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -80,12 +89,13 @@ export default function ResidentDocuments() {
     }
 
     const formData = new FormData();
-    formData.append("currentUserId", storedUser.id); // 🔥 REQUIRED
+    formData.append("currentUserId", storedUser.id);
     formData.append("residentId", storedUser.id);
     formData.append("title", docTitle);
     formData.append("type", docType);
     formData.append("file", selectedFile);
 
+    setUploading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/upload`, {
         method: "POST",
@@ -93,7 +103,10 @@ export default function ResidentDocuments() {
       });
 
       const result = await response.json();
-      if (!response.ok) throw new Error(result.message || "Upload failed");
+      if (!response.ok) {
+        alert("Upload failed: " + (result.message || "Unknown error"));
+        return;
+      }
 
       alert(result.message);
 
@@ -109,6 +122,8 @@ export default function ResidentDocuments() {
 
     } catch (err) {
       alert("Upload failed: " + err.message);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -140,12 +155,22 @@ export default function ResidentDocuments() {
 
             {/* Document list */}
             <div className="documents-box">
-              {filteredDocuments.length === 0 ? (
+              {loading ? (
+                <div className="documents-loading">
+                  <i className="pi pi-spin pi-spinner"></i>
+                  <span>Loading...</span>
+                </div>
+              ) : error ? (
+                <div className="no-documents">{error}</div>
+              ) : filteredDocuments.length === 0 ? (
                 <div className="no-documents">No documents found</div>
               ) : (
                 filteredDocuments.map((doc) => (
                   <div key={doc.id} className="document-row">
-                    <img src={documentIcon} alt="Document" className="document-icon" />
+                    <i
+                        className="pi pi-file"
+                        style={{ fontSize: "16px", marginRight: "12px" }}
+                    ></i>
                     <span className="document-name">{doc.title}</span>
                   </div>
                 ))
@@ -159,36 +184,6 @@ export default function ResidentDocuments() {
               style={{ display: "none" }}
               onChange={(e) => setSelectedFile(e.target.files[0])}
             />
-
-            {/* Add button */}
-            <button
-              className="documents-fab"
-              onClick={() => document.getElementById("fileInput").click()}
-            >
-              +
-            </button>
-
-            {/* Upload form */}
-            {selectedFile && (
-              <div className="upload-form">
-                <input
-                  type="text"
-                  placeholder="Document Title"
-                  value={docTitle}
-                  onChange={(e) => setDocTitle(e.target.value)}
-                />
-                <input
-                  type="text"
-                  placeholder="Document Type"
-                  value={docType}
-                  onChange={(e) => setDocType(e.target.value)}
-                />
-                <button onClick={handleUpload} disabled={uploading}>
-                  {uploading ? "Uploading..." : "Upload"}
-                </button>
-                <button onClick={() => setSelectedFile(null)}>Cancel</button>
-              </div>
-            )}
           </div>
         </div>
       </main>

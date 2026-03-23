@@ -9,7 +9,13 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "communication_portal")
+@SuppressWarnings("JpaDataSourceORMInspection")
+@Table(name = "communication_portal", indexes = {
+        @Index(name = "idx_conversation_id", columnList = "conversation_id"),
+        @Index(name = "idx_conv_recipient_read", columnList = "conversation_id, recipient_id, is_read"),
+        @Index(name = "idx_sender_id", columnList = "sender_id"),
+        @Index(name = "idx_recipient_id", columnList = "recipient_id")
+})
 public class CommunicationPortal {
 
     @Id
@@ -19,7 +25,6 @@ public class CommunicationPortal {
     @Column(name = "sender_id")
     private Long senderId;
 
-    // if admin/caregiver/resident is sending the message
     @Enumerated(EnumType.STRING)
     @Column(name = "sender_role")
     private UserRole senderRole;
@@ -27,12 +32,10 @@ public class CommunicationPortal {
     @Column(name = "recipient_id")
     private Long recipientId;
 
-    // if admin/caregiver/resident is receiving the message
     @Enumerated(EnumType.STRING)
     @Column(name = "recipient_role")
     private UserRole recipientRole;
 
-    // keeping subject for backwards compatibility, not used in chat UI
     private String subject;
 
     @Column(columnDefinition = "TEXT")
@@ -47,28 +50,18 @@ public class CommunicationPortal {
     @Column(name = "is_read")
     private Boolean isRead = false;
 
-    // get type of message from the enum
     @Enumerated(EnumType.STRING)
     @Column(name = "message_type")
     private MessageType messageType = MessageType.TEXT;
 
-    // conversation ID
     @Column(name = "conversation_id")
     private String conversationId;
 
-    // file/image attachment
     @Column(name = "attachment_url")
     private String attachmentUrl;
 
-    // filenames
     @Column(name = "attachment_name")
     private String attachmentName;
-
-    // read with timestamp
-    public void markAsRead() {
-        this.isRead = true;
-        this.readAt = LocalDateTime.now();
-    }
 
     @PrePersist
     protected void onCreate() {
@@ -80,8 +73,8 @@ public class CommunicationPortal {
             messageType = MessageType.TEXT;
         }
         if (conversationId == null && senderId != null && recipientId != null) {
-            Long smaller = Math.min(senderId, recipientId);
-            Long larger = Math.max(senderId, recipientId);
+            long smaller = Math.min(senderId, recipientId);
+            long larger = Math.max(senderId, recipientId);
             conversationId = smaller + "_" + larger;
         }
     }
@@ -92,7 +85,6 @@ public class CommunicationPortal {
         RESIDENT
     }
 
-    // msg enum
     public enum MessageType {
         TEXT,
         IMAGE,

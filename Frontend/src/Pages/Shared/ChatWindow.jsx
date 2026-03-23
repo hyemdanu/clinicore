@@ -2,21 +2,19 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { get, post, patch, uploadFile } from '../../services/api';
 import './css/messages.css';
 
-/*
- * Chat Window
- * displays message bubbles, handles sending messages and file uploads
- */
 export default function ChatWindow({ conversation, currentUser, onMessageSent, onBack }) {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
-    const [initialLoading, setInitialLoading] = useState(false);
     const [sending, setSending] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [loadingChat, setLoadingChat] = useState(false);
 
-    // ref for auto-scrolling to bottom
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
     const isFirstLoad = useRef(true);
+    const lastSentAt = useRef(0);
+    const prevMessageCount = useRef(0);
+    const activeConversationId = useRef(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -25,25 +23,24 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
     const fetchMessages = useCallback(async () => {
         if (!conversation) return;
 
-        // only show loading on first load of this conversation
-        if (isFirstLoad.current) {
-            setInitialLoading(true);
-        }
+        if (!isFirstLoad.current && Date.now() - lastSentAt.current < 5000) return;
 
+        const fetchingConversationId = conversation.conversationId;
+        if (isFirstLoad.current) setLoadingChat(true);
         try {
             const data = await get(
-                `/messages/chat/conversation/${conversation.conversationId}?userId=${currentUser.id}`
+                `/messages/chat/conversation/${fetchingConversationId}?userId=${currentUser.id}`
             );
-            setMessages(data);
+            if (activeConversationId.current !== fetchingConversationId) return;
+            setMessages(prev => (isFirstLoad.current || data.length >= prev.length) ? data : prev);
         } catch (err) {
             console.error('Error fetching messages:', err);
         } finally {
-            setInitialLoading(false);
             isFirstLoad.current = false;
+            setLoadingChat(false);
         }
     }, [conversation, currentUser.id]);
 
-    // mark conversation as read when opened
     const markAsRead = useCallback(async () => {
         if (!conversation) return;
 
@@ -56,30 +53,37 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
         }
     }, [conversation, currentUser.id]);
 
-    // fetch messages when conversation changes
     useEffect(() => {
         if (conversation) {
+            activeConversationId.current = conversation.conversationId;
             isFirstLoad.current = true;
+            prevMessageCount.current = 0;
+            setMessages([]);
             fetchMessages();
             markAsRead();
+
+            const interval = setInterval(fetchMessages, 3000);
+            return () => clearInterval(interval);
         } else {
             setMessages([]);
             isFirstLoad.current = true;
         }
     }, [conversation, fetchMessages, markAsRead]);
 
-    // auto-scroll to bottom when new messages arrive
     useEffect(() => {
-        scrollToBottom();
+        if (messages.length > prevMessageCount.current) {
+            scrollToBottom();
+        }
+        prevMessageCount.current = messages.length;
     }, [messages]);
 
-    // send a text message
     const handleSendMessage = async (e) => {
         e.preventDefault();
 
         if (!newMessage.trim() || sending) return;
 
         setSending(true);
+        lastSentAt.current = Date.now();
         try {
             const sentMessage = await post('/messages/chat/send', {
                 senderId: currentUser.id,
@@ -87,9 +91,9 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
                 message: newMessage.trim()
             });
 
-            // add to messages list
             setMessages(prev => [...prev, sentMessage]);
             setNewMessage('');
+            lastSentAt.current = Date.now();
             onMessageSent?.();
         } catch (err) {
             console.error('Error sending message:', err);
@@ -98,49 +102,45 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
         }
     };
 
-    // handle file selection
     const handleFileSelect = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         setUploading(true);
+        lastSentAt.current = Date.now();
         try {
-            // upload file first
             const uploadResult = await uploadFile('/upload/chat', file);
 
             if (uploadResult.success) {
-                // send message with attachment
                 const sentMessage = await post('/messages/chat/send-with-attachment', {
                     senderId: currentUser.id,
                     recipientId: conversation.otherUserId,
-                    message: '', // optional caption
+                    message: '',
                     messageType: uploadResult.type,
                     attachmentUrl: uploadResult.url,
                     attachmentName: uploadResult.originalName
                 });
 
                 setMessages(prev => [...prev, sentMessage]);
+                lastSentAt.current = Date.now();
                 onMessageSent?.();
             }
         } catch (err) {
             console.error('Error uploading file:', err);
         } finally {
             setUploading(false);
-            // reset file input
             if (fileInputRef.current) {
                 fileInputRef.current.value = '';
             }
         }
     };
 
-    // format message time
     const formatTime = (dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
 
-    // format date for date separators
     const formatDate = (dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
@@ -157,7 +157,6 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
         }
     };
 
-    // check if we need a date separator between messages
     const needsDateSeparator = (currentMsg, prevMsg) => {
         if (!prevMsg) return true;
 
@@ -167,7 +166,6 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
         return currentDate !== prevDate;
     };
 
-    // render attachment based on type
     const renderAttachment = (message) => {
         if (message.messageType === 'IMAGE') {
             return (
@@ -195,7 +193,6 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
         return null;
     };
 
-    // no conversation selected
     if (!conversation) {
         return (
             <div className="chat-window empty">
@@ -224,16 +221,12 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
             </div>
 
             <div className="chat-messages">
-                {initialLoading ? (
-                    <div className="messages-loading">
+                {loadingChat && (
+                    <div className="chat-loading">
                         <i className="pi pi-spin pi-spinner"></i>
-                        <span>Loading messages...</span>
                     </div>
-                ) : messages.length === 0 ? (
-                    <div className="messages-empty">
-                        <p>No messages yet. Say hello!</p>
-                    </div>
-                ) : (
+                )}
+                {!loadingChat && messages.length === 0 ? null : (
                     messages.map((message, index) => (
                         <div key={message.id}>
                             {needsDateSeparator(message, messages[index - 1]) && (

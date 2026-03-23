@@ -147,4 +147,24 @@ public class DocumentService {
 
         return result;
     }
+
+    public byte[] getDocumentFile(Long documentId, Long userId) {
+        UserProfile currentUser = userProfileRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Document document = documentsRepository.findById(documentId)
+                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+
+
+        if (currentUser.getRole() == UserProfile.Role.RESIDENT &&
+                !document.getResidentId().equals(currentUser.getId())) {
+            throw new IllegalArgumentException("You cannot view this document");
+        } else if (currentUser.getRole() == UserProfile.Role.CAREGIVER) {
+            boolean assigned = residentCaregiverRepository
+                    .existsByIdCaregiverIdAndIdResidentId(userId, document.getResidentId());
+            if (!assigned) throw new IllegalArgumentException("You are not assigned to this resident");
+        }
+
+        return document.getDocument();
+    }
 }

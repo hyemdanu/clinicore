@@ -1,17 +1,21 @@
-import React, { useState, useEffect } from "react";
-import "./css/CaregiverDocument.css";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { get } from "../../services/api";
+import "./css/AdminDocument.css";
 import "../Shared/css/residents.css";
 import searchIcon from "../../assets/icons/magnifying-glass.png";
-import { get } from "../../services/api";
 
-export default function CaregiverDocument({ sidebarOpen }) {
-    const [searchTerm, setSearchTerm] = useState("");
-    const [assignedResidents, setAssignedResidents] = useState([]);
+export default function AdminDocuments({ sidebarOpen }) {
+    const navigate = useNavigate();
+    const [residents, setResidents] = useState([]);
+    const [filteredResidents, setFilteredResidents] = useState([]);
     const [selectedResident, setSelectedResident] = useState(null);
     const [documents, setDocuments] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Upload states
     const [selectedFile, setSelectedFile] = useState(null);
     const [docTitle, setDocTitle] = useState("");
     const [docType, setDocType] = useState("");
@@ -19,67 +23,58 @@ export default function CaregiverDocument({ sidebarOpen }) {
     const [showUploadForm, setShowUploadForm] = useState(false);
 
     useEffect(() => {
-        fetchAssignedResidents();
+        fetchResidents();
     }, []);
 
-    const fetchAssignedResidents = async () => {
+    useEffect(() => {
+        let filtered = [...residents];
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter(resident =>
+                `${resident.firstName} ${resident.lastName}`.toLowerCase().includes(query)
+            );
+        }
+        setFilteredResidents(filtered);
+    }, [residents, searchQuery]);
+
+    const fetchResidents = async () => {
         setLoading(true);
         setError(null);
-
         try {
             const currentUserStr = localStorage.getItem("currentUser");
-            if (!currentUserStr) return;
-
-            const currentUserId = JSON.parse(currentUserStr).id;
-
-            const data = await get(
-                `/caregivers/my-residents?currentUserId=${currentUserId}`
-            );
-
-            setAssignedResidents(data.assigned || []);
-        } catch (err) {
-            console.error(err);
-            setError("Failed to load assigned residents");
+            if (!currentUserStr) return navigate("/");
+            const currentUser = JSON.parse(currentUserStr);
+            const residentsData = await get(`/residents/full?currentUserId=${currentUser.id}`);
+            setResidents(residentsData);
+        } catch (error) {
+            console.error("Error fetching residents:", error);
+            setError("Failed to load residents.");
         } finally {
             setLoading(false);
         }
     };
 
-    const fetchDocuments = async (residentId) => {
-        setLoading(true);
-        setError(null);
-        setDocuments([]);
-
-        try {
-            const currentUserStr = localStorage.getItem("currentUser");
-            if (!currentUserStr) throw new Error("User not logged in");
-
-            const currentUserId = JSON.parse(currentUserStr).id;
-
-            const response = await get(
-                `/documents/resident/${residentId}?userId=${currentUserId}`
-            );
-
-            console.log("Documents from backend:", response);
-
-            setDocuments(response || []);
-        } catch (err) {
-            console.error("Error fetching documents:", err);
-            setError("Failed to load documents");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleResidentClick = (resident) => {
+    const fetchDocuments = async (resident) => {
         setSelectedResident(resident);
-        fetchDocuments(resident.id);
+        setLoading(true);
+        setError(null);
+        try {
+            const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+            const docs = await get(`/documents/resident/${resident.id}?userId=${currentUser.id}`);
+            setDocuments(docs || []);
+        } catch (error) {
+            console.error("Error fetching documents:", error);
+            setError("Failed to load documents.");
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleBack = () => {
+    const goBack = () => {
         setSelectedResident(null);
         setDocuments([]);
-        setError(null);
+        setSearchQuery("");
+        setShowUploadForm(false);
     };
 
     const handleUpload = async () => {
@@ -91,7 +86,6 @@ export default function CaregiverDocument({ sidebarOpen }) {
 
         try {
             const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-
             const formData = new FormData();
             formData.append("currentUserId", currentUser.id);
             formData.append("residentId", selectedResident.id);
@@ -99,37 +93,34 @@ export default function CaregiverDocument({ sidebarOpen }) {
             formData.append("type", docType);
             formData.append("file", selectedFile);
 
-            const response = await fetch(
-                "http://localhost:8080/api/documents/upload",
-                {
-                    method: "POST",
-                    body: formData,
-                }
-            );
+            const response = await fetch(`http://localhost:8080/api/documents/upload`, {
+                method: "POST",
+                body: formData,
+            });
 
             const result = await response.json();
-
             if (!response.ok) throw new Error(result.message || "Upload failed");
 
             alert(result.message);
 
-            fetchDocuments(selectedResident.id);
+            // refresh documents
+            fetchDocuments(selectedResident);
 
+            // reset upload form
             setSelectedFile(null);
             setDocTitle("");
             setDocType("");
             setShowUploadForm(false);
-
         } catch (err) {
-            console.error(err);
             alert("Upload failed: " + err.message);
+            console.error(err);
         } finally {
             setUploading(false);
         }
     };
 
-    const filteredDocuments = documents.filter((d) =>
-        d.title.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredDocuments = documents.filter(doc =>
+        (doc.title || "").toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const openDocument = (docId) => {
@@ -141,30 +132,31 @@ export default function CaregiverDocument({ sidebarOpen }) {
     return (
         <div className="dashboard-container">
             <main
-                className={`main-content ${
+                className={`admin-documents-content ${
                     sidebarOpen ? "content-with-sidebar" : ""
                 }`}
             >
                 <h2 className="dashboard-title">Documents</h2>
-                {/* Search Bar */}
+                {/* Search */}
                 <div className="documents-search">
                     <img src={searchIcon} alt="Search" className="search-icon" />
                     <input
                         type="text"
                         placeholder="Search Document Name or Code"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
 
                 {!selectedResident && (
                     <div className="residents-section-label">
-                        Assigned to You
+                        All Residents
                     </div>
                 )}
-                {/* Document List */}
+
                 <div className="documents-box">
                     {error && <div style={{ color: "red" }}>{error}</div>}
+
                     {loading && (
                         <div className="residents-loading">
                             <i className="pi pi-spin pi-spinner"></i>
@@ -173,74 +165,58 @@ export default function CaregiverDocument({ sidebarOpen }) {
                     )}
 
                     {!selectedResident
-                        ? assignedResidents.map((resident) => (
+                        ? filteredResidents.map((resident) => (
                             <div
                                 key={resident.id}
                                 className="document-row"
-                                onClick={() =>
-                                    handleResidentClick(resident)
-                                }
+                                onClick={() => fetchDocuments(resident)}
                                 style={{ cursor: "pointer" }}
                             >
                                 <div className="resident-avatar">
                                     <i className="pi pi-user"></i>
                                 </div>
                                 <span className="document-name">
-                                      {resident.firstName}{" "}
-                                    {resident.lastName}
-                                  </span>
+                                    {resident.firstName} {resident.lastName}
+                                </span>
                             </div>
                         ))
                         : !loading &&
-                        !error &&
-                        (
+                        !error && (
                             <>
                                 <div className="documents-header">
-                                    <button className="back-button" onClick={handleBack} aria-label="Back">
+                                    <button className="back-button" onClick={goBack} aria-label="Back">
                                         <span className="back-arrow">←</span>
                                     </button>
                                     <div className="resident-documents-title">
-                                        {selectedResident.firstName}{" "}
-                                        {selectedResident.lastName}
+                                        {selectedResident.firstName} {selectedResident.lastName}
                                     </div>
                                 </div>
+
+                                {/* Upload form (only shows after clicking +) */}
                                 {showUploadForm && (
                                     <div className="upload-section">
-                                        <input
-                                            type="file"
-                                            onChange={(e) => setSelectedFile(e.target.files[0])}
-                                        />
-
+                                        <input type="file" onChange={(e) => setSelectedFile(e.target.files[0])} />
                                         <input
                                             type="text"
                                             placeholder="Document Title"
                                             value={docTitle}
                                             onChange={(e) => setDocTitle(e.target.value)}
                                         />
-
                                         <input
                                             type="text"
                                             placeholder="Document Type"
                                             value={docType}
                                             onChange={(e) => setDocType(e.target.value)}
                                         />
-
-                                        <button
-                                            className="upload-button"
-                                            onClick={handleUpload}
-                                            disabled={uploading}
-                                        >
-                                            {uploading ? "Uploading..." : "Upload"}
+                                        <button className="upload-button" onClick={handleUpload} disabled={uploading}>
+                                            <span>{uploading ? "Uploading..." : "Upload"}</span>
                                         </button>
-
-                                        <button
-                                            className="cancel-button"
-                                            onClick={() => setShowUploadForm(false)}
-                                        >
-                                            Cancel
+                                        <button className="cancel-button" onClick={() => setShowUploadForm(false)}>
+                                            <span>Cancel</span>
                                         </button>
                                     </div>
                                 )}
+
                                 {filteredDocuments.length > 0 ? (
                                     filteredDocuments.map((doc) => (
                                         <div
@@ -270,16 +246,16 @@ export default function CaregiverDocument({ sidebarOpen }) {
                             </>
                         )}
                 </div>
-                {/* Floating Action Button */}
+
                 {selectedResident && (
                     <button
                         className="documents-fab"
                         onClick={() => setShowUploadForm(true)}
+                        title="Add Document"
                     >
                         +
                     </button>
                 )}
-
             </main>
         </div>
     );

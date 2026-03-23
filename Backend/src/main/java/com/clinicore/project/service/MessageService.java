@@ -9,13 +9,10 @@ import com.clinicore.project.repository.UserProfileRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * message service handing message logic
- */
 @Service
 public class MessageService {
 
@@ -28,13 +25,25 @@ public class MessageService {
         this.userProfileRepository = userProfileRepository;
     }
 
-    /**
-     * get all conversations for a user
-     * returns list with last message preview and unread count
-     */
     public List<ConversationDTO> getUserConversations(Long userId) {
-        // get the latest message from each conversation
         List<CommunicationPortal> latestMessages = messagesRepository.findUserConversations(userId);
+
+        if (latestMessages.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        Set<Long> otherUserIds = new HashSet<>();
+        for (CommunicationPortal msg : latestMessages) {
+            Long otherUserId = msg.getSenderId().equals(userId) ? msg.getRecipientId() : msg.getSenderId();
+            otherUserIds.add(otherUserId);
+        }
+        Map<Long, UserProfile> userMap = userProfileRepository.findAllById(otherUserIds).stream()
+                .collect(Collectors.toMap(UserProfile::getId, Function.identity()));
+
+        Map<String, Long> unreadMap = new HashMap<>();
+        for (Object[] row : messagesRepository.countUnreadByConversation(userId)) {
+            unreadMap.put((String) row[0], (Long) row[1]);
+        }
 
         List<ConversationDTO> conversations = new ArrayList<>();
 
@@ -42,26 +51,22 @@ public class MessageService {
             ConversationDTO dto = new ConversationDTO();
             dto.setConversationId(msg.getConversationId());
 
-            // figure out who the other person is
             Long otherUserId = msg.getSenderId().equals(userId) ? msg.getRecipientId() : msg.getSenderId();
             dto.setOtherUserId(otherUserId);
 
-            // get the other person's name and role
-            UserProfile otherUser = userProfileRepository.findById(otherUserId).orElse(null);
+            UserProfile otherUser = userMap.get(otherUserId);
             if (otherUser != null) {
                 dto.setOtherUserName(otherUser.getFirstName() + " " + otherUser.getLastName());
                 dto.setOtherUserRole(otherUser.getRole() != null ? otherUser.getRole().name() : null);
             }
 
-            // last message preview
             dto.setLastMessage(msg.getMessage());
             dto.setLastMessageType(msg.getMessageType() != null ? msg.getMessageType().name() : "TEXT");
             dto.setLastMessageAt(msg.getSentAt());
             dto.setLastMessageSenderId(msg.getSenderId());
 
-            // count unread in this conversation
-            Integer unreadCount = messagesRepository.countUnreadInConversation(msg.getConversationId(), userId);
-            dto.setUnreadCount(unreadCount != null ? unreadCount : 0);
+            Long unread = unreadMap.getOrDefault(msg.getConversationId(), 0L);
+            dto.setUnreadCount(unread.intValue());
 
             conversations.add(dto);
         }
@@ -69,39 +74,34 @@ public class MessageService {
         return conversations;
     }
 
-    /**
-     * get all messages in a conversation
-     */
     public List<MessageDTO> getConversationMessages(String conversationId) {
         List<CommunicationPortal> messages = messagesRepository.findByConversationIdOrderBySentAtAsc(conversationId);
 
+        if (messages.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        Set<Long> userIds = new HashSet<>();
+        for (CommunicationPortal msg : messages) {
+            userIds.add(msg.getSenderId());
+            userIds.add(msg.getRecipientId());
+        }
+        Map<Long, UserProfile> userMap = userProfileRepository.findAllById(userIds).stream()
+                .collect(Collectors.toMap(UserProfile::getId, Function.identity()));
+
         return messages.stream()
                 .map(msg -> {
-                    // get sender and recipient names
-                    String senderName = null;
-                    String recipientName = null;
-
-                    UserProfile sender = userProfileRepository.findById(msg.getSenderId()).orElse(null);
-                    if (sender != null) {
-                        senderName = sender.getFirstName() + " " + sender.getLastName();
-                    }
-
-                    UserProfile recipient = userProfileRepository.findById(msg.getRecipientId()).orElse(null);
-                    if (recipient != null) {
-                        recipientName = recipient.getFirstName() + " " + recipient.getLastName();
-                    }
-
+                    UserProfile sender = userMap.get(msg.getSenderId());
+                    UserProfile recipient = userMap.get(msg.getRecipientId());
+                    String senderName = sender != null ? sender.getFirstName() + " " + sender.getLastName() : null;
+                    String recipientName = recipient != null ? recipient.getFirstName() + " " + recipient.getLastName() : null;
                     return MessageDTO.fromEntityWithNames(msg, senderName, recipientName);
                 })
                 .collect(Collectors.toList());
     }
 
-    /**
-     * send a text message
-     */
     @Transactional
     public MessageDTO sendMessage(Long senderId, Long recipientId, String messageText) {
-        // get sender and recipient info
         UserProfile sender = userProfileRepository.findById(senderId)
                 .orElseThrow(() -> new RuntimeException("Sender not found"));
         UserProfile recipient = userProfileRepository.findById(recipientId)
@@ -114,7 +114,6 @@ public class MessageService {
         message.setRecipientRole(convertRole(recipient.getRole()));
         message.setMessage(messageText);
         message.setMessageType(CommunicationPortal.MessageType.TEXT);
-        // conversationId is auto-generated in @PrePersist
 
         CommunicationPortal saved = messagesRepository.save(message);
 
@@ -124,9 +123,6 @@ public class MessageService {
         return MessageDTO.fromEntityWithNames(saved, senderName, recipientName);
     }
 
-    /**
-     * send a message with attachment (image or file)
-     */
     @Transactional
     public MessageDTO sendMessageWithAttachment(Long senderId, Long recipientId,
                                                  String messageText,
@@ -156,34 +152,17 @@ public class MessageService {
         return MessageDTO.fromEntityWithNames(saved, senderName, recipientName);
     }
 
-    /**
-     * mark all messages in a conversation as read for a user
-     */
     @Transactional
     public void markConversationAsRead(String conversationId, Long userId) {
-        List<CommunicationPortal> unread = messagesRepository.findUnreadInConversation(conversationId, userId);
-
-        for (CommunicationPortal msg : unread) {
-            msg.markAsRead();
-        }
-
-        messagesRepository.saveAll(unread);
+        messagesRepository.bulkMarkAsRead(conversationId, userId);
     }
 
-    /**
-     * get total unread count for a user for notis
-     */
     public Integer getTotalUnreadCount(Long userId) {
         Integer count = messagesRepository.countTotalUnread(userId);
         return count != null ? count : 0;
     }
 
-    /**
-     * get users available to chat with
-     * returns all users except the current user
-     */
     public List<UserProfile> getAvailableUsers(Long currentUserId) {
-        // verify current user exists first
         if (currentUserId == null) {
             throw new RuntimeException("Current user ID is required");
         }
@@ -196,18 +175,12 @@ public class MessageService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * convert UserProfile.Role to CommunicationPortal.UserRole
-     * they're the same values but different enums so we gotta convert
-     */
+    // same values, different enums
     private CommunicationPortal.UserRole convertRole(UserProfile.Role role) {
         if (role == null) return null;
         return CommunicationPortal.UserRole.valueOf(role.name());
     }
 
-    /**
-     * generate conversationId from two user IDs
-     */
     public String generateConversationId(long userId1, long userId2) {
         long smaller = Math.min(userId1, userId2);
         long larger = Math.max(userId1, userId2);

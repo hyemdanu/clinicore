@@ -18,7 +18,7 @@ import documentsIcon from "../../assets/icons/dashboardicon.png";   // placehold
 export default function ResidentDashboard() {
     const navigate = useNavigate();
 
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
 
     const [resident, setResident] = useState(null);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -50,7 +50,7 @@ export default function ResidentDashboard() {
 
                 // Try all requests, but don't block rendering if some fail
                 const results = await Promise.allSettled([
-                    get(`/residents/profile?currentUserId=${currentUserId}`),
+                    get(`/user/${currentUserId}/profile?currentUserId=${currentUserId}`),
                     get(`/residents/medications?currentUserId=${currentUserId}`),
                     get(`/residents/messages/unread?currentUserId=${currentUserId}`),
                     get(`/residents/documents/recent?currentUserId=${currentUserId}&limit=3`),
@@ -62,6 +62,13 @@ export default function ResidentDashboard() {
                 const meds    = val(1, []);
                 const unread  = val(2, 0);
                 const docs    = val(3, []);
+
+                if (profile) {
+                    console.log("Profile data from dashboard:", profile);
+                    setResident(profile);
+                } else {
+                    setResident(currentUser);
+                }
 
                 setResident(profile);
                 setActiveMedCount(Array.isArray(meds) ? meds.length : 0);
