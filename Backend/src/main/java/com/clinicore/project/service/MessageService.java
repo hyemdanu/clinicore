@@ -6,8 +6,10 @@ import com.clinicore.project.entity.CommunicationPortal;
 import com.clinicore.project.entity.UserProfile;
 import com.clinicore.project.repository.MessagesRepository;
 import com.clinicore.project.repository.UserProfileRepository;
+import com.clinicore.project.util.EncryptionUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import javax.crypto.SecretKey;
 
 import java.util.*;
 import java.util.function.Function;
@@ -18,11 +20,13 @@ public class MessageService {
 
     private final MessagesRepository messagesRepository;
     private final UserProfileRepository userProfileRepository;
+    private final SecretKey secretKey;
 
     public MessageService(MessagesRepository messagesRepository,
-                         UserProfileRepository userProfileRepository) {
+                          UserProfileRepository userProfileRepository) {
         this.messagesRepository = messagesRepository;
         this.userProfileRepository = userProfileRepository;
+        this.secretKey = EncryptionUtil.getKey(); // Updated method call
     }
 
     public List<ConversationDTO> getUserConversations(Long userId) {
@@ -108,11 +112,19 @@ public class MessageService {
                 .orElseThrow(() -> new RuntimeException("Recipient not found"));
 
         CommunicationPortal message = new CommunicationPortal();
+
+        // Encrypt message
+        try {
+            String encryptedMessage = EncryptionUtil.encrypt(messageText, secretKey);
+            message.setMessage(encryptedMessage);
+        } catch (Exception e) {
+            // Handle error
+        }
+
         message.setSenderId(senderId);
         message.setSenderRole(convertRole(sender.getRole()));
         message.setRecipientId(recipientId);
         message.setRecipientRole(convertRole(recipient.getRole()));
-        message.setMessage(messageText);
         message.setMessageType(CommunicationPortal.MessageType.TEXT);
 
         CommunicationPortal saved = messagesRepository.save(message);
@@ -135,11 +147,19 @@ public class MessageService {
                 .orElseThrow(() -> new RuntimeException("Recipient not found"));
 
         CommunicationPortal message = new CommunicationPortal();
+
+        // Encrypt message
+        try {
+            String encryptedMessage = EncryptionUtil.encrypt(messageText, secretKey);
+            message.setMessage(encryptedMessage);
+        } catch (Exception e) {
+            // Handle error
+        }
+
         message.setSenderId(senderId);
         message.setSenderRole(convertRole(sender.getRole()));
         message.setRecipientId(recipientId);
         message.setRecipientRole(convertRole(recipient.getRole()));
-        message.setMessage(messageText);
         message.setMessageType(messageType);
         message.setAttachmentUrl(attachmentUrl);
         message.setAttachmentName(attachmentName);
