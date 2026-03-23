@@ -17,27 +17,30 @@ public class MedicalServices {
 
     @Column(name = "hospice_agency")
     private String hospiceAgency;
-    
+
     @Column(name = "preferred_hospital")
     private String preferredHospital;
-    
+
     @Column(name = "preferred_pharmacy")
     private String preferredPharmacy;
-    
+
     @Column(name = "home_health_agency")
     private String homeHealthAgency;
-    
+
     private String mortuary;
-    
+
     @Column(name = "dnr_polst")
     private String dnrPolst;
-    
+
     private Boolean hospice;
-    
+
     @Column(name = "home_health")
     private Boolean homeHealth;
-    
+
     private String notes;
+
+    @Column(name = "data_hash")             // SHA-256 hash of all service fields
+    private String dataHash;                // set via ResidentMedicalInformationService.updateMedicalServicesHash()
 
     // Relationship is owned by MedicalProfile (the owning side is the medical services property in MedicalProfile)
     // MedicalProfile controls the FK via @JoinColumn

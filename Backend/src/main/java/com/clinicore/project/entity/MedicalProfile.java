@@ -23,6 +23,9 @@ public class MedicalProfile {
     @Column
     private String notes;
 
+    @Column(name = "data_hash")             // SHA-256 hash of insurance + notes
+    private String dataHash;                // set via ResidentMedicalInformationService.updateMedicalProfileHash()
+
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
