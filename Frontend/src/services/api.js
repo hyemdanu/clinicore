@@ -15,6 +15,12 @@ const apiFetch = async (endpoint, method = 'GET', data = null) => {
         method,
     };
 
+    // attach JWT token if user is logged in
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    if (user?.token) {
+        config.headers = { ...config.headers, Authorization: `Bearer ${user.token}` };
+    }
+
     // add parsed body if data is provided
     if (data) {
         config.body = JSON.stringify(data);
@@ -54,9 +60,16 @@ export const uploadFile = async (endpoint, file) => {
     const formData = new FormData();
     formData.append('file', file);
 
+    const headers = {};
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    if (user?.token) {
+        headers['Authorization'] = `Bearer ${user.token}`;
+    }
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         credentials: 'include',
+        headers,
         body: formData,
         // don't set Content-Type header - browser will set it with boundary
     });

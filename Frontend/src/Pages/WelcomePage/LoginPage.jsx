@@ -35,11 +35,12 @@ export default function LoginPage() {
                 passwordHash: password
             });
 
-            // Store user data in localStorage for session management
+            // Store user data + JWT token in localStorage for session management
             localStorage.setItem('currentUser', JSON.stringify({
                 id: data.id,
                 username: data.username,
-                role: data.role
+                role: data.role,
+                token: data.token
             }));
 
             // Redirect by role

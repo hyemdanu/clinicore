@@ -26,6 +26,7 @@ public class AccountCredentialService {
     private final UserProfileRepository userProfileRepository;
     private final EmailService emailService;
     private final PasswordService passwordService;
+    private final JwtService jwtService;
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
@@ -33,11 +34,13 @@ public class AccountCredentialService {
     public AccountCredentialService(AccountCredentialRepository accountCredentialRepository,
                                     UserProfileRepository userProfileRepository,
                                     EmailService emailService,
-                                    PasswordService passwordService) {
+                                    PasswordService passwordService,
+                                    JwtService jwtService) {
         this.accountCredentialRepository = accountCredentialRepository;
         this.userProfileRepository = userProfileRepository;
         this.emailService = emailService;
         this.passwordService = passwordService;
+        this.jwtService = jwtService;
     }
 
     // authenticate user with username and password using ARGON2
@@ -82,11 +85,19 @@ public class AccountCredentialService {
             userProfileRepository.save(userProfile);
         }
 
+        // Generate JWT token
+        String token = jwtService.generateToken(
+                userProfile.getId(),
+                userProfile.getUsername(),
+                userProfile.getRole().toString()
+        );
+
         // Build and return authentication response on success
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("id", userProfile.getId());
         response.put("username", userProfile.getUsername());
         response.put("role", userProfile.getRole().toString());
+        response.put("token", token);
 
         return response;
     }
