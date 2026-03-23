@@ -50,6 +50,9 @@ public class AccountCredentialService {
         }
 
         String storedPassword = userProfile.getPasswordHash();
+        if (storedPassword == null) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
         boolean isValidPassword = false;
 
         //Support multiple password formats
