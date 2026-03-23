@@ -5,6 +5,7 @@ import com.clinicore.project.entity.*;
 import com.clinicore.project.repository.*;
 import com.clinicore.project.util.HashUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
  * The verifyXxxIntegrity() helpers throw SecurityException if tampering is detected.
  */
 @Service
+@Transactional(readOnly = true)
 public class ResidentMedicalInformationService {
 
     // repositories for db access

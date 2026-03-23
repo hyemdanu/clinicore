@@ -13,9 +13,11 @@ package com.clinicore.project.service;
 import com.clinicore.project.entity.*;
 import com.clinicore.project.repository.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 @Service
+@Transactional(readOnly = true)
 public class UserProfileService {
 
     // variables

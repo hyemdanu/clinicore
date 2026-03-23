@@ -3,6 +3,7 @@ package com.clinicore.project.service;
 import com.clinicore.project.entity.*;
 import com.clinicore.project.repository.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.*;
@@ -52,19 +53,20 @@ public class DocumentService {
     }
 
     // Get ALL documents for a resident (or all if admin/caregiver)
+    @Transactional(readOnly = true)
     public List<Map<String, Object>> getDocuments(Long userId) {
         UserProfile currentUser = userProfileRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
 
-        List<Document> documents;
+        List<DocumentsRepository.DocumentMetadata> documents;
         if (currentUser.getRole() == UserProfile.Role.ADMIN || currentUser.getRole() == UserProfile.Role.CAREGIVER) {
-            documents = documentsRepository.findAll();
+            documents = documentsRepository.findAllMetadata();
         } else {
-            documents = documentsRepository.findByResidentId(currentUser.getId());
+            documents = documentsRepository.findMetadataByResidentId(currentUser.getId());
         }
 
         List<Map<String, Object>> result = new ArrayList<>();
-        for (Document doc : documents) {
+        for (DocumentsRepository.DocumentMetadata doc : documents) {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("id", doc.getId());
             map.put("title", doc.getTitle());
@@ -77,6 +79,7 @@ public class DocumentService {
     }
 
     // Get Single Document (by ID)
+    @Transactional(readOnly = true)
     public Map<String, Object> getDocumentById(Long userId, Long documentId) {
         UserProfile currentUser = userProfileRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
@@ -100,42 +103,30 @@ public class DocumentService {
         return map;
     }
 
+    @Transactional(readOnly = true)
     public List<Map<String, Object>> getDocumentsForResident(Long userId, Long residentId) {
 
         UserProfile currentUser = userProfileRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        List<Document> docs;
-
-        if (currentUser.getRole() == UserProfile.Role.ADMIN) {
-            docs = documentsRepository.findByResidentId(residentId);
-        }
-        else if (currentUser.getRole() == UserProfile.Role.CAREGIVER) {
-
+        if (currentUser.getRole() == UserProfile.Role.CAREGIVER) {
             boolean assigned = residentCaregiverRepository
                     .existsByIdCaregiverIdAndIdResidentId(userId, residentId);
-
             if (!assigned) {
                 throw new IllegalArgumentException("You are not assigned to this resident");
             }
-
-            docs = documentsRepository.findByResidentId(residentId);
-        }
-        else if (currentUser.getRole() == UserProfile.Role.RESIDENT) {
-
+        } else if (currentUser.getRole() == UserProfile.Role.RESIDENT) {
             if (!currentUser.getId().equals(residentId)) {
                 throw new IllegalArgumentException("You cannot view this resident's documents");
             }
-
-            docs = documentsRepository.findByResidentId(residentId);
-        }
-        else {
+        } else if (currentUser.getRole() != UserProfile.Role.ADMIN) {
             throw new IllegalArgumentException("Invalid role");
         }
 
-        List<Map<String, Object>> result = new ArrayList<>();
+        List<DocumentsRepository.DocumentMetadata> docs = documentsRepository.findMetadataByResidentId(residentId);
 
-        for (Document doc : docs) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (DocumentsRepository.DocumentMetadata doc : docs) {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("id", doc.getId());
             map.put("title", doc.getTitle());
@@ -148,13 +139,13 @@ public class DocumentService {
         return result;
     }
 
-    public byte[] getDocumentFile(Long documentId, Long userId) {
+    @Transactional(readOnly = true)
+    public Document getDocumentWithFile(Long documentId, Long userId) {
         UserProfile currentUser = userProfileRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         Document document = documentsRepository.findById(documentId)
                 .orElseThrow(() -> new IllegalArgumentException("Document not found"));
-
 
         if (currentUser.getRole() == UserProfile.Role.RESIDENT &&
                 !document.getResidentId().equals(currentUser.getId())) {
@@ -165,6 +156,6 @@ public class DocumentService {
             if (!assigned) throw new IllegalArgumentException("You are not assigned to this resident");
         }
 
-        return document.getDocument();
+        return document;
     }
 }

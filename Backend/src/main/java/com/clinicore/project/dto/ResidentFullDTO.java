@@ -1,5 +1,7 @@
 package com.clinicore.project.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -89,11 +91,22 @@ public class ResidentFullDTO {
     public static class MedicationDTO {
         private Long id;
         private Long medicationInventoryId;
+
+        @NotBlank(message = "Medication name is required")
+        @Size(max = 255, message = "Medication name must be under 255 characters")
         private String name;
+
+        @Size(max = 255, message = "Dosage must be under 255 characters")
         private String dosage;
+
+        @Size(max = 255, message = "Schedule must be under 255 characters")
         private String schedule;
+
         private Integer inventoryQuantity;
+
+        @Size(max = 1000, message = "Notes must be under 1000 characters")
         private String notes;
+
         private String intakeStatus;
         private String lastAdministeredAt;
         private String nextDoseTime;
@@ -107,8 +120,14 @@ public class ResidentFullDTO {
     public static class AllergyDTO {
         private Long id;
         private Long residentId;
+
+        @NotBlank(message = "Allergy type is required")
+        @Size(max = 255, message = "Allergy type must be under 255 characters")
         private String allergyType;
+
         private Integer severity;
+
+        @Size(max = 1000, message = "Notes must be under 1000 characters")
         private String notes;
     }
 
@@ -119,7 +138,12 @@ public class ResidentFullDTO {
     public static class DiagnosisDTO {
         private Long id;
         private Long residentId;
+
+        @NotBlank(message = "Diagnosis is required")
+        @Size(max = 500, message = "Diagnosis must be under 500 characters")
         private String diagnosis;
+
+        @Size(max = 1000, message = "Notes must be under 1000 characters")
         private String notes;
     }
 

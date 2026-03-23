@@ -1,6 +1,6 @@
 import React from "react";
 import "./css/caregiver.css";
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -107,41 +107,26 @@ export default function CaregiverDashboard() {
             const currentUser = JSON.parse(currentUserStr);
             const currentUserId = currentUser.id;
 
-            const data = await get(`/user/residents/list?currentUserId=${currentUserId}`);
+            // lightweight endpoint — returns only names + medication status counts
+            const data = await get(`/residents/medication-summary?currentUserId=${currentUserId}`);
 
-            const residentsWithTasks = await Promise.all(
-                (data || []).map(async (r) => {
-                    const medications = await get(
-                        `/user/residents/medication/list?currentUserId=${currentUserId}&residentId=${r.id}`
-                    );
+            const residentsWithTasks = (data || []).map((r) => {
+                const counts = r.medicationCounts || {
+                    ADMINISTERED: 0, PENDING: 0, MISSED: 0, WITHHELD: 0
+                };
 
-                    const counts = {
-                        ADMINISTERED: 0,
-                        PENDING: 0,
-                        MISSED: 0,
-                        WITHHELD: 0
-                    };
-
-                    (medications || []).forEach((med) => {
-                        const status = med.intakeStatus || "PENDING";
-                        if (counts[status] !== undefined) {
-                            counts[status] += 1;
-                        }
-                    });
-
-                    return {
-                        id: r.id,
-                        name: `${r.firstName} ${r.lastName}`.trim(),
-                        counts,
-                        tasks: [
-                            { label: `Taken ${counts.ADMINISTERED}`, color: "#2ecc71" },
-                            { label: `Pending ${counts.PENDING}`, color: "#f1c40f" },
-                            { label: `Missed ${counts.MISSED}`, color: "#e74c3c" },
-                            { label: `Withheld ${counts.WITHHELD}`, color: "#8e44ad" }
-                        ]
-                    };
-                })
-            );
+                return {
+                    id: r.id,
+                    name: `${r.firstName} ${r.lastName}`.trim(),
+                    counts,
+                    tasks: [
+                        { label: `Taken ${counts.ADMINISTERED}`, color: "#2ecc71" },
+                        { label: `Pending ${counts.PENDING}`, color: "#f1c40f" },
+                        { label: `Missed ${counts.MISSED}`, color: "#e74c3c" },
+                        { label: `Withheld ${counts.WITHHELD}`, color: "#8e44ad" }
+                    ]
+                };
+            });
 
             setResidents(residentsWithTasks);
         } catch (err) {
@@ -156,15 +141,18 @@ export default function CaregiverDashboard() {
         fetchResidents();
     }, [fetchResidents]);
 
-    const totalTasks = residents.reduce((sum, r) => {
-        if (!r.counts) return sum;
-        return sum + r.counts.ADMINISTERED + r.counts.PENDING + r.counts.MISSED + r.counts.WITHHELD;
-    }, 0);
-    const completedTasks = residents.reduce((sum, r) => {
-        if (!r.counts) return sum;
-        return sum + r.counts.ADMINISTERED;
-    }, 0);
-    const progressPercent = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
+    const { progressPercent } = useMemo(() => {
+        const total = residents.reduce((sum, r) => {
+            if (!r.counts) return sum;
+            return sum + r.counts.ADMINISTERED + r.counts.PENDING + r.counts.MISSED + r.counts.WITHHELD;
+        }, 0);
+        const completed = residents.reduce((sum, r) => {
+            if (!r.counts) return sum;
+            return sum + r.counts.ADMINISTERED;
+        }, 0);
+        const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+        return { totalTasks: total, completedTasks: completed, progressPercent: percent };
+    }, [residents]);
 
     const renderDashboardContent = () => (
         <div className="caregiver-dashboard-content">

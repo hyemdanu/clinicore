@@ -64,7 +64,6 @@ export default function ResidentDashboard() {
                 const docs    = val(3, []);
 
                 if (profile) {
-                    console.log("Profile data from dashboard:", profile);
                     setResident(profile);
                 } else {
                     setResident(currentUser);

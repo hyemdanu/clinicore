@@ -7,7 +7,7 @@ export default function ResetPasswordPage() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
-    const [email, setEmail] = useState("");
+    const [token, setToken] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [message, setMessage] = useState("");
@@ -15,12 +15,12 @@ export default function ResetPasswordPage() {
     const [success, setSuccess] = useState(false);
 
     useEffect(() => {
-        // grab email from URL: /reset-password?email=user@example.com
-        const emailFromUrl = searchParams.get("email");
-        if (!emailFromUrl) {
+        // grab token from URL: /reset-password?token=uuid-here
+        const tokenFromUrl = searchParams.get("token");
+        if (!tokenFromUrl) {
             setMessage("Invalid reset link. Please request a new one.");
         } else {
-            setEmail(emailFromUrl);
+            setToken(tokenFromUrl);
         }
     }, [searchParams]);
 
@@ -28,6 +28,10 @@ export default function ResetPasswordPage() {
         e.preventDefault();
         setMessage("");
 
+        if (newPassword.length < 8) {
+            setMessage("Password must be at least 8 characters.");
+            return;
+        }
         if (newPassword !== confirmPassword) {
             setMessage("Passwords do not match.");
             return;
@@ -36,7 +40,7 @@ export default function ResetPasswordPage() {
         setLoading(true);
         try {
             await post("/accountCredential/reset-password", {
-                email,
+                token,
                 newPassword
             });
 
@@ -60,15 +64,12 @@ export default function ResetPasswordPage() {
             <div className="container-box">
                 <h2>Reset Password</h2>
 
-                {!email ? (
+                {!token ? (
                     <p style={{ color: "red" }}>{message}</p>
                 ) : success ? (
                     <p style={{ color: "green" }}>{message}</p>
                 ) : (
                     <>
-                        <p style={{ color: "#666", marginBottom: "20px", fontSize: "14px" }}>
-                            Resetting password for: <strong>{email}</strong>
-                        </p>
 
                         <form onSubmit={handleResetPassword}>
                             <label htmlFor="newPassword">New Password</label>

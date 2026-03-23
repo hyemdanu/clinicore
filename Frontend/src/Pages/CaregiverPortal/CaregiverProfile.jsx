@@ -56,7 +56,6 @@ export default function CaregiverProfile() {
 
                 // fetch profile from backend
                 const profile = await get(`/user/${currentUserId}/profile?currentUserId=${currentUserId}`);
-                console.log("Caregiver profile loaded:", profile);
                 setCaregiver(profile);
 
                 // populate the form

@@ -9,7 +9,10 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user_profile")
+@Table(name = "user_profile", indexes = {
+    @Index(name = "idx_user_profile_role", columnList = "role"),
+    @Index(name = "idx_user_profile_password_reset_token", columnList = "password_reset_token")
+})
 public class UserProfile {
 
     @Id
@@ -53,18 +56,16 @@ public class UserProfile {
     @Column
     private LocalDateTime updatedAt;
 
+    @Column(name = "password_reset_token")
+    private String passwordResetToken;
 
+    @Column(name = "password_reset_token_expires_at")
+    private LocalDateTime passwordResetTokenExpiresAt;
 
-    // child entities (admin/caregiver/resident) own these relationships via @MapsId
-    // Lazy loading is used to avoid fetching unnecessary data
-    @OneToOne(mappedBy = "userProfile", fetch = FetchType.LAZY)
-    private Admin admin;
-
-    @OneToOne(mappedBy = "userProfile", fetch = FetchType.LAZY)
-    private Caregiver caregiver;
-
-    @OneToOne(mappedBy = "userProfile", fetch = FetchType.LAZY)
-    private Resident resident;
+    // Note: inverse @OneToOne mappings to Admin/Caregiver/Resident were removed.
+    // Hibernate cannot lazily load inverse @OneToOne — it fires a SELECT per UserProfile
+    // per mapping to check if the record exists. With 3 mappings × N users = 3N extra queries.
+    // Instead, load Admin/Caregiver/Resident directly from their repositories when needed.
 
     @PrePersist
     protected void onCreate() {

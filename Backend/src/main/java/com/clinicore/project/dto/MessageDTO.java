@@ -62,4 +62,13 @@ public class MessageDTO {
         }
         return dto;
     }
+
+    // overload: use provided plaintext instead of entity's (encrypted) message field
+    public static MessageDTO fromEntityWithNames(CommunicationPortal msg, String senderName, String recipientName, String plaintextMessage) {
+        MessageDTO dto = fromEntityWithNames(msg, senderName, recipientName);
+        if (dto != null) {
+            dto.setMessage(plaintextMessage);
+        }
+        return dto;
+    }
 }

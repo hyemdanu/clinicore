@@ -9,7 +9,9 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "invitation")
+@Table(name = "invitation", indexes = {
+    @Index(name = "idx_invitation_email", columnList = "email")
+})
 public class Invitation {
 
     @Id

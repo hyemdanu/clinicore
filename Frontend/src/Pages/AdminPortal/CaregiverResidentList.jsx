@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Toast } from 'primereact/toast';
 import { get, post, del, put } from '../../services/api';
 import '../Shared/css/residents.css';
 
@@ -10,9 +11,9 @@ import '../Shared/css/residents.css';
  */
 export default function CaregiverResidentList() {
     const navigate = useNavigate();
+    const toastRef = useRef(null);
 
     const [caregivers, setCaregivers] = useState([]);
-    const [filteredCaregivers, setFilteredCaregivers] = useState([]);
     const [allResidents, setAllResidents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -74,7 +75,7 @@ export default function CaregiverResidentList() {
         fetchAllResidents();
     }, [fetchCaregivers, fetchAllResidents]);
 
-    useEffect(() => {
+    const filteredCaregivers = useMemo(() => {
         let filtered = [...caregivers];
 
         if (searchQuery.trim()) {
@@ -89,7 +90,7 @@ export default function CaregiverResidentList() {
             return a.lastName.localeCompare(b.lastName);
         });
 
-        setFilteredCaregivers(filtered);
+        return filtered;
     }, [caregivers, searchQuery, sortBy]);
 
     const toggleExpanded = (id) => {
@@ -117,7 +118,7 @@ export default function CaregiverResidentList() {
             await del(`/caregivers/${caregiverId}/residents/${residentId}?currentUserId=${currentUser.id}`);
             fetchCaregivers();
         } catch (err) {
-            alert(err.message || 'Failed to remove resident.');
+            toastRef.current?.show({ severity: 'error', summary: 'Error', detail: err.message || 'Failed to remove resident.' });
         }
     };
 
@@ -205,6 +206,7 @@ export default function CaregiverResidentList() {
 
     return (
         <div className="residents-tab">
+            <Toast ref={toastRef} />
             <div className="residents-actions">
                 <button className="action-btn sort-btn" onClick={toggleSort}>
                     <i className="pi pi-sort-alt"></i>

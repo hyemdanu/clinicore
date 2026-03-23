@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
 import { get, post, put, del } from '../../services/api.js';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
@@ -13,6 +14,12 @@ import consumablesIcon from '../../assets/icons/consumablesIcon.png';
 
 export default function ConsumablesInventory() {
     const navigate = useNavigate();
+    const toastRef = useRef(null);
+    const [currentUser] = useState(() => {
+        const str = localStorage.getItem('currentUser');
+        if (!str) return null;
+        return JSON.parse(str);
+    });
 
     // Consumables data
     const [consumables, setConsumables] = useState([]);
@@ -46,19 +53,10 @@ export default function ConsumablesInventory() {
         setError(null);
 
         try {
-            const currentUserStr = localStorage.getItem('currentUser');
-            if (!currentUserStr) {
-                navigate('/');
-                return;
-            }
-
-            const currentUser = JSON.parse(currentUserStr);
-            const currentUserId = currentUser.id;
-
-            const data = await get(`/inventory/consumables?currentUserId=${currentUserId}`);
+            if (!currentUser) { navigate('/'); return; }
+            const data = await get(`/inventory/consumables?currentUserId=${currentUser.id}`);
             setConsumables(data);
-        } catch (error) {
-            console.error('Error fetching consumables:', error);
+        } catch {
             setError('Failed to load consumables inventory. Please try again.');
         } finally {
             setLoading(false);
@@ -67,20 +65,18 @@ export default function ConsumablesInventory() {
 
     const handleAdjustQuantity = async (consumable, change) => {
         if (consumable.quantity === 0 && change < 0) {
-            alert('Quantity cannot be less than 0');
+            toastRef.current?.show({ severity: 'warn', summary: 'Invalid', detail: 'Quantity cannot be less than 0' });
             return;
         }
         try {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             const newQuantity = Math.max(0, consumable.quantity + change);
             await put(`/inventory/consumables/${consumable.id}?currentUserId=${currentUser.id}`, {
                 ...consumable,
                 quantity: newQuantity
             });
-            await fetchConsumables();
-        } catch (error) {
-            console.error('Error adjusting quantity:', error);
-            alert('Failed to adjust quantity. Please try again.');
+            setConsumables(prev => prev.map(c => c.id === consumable.id ? { ...c, quantity: newQuantity } : c));
+        } catch {
+            toastRef.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to adjust quantity. Please try again.' });
         }
     };
 
@@ -92,65 +88,59 @@ export default function ConsumablesInventory() {
 
     const handleSaveEdit = async () => {
         if (!editFormData.name.trim() || !editFormData.quantity) {
-            alert('Please fill in all fields');
+            toastRef.current?.show({ severity: 'warn', summary: 'Missing Fields', detail: 'Please fill in all fields' });
             return;
         }
         const quantity = parseInt(editFormData.quantity);
         if (quantity < 0) {
-            alert('Quantity cannot be negative. Please enter a value of 0 or greater.');
+            toastRef.current?.show({ severity: 'warn', summary: 'Invalid', detail: 'Quantity cannot be negative. Please enter a value of 0 or greater.' });
             return;
         }
         try {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             await put(`/inventory/consumables/${selectedConsumable.id}?currentUserId=${currentUser.id}`, {
                 ...selectedConsumable,
                 name: editFormData.name.trim(),
                 quantity
             });
-            await fetchConsumables();
+            setConsumables(prev => prev.map(c => c.id === selectedConsumable.id ? { ...c, name: editFormData.name.trim(), quantity } : c));
             setEditDialogVisible(false);
             setSelectedConsumable(null);
             setEditFormData({ name: '', quantity: '' });
-        } catch (error) {
-            console.error('Error updating consumable:', error);
-            alert('Failed to update consumable. Please try again.');
+        } catch {
+            toastRef.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to update consumable. Please try again.' });
         }
     };
 
     const handleDeleteConsumable = async (consumable) => {
         if (!window.confirm(`Are you sure you want to delete ${consumable.name}?`)) return;
         try {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             await del(`/inventory/consumables/${consumable.id}?currentUserId=${currentUser.id}`);
-            await fetchConsumables();
-        } catch (error) {
-            console.error('Error deleting consumable:', error);
-            alert('Failed to delete consumable. Please try again.');
+            setConsumables(prev => prev.filter(c => c.id !== consumable.id));
+        } catch {
+            toastRef.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to delete consumable. Please try again.' });
         }
     };
 
     const handleAddConsumable = async () => {
         if (!addFormData.name.trim() || !addFormData.quantity) {
-            alert('Please fill in all fields');
+            toastRef.current?.show({ severity: 'warn', summary: 'Missing Fields', detail: 'Please fill in all fields' });
             return;
         }
         const quantity = parseInt(addFormData.quantity);
         if (quantity < 0) {
-            alert('Quantity cannot be negative. Please enter a value of 0 or greater.');
+            toastRef.current?.show({ severity: 'warn', summary: 'Invalid', detail: 'Quantity cannot be negative. Please enter a value of 0 or greater.' });
             return;
         }
         try {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            await post(`/inventory/consumables?currentUserId=${currentUser.id}`, {
+            const created = await post(`/inventory/consumables?currentUserId=${currentUser.id}`, {
                 name: addFormData.name.trim(),
                 quantity
             });
-            await fetchConsumables();
+            setConsumables(prev => [...prev, created]);
             setAddDialogVisible(false);
             setAddFormData({ name: '', quantity: '' });
-        } catch (error) {
-            console.error('Error adding consumable:', error);
-            alert('Failed to add consumable. Please try again.');
+        } catch {
+            toastRef.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to add consumable. Please try again.' });
         }
     };
 
@@ -209,6 +199,7 @@ export default function ConsumablesInventory() {
 
     return (
         <div className="consumables-inventory-content">
+            <Toast ref={toastRef} />
             <div className="inventory-header-section">
                 <div className="header-icon-wrapper">
                     <img src={consumablesIcon} alt="Consumables" className="header-icon" />

@@ -38,6 +38,7 @@ public class AccountCreationRequestService {
 
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final PasswordService passwordService;
 
 
     // construct the service layer with all repositories
@@ -49,7 +50,8 @@ public class AccountCreationRequestService {
             CaregiverRepository caregiverRepository,
             AdminRepository adminRepository,
             EmailService emailService,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            PasswordService passwordService){
         this.accountCreationRequestRepository = accountCreationRequestRepository;
 
         this.userProfileRepository = userProfileRepository;
@@ -58,6 +60,7 @@ public class AccountCreationRequestService {
         this.adminRepository = adminRepository;
         this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
+        this.passwordService = passwordService;
     }
 
 
@@ -456,6 +459,7 @@ public class AccountCreationRequestService {
         newUser.setLastName(request.getLastName());
         newUser.setEmail(request.getEmail());
         newUser.setUsername(username);
+        hashedPassword = passwordService.hashPassword(password);  //  Hash with Argon2
         newUser.setPasswordHash(hashedPassword);
         newUser.setGender(gender);
         newUser.setBirthday(LocalDate.parse(birthday));
@@ -517,4 +521,5 @@ public class AccountCreationRequestService {
         admin.setUserProfile(userProfile);
         adminRepository.save(admin);
     }
+
 }

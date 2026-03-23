@@ -3,6 +3,7 @@ package com.clinicore.project.controller;
 import com.clinicore.project.dto.MedicalConsumableDTO;
 import com.clinicore.project.dto.MedicationInventoryDTO;
 import com.clinicore.project.service.InventoryService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +48,7 @@ public class InventoryController {
 
     @PostMapping("/medication")
     public ResponseEntity<?> createMedicationInventory(@RequestParam Long currentUserId,
-                                                       @RequestBody MedicationInventoryDTO medicationDTO) {
+                                                       @Valid @RequestBody MedicationInventoryDTO medicationDTO) {
         try {
             MedicationInventoryDTO created = inventoryService.createMedicationInventory(currentUserId, medicationDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
@@ -64,7 +65,7 @@ public class InventoryController {
     @PutMapping("/medication/{itemId}")
     public ResponseEntity<?> updateMedicationInventory(@RequestParam Long currentUserId,
                                                        @PathVariable Long itemId,
-                                                       @RequestBody MedicationInventoryDTO medicationDTO) {
+                                                       @Valid @RequestBody MedicationInventoryDTO medicationDTO) {
         try {
             MedicationInventoryDTO updated = inventoryService.updateMedicationInventory(currentUserId, itemId, medicationDTO);
             return ResponseEntity.ok(updated);
@@ -102,7 +103,7 @@ public class InventoryController {
  */
     @PostMapping("/consumables")
     public ResponseEntity<?> createConsumableInventory(@RequestParam Long currentUserId,
-                                                       @RequestBody MedicalConsumableDTO consumableDTO) {
+                                                       @Valid @RequestBody MedicalConsumableDTO consumableDTO) {
         try {
             MedicalConsumableDTO created = inventoryService.createConsumableInventory(currentUserId, consumableDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
@@ -122,7 +123,7 @@ public class InventoryController {
     @PutMapping("/consumables/{itemId}")
     public ResponseEntity<?> updateConsumableInventory(@RequestParam Long currentUserId,
                                                        @PathVariable Long itemId,
-                                                       @RequestBody MedicalConsumableDTO consumableDTO) {
+                                                       @Valid @RequestBody MedicalConsumableDTO consumableDTO) {
         try {
             MedicalConsumableDTO updated = inventoryService.updateConsumableInventory(currentUserId, itemId, consumableDTO);
             return ResponseEntity.ok(updated);

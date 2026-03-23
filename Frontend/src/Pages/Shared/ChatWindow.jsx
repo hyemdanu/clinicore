@@ -1,6 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { get, post, patch, uploadFile } from '../../services/api';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { get, post, patch, uploadFile, API_BASE_URL } from '../../services/api';
 import './css/messages.css';
+
+const SERVER_BASE_URL = API_BASE_URL.replace(/\/api$/, '');
 
 export default function ChatWindow({ conversation, currentUser, onMessageSent, onBack }) {
     const [messages, setMessages] = useState([]);
@@ -166,21 +168,41 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
         return currentDate !== prevDate;
     };
 
+    // pre-compute formatted dates/times so they don't recalculate on every render
+    const processedMessages = useMemo(() =>
+        messages.map((msg, index) => ({
+            ...msg,
+            formattedTime: formatTime(msg.sentAt),
+            formattedDate: formatDate(msg.sentAt),
+            showDateSeparator: needsDateSeparator(msg, messages[index - 1])
+        })),
+    [messages]);
+
+    // builds a safe attachment URL — only allows paths starting with /
+    // blocks javascript:, data:, and other dangerous URL schemes
+    const getSafeAttachmentUrl = (attachmentUrl) => {
+        if (!attachmentUrl || !attachmentUrl.startsWith('/')) return null;
+        return `${SERVER_BASE_URL}${attachmentUrl}`;
+    };
+
     const renderAttachment = (message) => {
+        const url = getSafeAttachmentUrl(message.attachmentUrl);
+        if (!url) return null;
+
         if (message.messageType === 'IMAGE') {
             return (
                 <div className="message-image">
                     <img
-                        src={`http://localhost:8080${message.attachmentUrl}`}
+                        src={url}
                         alt={message.attachmentName || 'Image'}
-                        onClick={() => window.open(`http://localhost:8080${message.attachmentUrl}`, '_blank')}
+                        onClick={() => window.open(url, '_blank')}
                     />
                 </div>
             );
         } else if (message.messageType === 'FILE') {
             return (
                 <a
-                    href={`http://localhost:8080${message.attachmentUrl}`}
+                    href={url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="message-file"
@@ -226,12 +248,12 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
                         <i className="pi pi-spin pi-spinner"></i>
                     </div>
                 )}
-                {!loadingChat && messages.length === 0 ? null : (
-                    messages.map((message, index) => (
+                {!loadingChat && processedMessages.length === 0 ? null : (
+                    processedMessages.map((message) => (
                         <div key={message.id}>
-                            {needsDateSeparator(message, messages[index - 1]) && (
+                            {message.showDateSeparator && (
                                 <div className="date-separator">
-                                    <span>{formatDate(message.sentAt)}</span>
+                                    <span>{message.formattedDate}</span>
                                 </div>
                             )}
 
@@ -246,7 +268,7 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
                                     )}
 
                                     <span className="message-time">
-                                        {formatTime(message.sentAt)}
+                                        {message.formattedTime}
                                         {message.senderId === currentUser.id && (
                                             <i className={`pi ${message.isRead ? 'pi-check-circle' : 'pi-check'}`}></i>
                                         )}
