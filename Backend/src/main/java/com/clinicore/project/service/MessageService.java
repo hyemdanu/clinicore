@@ -64,7 +64,10 @@ public class MessageService {
                 dto.setOtherUserRole(otherUser.getRole() != null ? otherUser.getRole().name() : null);
             }
 
-            dto.setLastMessage(msg.getMessage());
+            // Decrypt the last message
+            String decryptedMessage = decryptSafe(msg.getMessage());
+
+            dto.setLastMessage(decryptedMessage);
             dto.setLastMessageType(msg.getMessageType() != null ? msg.getMessageType().name() : "TEXT");
             dto.setLastMessageAt(msg.getSentAt());
             dto.setLastMessageSenderId(msg.getSenderId());
@@ -148,7 +151,7 @@ public class MessageService {
         message.setSenderRole(convertRole(sender.getRole()));
         message.setRecipientId(recipientId);
         message.setRecipientRole(convertRole(recipient.getRole()));
-        message.setMessage(messageText);
+        message.setMessage(encryptionService.encrypt(messageText));
         message.setMessageType(messageType);
         message.setAttachmentUrl(attachmentUrl);
         message.setAttachmentName(attachmentName);
