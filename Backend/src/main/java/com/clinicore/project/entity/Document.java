@@ -34,4 +34,8 @@ public class Document {
     protected void onCreate() {
         uploaded_at = LocalDateTime.now();
     }
+
+    @Column(name = "file_hash")
+    private String fileHash;
+
 }

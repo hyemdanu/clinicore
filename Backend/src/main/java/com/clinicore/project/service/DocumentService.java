@@ -14,13 +14,16 @@ public class DocumentService {
     private final DocumentsRepository documentsRepository;
     private final UserProfileRepository userProfileRepository;
     private final ResidentCaregiverRepository residentCaregiverRepository;
+    private final HashService_SHA256 hashService;
 
     public DocumentService(DocumentsRepository documentsRepository,
                            UserProfileRepository userProfileRepository,
-                           ResidentCaregiverRepository residentCaregiverRepository) {
+                           ResidentCaregiverRepository residentCaregiverRepository,
+                           HashService_SHA256 hashService) {
         this.documentsRepository = documentsRepository;
         this.userProfileRepository = userProfileRepository;
         this.residentCaregiverRepository = residentCaregiverRepository;
+        this.hashService = hashService;
     }
 
     // Upload document
@@ -42,7 +45,10 @@ public class DocumentService {
         document.setResidentId(residentId);
         document.setTitle(title);
         document.setType(type);
-        document.setDocument(file.getBytes());
+        byte[] fileBytes = file.getBytes();
+        String hash = hashService.hashBytes(fileBytes);
+        document.setDocument(fileBytes);
+        document.setFileHash(hash);
         documentsRepository.save(document);
 
         return Map.of(
