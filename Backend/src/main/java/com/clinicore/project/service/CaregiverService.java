@@ -39,6 +39,12 @@ public class CaregiverService {
         }
 
         List<Caregiver> caregivers = caregiverRepository.findAll();
+
+        // batch-load all assignments with profiles in one query (avoids N+1 per caregiver + per assignment)
+        List<ResidentCaregiver> allAssignments = residentCaregiverRepository.findAllWithProfiles();
+        Map<Long, List<ResidentCaregiver>> assignmentsByCaregiver = allAssignments.stream()
+                .collect(Collectors.groupingBy(a -> a.getCaregiver().getUserProfile().getId()));
+
         List<Map<String, Object>> result = new ArrayList<>();
 
         for (Caregiver caregiver : caregivers) {
@@ -51,8 +57,8 @@ public class CaregiverService {
             caregiverMap.put("email", profile.getEmail());
             caregiverMap.put("contactNumber", profile.getContactNumber());
 
-            // look up which residents this caregiver is responsible for
-            List<ResidentCaregiver> assignments = residentCaregiverRepository.findById_CaregiverId(profile.getId());
+            // use pre-loaded assignments instead of querying per caregiver
+            List<ResidentCaregiver> assignments = assignmentsByCaregiver.getOrDefault(profile.getId(), Collections.emptyList());
             List<Map<String, Object>> residentsList = new ArrayList<>();
 
             for (ResidentCaregiver assignment : assignments) {
@@ -184,11 +190,18 @@ public class CaregiverService {
             throw new IllegalArgumentException("Only caregivers can access this endpoint");
         }
 
-        // get all residents assigned to this caregiver
-        List<ResidentCaregiver> myAssignments = residentCaregiverRepository.findById_CaregiverId(currentUserId);
-        Set<Long> myResidentIds = myAssignments.stream()
-                .map(a -> a.getResident().getUserProfile().getId())
-                .collect(Collectors.toSet());
+        // batch-load ALL assignments with profiles in one query (avoids lazy loads on getResident/getCaregiver)
+        // single pass to build both maps instead of iterating twice
+        List<ResidentCaregiver> allAssignments = residentCaregiverRepository.findAllWithProfiles();
+        Map<Long, List<ResidentCaregiver>> assignmentsByResident = new HashMap<>();
+        Set<Long> myResidentIds = new HashSet<>();
+        for (ResidentCaregiver a : allAssignments) {
+            Long residentId = a.getResident().getUserProfile().getId();
+            assignmentsByResident.computeIfAbsent(residentId, k -> new ArrayList<>()).add(a);
+            if (a.getCaregiver().getUserProfile().getId().equals(currentUserId)) {
+                myResidentIds.add(residentId);
+            }
+        }
 
         // get all residents
         List<UserProfile> allResidents = userProfileRepository.findByRole(UserProfile.Role.RESIDENT);
@@ -197,9 +210,6 @@ public class CaregiverService {
         List<Map<String, Object>> others = new ArrayList<>();
 
         for (UserProfile resident : allResidents) {
-            // get all caregivers assigned to this resident
-            List<ResidentCaregiver> residentAssignments = residentCaregiverRepository.findById_ResidentId(resident.getId());
-
             Map<String, Object> residentMap = new LinkedHashMap<>();
             residentMap.put("id", resident.getId());
             residentMap.put("firstName", resident.getFirstName());
@@ -208,7 +218,8 @@ public class CaregiverService {
             if (myResidentIds.contains(resident.getId())) {
                 assigned.add(residentMap);
             } else {
-                // add assigned caregiver names for the indicator
+                // look up from pre-loaded map instead of querying per resident
+                List<ResidentCaregiver> residentAssignments = assignmentsByResident.getOrDefault(resident.getId(), Collections.emptyList());
                 List<String> caregiverNames = residentAssignments.stream()
                         .map(a -> a.getCaregiver().getUserProfile().getFirstName() + " " + a.getCaregiver().getUserProfile().getLastName())
                         .collect(Collectors.toList());

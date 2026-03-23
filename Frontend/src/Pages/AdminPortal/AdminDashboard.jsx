@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -29,7 +29,7 @@ export default function AdminDashboard() {
 
     const [medicationInventory, setMedicationInventory] = useState([]);
     const [consumablesInventory, setConsumablesInventory] = useState([]);
-    const [, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const [medicationSort, setMedicationSort] = useState('quantity-asc');
@@ -58,8 +58,7 @@ export default function AdminDashboard() {
             ]);
             setMedicationInventory(medications);
             setConsumablesInventory(consumables);
-        } catch (error) {
-            console.error('Error fetching inventory data:', error);
+        } catch {
             setError('Failed to load inventory data. Please try again.');
         } finally {
             setLoading(false);
@@ -67,8 +66,10 @@ export default function AdminDashboard() {
     }, [navigate]);
 
     useEffect(() => {
-        fetchInventoryData();
-    }, [fetchInventoryData]);
+        if (activeTab === 'dashboard') {
+            fetchInventoryData();
+        }
+    }, [activeTab, fetchInventoryData]);
 
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
@@ -102,13 +103,13 @@ export default function AdminDashboard() {
         });
     };
 
-    const sortedMedications = sortData(medicationInventory, medicationSort);
-    const sortedConsumables = sortData(consumablesInventory, consumablesSort);
+    const sortedMedications = useMemo(() => sortData(medicationInventory, medicationSort), [medicationInventory, medicationSort]);
+    const sortedConsumables = useMemo(() => sortData(consumablesInventory, consumablesSort), [consumablesInventory, consumablesSort]);
 
-    const lowStockItems = [
+    const lowStockItems = useMemo(() => [
         ...medicationInventory.map(item => ({ ...item, category: 'Medication' })),
         ...consumablesInventory.map(item => ({ ...item, category: 'Consumable' }))
-    ].filter(item => Number(item.quantity) <= 10);
+    ].filter(item => Number(item.quantity) <= 10), [medicationInventory, consumablesInventory]);
 
     const lowStockCount = lowStockItems.length;
 
@@ -129,6 +130,16 @@ export default function AdminDashboard() {
                 <h2 className="dashboard-title">Inventory Dashboard</h2>
             </div>
 
+            {loading && (
+                <div className="caregiver-loading">
+                    <i className="pi pi-spin pi-spinner caregiver-spinner"></i>
+                    <span>Loading inventory...</span>
+                </div>
+            )}
+
+            {!loading && error && <div className="error-message">{error}</div>}
+
+            {!loading && !error && <>
             {lowStockCount > 0 && (
                 <div
                     className="low-stock-alert"
@@ -153,8 +164,6 @@ export default function AdminDashboard() {
                     </div>
                 </div>
             )}
-
-            {error && <div className="error-message">{error}</div>}
 
             <section className="inventory-section">
                 <div className="inventory-header">
@@ -201,6 +210,7 @@ export default function AdminDashboard() {
                     <Column field="quantity" header="Quantity" body={quantityTemplate} style={{ width: '40%' }} />
                 </DataTable>
             </section>
+            </>}
         </>
     );
 

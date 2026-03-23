@@ -18,13 +18,17 @@ public class MessageService {
 
     private final MessagesRepository messagesRepository;
     private final UserProfileRepository userProfileRepository;
+    private final EncryptionService encryptionService;
 
     public MessageService(MessagesRepository messagesRepository,
-                         UserProfileRepository userProfileRepository) {
+                         UserProfileRepository userProfileRepository,
+                         EncryptionService encryptionService) {
         this.messagesRepository = messagesRepository;
         this.userProfileRepository = userProfileRepository;
+        this.encryptionService = encryptionService;
     }
 
+    @Transactional(readOnly = true)
     public List<ConversationDTO> getUserConversations(Long userId) {
         List<CommunicationPortal> latestMessages = messagesRepository.findUserConversations(userId);
 
@@ -74,6 +78,7 @@ public class MessageService {
         return conversations;
     }
 
+    @Transactional(readOnly = true)
     public List<MessageDTO> getConversationMessages(String conversationId) {
         List<CommunicationPortal> messages = messagesRepository.findByConversationIdOrderBySentAtAsc(conversationId);
 
@@ -91,6 +96,10 @@ public class MessageService {
 
         return messages.stream()
                 .map(msg -> {
+                    // decrypt message content before building DTO
+                    String decrypted = decryptSafe(msg.getMessage());
+                    msg.setMessage(decrypted);
+
                     UserProfile sender = userMap.get(msg.getSenderId());
                     UserProfile recipient = userMap.get(msg.getRecipientId());
                     String senderName = sender != null ? sender.getFirstName() + " " + sender.getLastName() : null;
@@ -102,25 +111,26 @@ public class MessageService {
 
     @Transactional
     public MessageDTO sendMessage(Long senderId, Long recipientId, String messageText) {
-        UserProfile sender = userProfileRepository.findById(senderId)
-                .orElseThrow(() -> new RuntimeException("Sender not found"));
-        UserProfile recipient = userProfileRepository.findById(recipientId)
-                .orElseThrow(() -> new RuntimeException("Recipient not found"));
+        UserProfile[] users = loadSenderAndRecipient(senderId, recipientId);
+        UserProfile sender = users[0];
+        UserProfile recipient = users[1];
 
         CommunicationPortal message = new CommunicationPortal();
         message.setSenderId(senderId);
         message.setSenderRole(convertRole(sender.getRole()));
         message.setRecipientId(recipientId);
         message.setRecipientRole(convertRole(recipient.getRole()));
-        message.setMessage(messageText);
+        message.setMessage(encryptionService.encrypt(messageText));
         message.setMessageType(CommunicationPortal.MessageType.TEXT);
 
-        CommunicationPortal saved = messagesRepository.save(message);
+        messagesRepository.save(message);
 
+        // build DTO with plaintext directly — do NOT modify the managed entity
+        // (Hibernate dirty-checking would overwrite the encrypted value back to plaintext)
         String senderName = sender.getFirstName() + " " + sender.getLastName();
         String recipientName = recipient.getFirstName() + " " + recipient.getLastName();
 
-        return MessageDTO.fromEntityWithNames(saved, senderName, recipientName);
+        return MessageDTO.fromEntityWithNames(message, senderName, recipientName, messageText);
     }
 
     @Transactional
@@ -129,10 +139,9 @@ public class MessageService {
                                                  CommunicationPortal.MessageType messageType,
                                                  String attachmentUrl,
                                                  String attachmentName) {
-        UserProfile sender = userProfileRepository.findById(senderId)
-                .orElseThrow(() -> new RuntimeException("Sender not found"));
-        UserProfile recipient = userProfileRepository.findById(recipientId)
-                .orElseThrow(() -> new RuntimeException("Recipient not found"));
+        UserProfile[] users = loadSenderAndRecipient(senderId, recipientId);
+        UserProfile sender = users[0];
+        UserProfile recipient = users[1];
 
         CommunicationPortal message = new CommunicationPortal();
         message.setSenderId(senderId);
@@ -152,27 +161,49 @@ public class MessageService {
         return MessageDTO.fromEntityWithNames(saved, senderName, recipientName);
     }
 
+    // batch-load sender and recipient in one query instead of two
+    private UserProfile[] loadSenderAndRecipient(Long senderId, Long recipientId) {
+        Map<Long, UserProfile> usersById = userProfileRepository.findAllById(List.of(senderId, recipientId)).stream()
+                .collect(Collectors.toMap(UserProfile::getId, Function.identity()));
+
+        UserProfile sender = usersById.get(senderId);
+        if (sender == null) throw new RuntimeException("Sender not found");
+
+        UserProfile recipient = usersById.get(recipientId);
+        if (recipient == null) throw new RuntimeException("Recipient not found");
+
+        return new UserProfile[]{sender, recipient};
+    }
+
     @Transactional
     public void markConversationAsRead(String conversationId, Long userId) {
         messagesRepository.bulkMarkAsRead(conversationId, userId);
     }
 
+    @Transactional(readOnly = true)
     public Integer getTotalUnreadCount(Long userId) {
         Integer count = messagesRepository.countTotalUnread(userId);
         return count != null ? count : 0;
     }
 
+    @Transactional(readOnly = true)
     public List<UserProfile> getAvailableUsers(Long currentUserId) {
         if (currentUserId == null) {
             throw new RuntimeException("Current user ID is required");
         }
 
-        userProfileRepository.findById(currentUserId)
-                .orElseThrow(() -> new RuntimeException("Current user not found with ID: " + currentUserId));
+        return userProfileRepository.findByIdNot(currentUserId);
+    }
 
-        return userProfileRepository.findAll().stream()
-                .filter(user -> user.getId() != null && !user.getId().equals(currentUserId))
-                .collect(Collectors.toList());
+    // try to decrypt
+    private String decryptSafe(String message) {
+        if (message == null || message.isEmpty()) return message;
+        try {
+            return encryptionService.decrypt(message);
+        } catch (Exception e) {
+            // message was stored before encryption was enabled — return plaintext
+            return message;
+        }
     }
 
     // same values, different enums

@@ -1,5 +1,6 @@
-// our backend api
-const API_BASE_URL = "http://localhost:8080/api";
+// reads from .env file
+// fallback to localhost for dev if .env is missing
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
 
 // base options for all requests
 const defaultOptions = {
@@ -26,7 +27,7 @@ const apiFetch = async (endpoint, method = 'GET', data = null) => {
         let errorMessage = `API Error: ${response.status}`;
         try {
             const errorData = await response.json();
-            errorMessage = errorData.message || errorMessage;
+            errorMessage = errorData.message || errorData.error || errorMessage;
         } catch {
             // If response is not JSON, use status text
             errorMessage = `${errorMessage} - ${response.statusText}`;

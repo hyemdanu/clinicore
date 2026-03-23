@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
 import { get, post, put, del } from '../../services/api.js';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
@@ -13,6 +14,12 @@ import medicationsIcon from '../../assets/icons/medicationsIcon.png';
 
 export default function MedicationInventory() {
     const navigate = useNavigate();
+    const toastRef = useRef(null);
+    const [currentUser] = useState(() => {
+        const str = localStorage.getItem('currentUser');
+        if (!str) return null;
+        return JSON.parse(str);
+    });
 
     const [medications, setMedications] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -34,16 +41,10 @@ export default function MedicationInventory() {
         setLoading(true);
         setError(null);
         try {
-            const currentUserStr = localStorage.getItem('currentUser');
-            if (!currentUserStr) {
-                navigate('/');
-                return;
-            }
-            const currentUser = JSON.parse(currentUserStr);
+            if (!currentUser) { navigate('/'); return; }
             const data = await get(`/inventory/medication?currentUserId=${currentUser.id}`);
             setMedications(data);
         } catch (error) {
-            console.error('Error fetching medications:', error);
             setError('Failed to load medication inventory. Please try again.');
         } finally {
             setLoading(false);
@@ -52,20 +53,18 @@ export default function MedicationInventory() {
 
     const handleAdjustQuantity = async (medication, change) => {
         if (medication.quantity === 0 && change < 0) {
-            alert('Quantity cannot be less than 0');
+            toastRef.current?.show({ severity: 'warn', summary: 'Invalid', detail: 'Quantity cannot be less than 0' });
             return;
         }
         try {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             const newQuantity = Math.max(0, medication.quantity + change);
             await put(`/inventory/medication/${medication.id}?currentUserId=${currentUser.id}`, {
                 ...medication,
                 quantity: newQuantity
             });
-            await fetchMedications();
+            setMedications(prev => prev.map(m => m.id === medication.id ? { ...m, quantity: newQuantity } : m));
         } catch (error) {
-            console.error('Error adjusting quantity:', error);
-            alert('Failed to adjust quantity. Please try again.');
+            toastRef.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to adjust quantity. Please try again.' });
         }
     };
 
@@ -77,65 +76,59 @@ export default function MedicationInventory() {
 
     const handleSaveEdit = async () => {
         if (!editFormData.name.trim() || !editFormData.quantity) {
-            alert('Please fill in all fields');
+            toastRef.current?.show({ severity: 'warn', summary: 'Missing Fields', detail: 'Please fill in all fields' });
             return;
         }
         const quantity = parseInt(editFormData.quantity);
         if (quantity < 0) {
-            alert('Quantity cannot be negative. Please enter a value of 0 or greater.');
+            toastRef.current?.show({ severity: 'warn', summary: 'Invalid', detail: 'Quantity cannot be negative. Please enter a value of 0 or greater.' });
             return;
         }
         try {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             await put(`/inventory/medication/${selectedMedication.id}?currentUserId=${currentUser.id}`, {
                 ...selectedMedication,
                 name: editFormData.name.trim(),
                 quantity
             });
-            await fetchMedications();
+            setMedications(prev => prev.map(m => m.id === selectedMedication.id ? { ...m, name: editFormData.name.trim(), quantity } : m));
             setEditDialogVisible(false);
             setSelectedMedication(null);
             setEditFormData({ name: '', quantity: '' });
         } catch (error) {
-            console.error('Error updating medication:', error);
-            alert('Failed to update medication. Please try again.');
+            toastRef.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to update medication. Please try again.' });
         }
     };
 
     const handleDeleteMedication = async (medication) => {
         if (!window.confirm(`Are you sure you want to delete ${medication.name}?`)) return;
         try {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             await del(`/inventory/medication/${medication.id}?currentUserId=${currentUser.id}`);
-            await fetchMedications();
+            setMedications(prev => prev.filter(m => m.id !== medication.id));
         } catch (error) {
-            console.error('Error deleting medication:', error);
-            alert('Failed to delete medication. Please try again.');
+            toastRef.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to delete medication. Please try again.' });
         }
     };
 
     const handleAddMedication = async () => {
         if (!addFormData.name.trim() || !addFormData.quantity) {
-            alert('Please fill in all fields');
+            toastRef.current?.show({ severity: 'warn', summary: 'Missing Fields', detail: 'Please fill in all fields' });
             return;
         }
         const quantity = parseInt(addFormData.quantity);
         if (quantity < 0) {
-            alert('Quantity cannot be negative. Please enter a value of 0 or greater.');
+            toastRef.current?.show({ severity: 'warn', summary: 'Invalid', detail: 'Quantity cannot be negative. Please enter a value of 0 or greater.' });
             return;
         }
         try {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            await post(`/inventory/medication?currentUserId=${currentUser.id}`, {
+            const created = await post(`/inventory/medication?currentUserId=${currentUser.id}`, {
                 name: addFormData.name.trim(),
                 quantity
             });
-            await fetchMedications();
+            setMedications(prev => [...prev, created]);
             setAddDialogVisible(false);
             setAddFormData({ name: '', quantity: '' });
         } catch (error) {
-            console.error('Error adding medication:', error);
-            alert('Failed to add medication. Please try again.');
+            toastRef.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to add medication. Please try again.' });
         }
     };
 
@@ -194,6 +187,7 @@ export default function MedicationInventory() {
 
     return (
         <div className="medication-inventory-content">
+            <Toast ref={toastRef} />
             <div className="inventory-header-section">
                 <div className="header-icon-wrapper">
                     <img src={medicationsIcon} alt="Medication" className="header-icon" />

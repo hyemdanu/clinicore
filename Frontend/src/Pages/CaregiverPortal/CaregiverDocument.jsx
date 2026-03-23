@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Toast } from "primereact/toast";
 import "./css/CaregiverDocument.css";
 import "../Shared/css/residents.css";
 import searchIcon from "../../assets/icons/magnifying-glass.png";
-import { get } from "../../services/api";
+import { get, API_BASE_URL } from "../../services/api";
 
 export default function CaregiverDocument({ sidebarOpen }) {
+    const toastRef = useRef(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [assignedResidents, setAssignedResidents] = useState([]);
     const [selectedResident, setSelectedResident] = useState(null);
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const docCache = useRef({});
 
     const [selectedFile, setSelectedFile] = useState(null);
     const [docTitle, setDocTitle] = useState("");
@@ -45,9 +48,15 @@ export default function CaregiverDocument({ sidebarOpen }) {
         }
     };
 
-    const fetchDocuments = async (residentId) => {
-        setLoading(true);
+    const fetchDocuments = async (residentId, skipCache = false) => {
         setError(null);
+
+        if (!skipCache && docCache.current[residentId]) {
+            setDocuments(docCache.current[residentId]);
+            return;
+        }
+
+        setLoading(true);
         setDocuments([]);
 
         try {
@@ -60,9 +69,9 @@ export default function CaregiverDocument({ sidebarOpen }) {
                 `/documents/resident/${residentId}?userId=${currentUserId}`
             );
 
-            console.log("Documents from backend:", response);
-
-            setDocuments(response || []);
+            const result = response || [];
+            docCache.current[residentId] = result;
+            setDocuments(result);
         } catch (err) {
             console.error("Error fetching documents:", err);
             setError("Failed to load documents");
@@ -83,9 +92,14 @@ export default function CaregiverDocument({ sidebarOpen }) {
     };
 
     const handleUpload = async () => {
-        if (!selectedResident) return alert("Select a resident first");
-        if (!selectedFile || !docTitle || !docType)
-            return alert("Please select a file and enter title/type");
+        if (!selectedResident) {
+            toastRef.current?.show({ severity: "warn", summary: "No Resident", detail: "Select a resident first" });
+            return;
+        }
+        if (!selectedFile || !docTitle || !docType) {
+            toastRef.current?.show({ severity: "warn", summary: "Missing Fields", detail: "Please select a file and enter title/type" });
+            return;
+        }
 
         setUploading(true);
 
@@ -100,7 +114,7 @@ export default function CaregiverDocument({ sidebarOpen }) {
             formData.append("file", selectedFile);
 
             const response = await fetch(
-                "http://localhost:8080/api/documents/upload",
+                `${API_BASE_URL}/documents/upload`,
                 {
                     method: "POST",
                     body: formData,
@@ -111,9 +125,9 @@ export default function CaregiverDocument({ sidebarOpen }) {
 
             if (!response.ok) throw new Error(result.message || "Upload failed");
 
-            alert(result.message);
+            toastRef.current?.show({ severity: "success", summary: "Success", detail: result.message });
 
-            fetchDocuments(selectedResident.id);
+            fetchDocuments(selectedResident.id, true);
 
             setSelectedFile(null);
             setDocTitle("");
@@ -122,7 +136,7 @@ export default function CaregiverDocument({ sidebarOpen }) {
 
         } catch (err) {
             console.error(err);
-            alert("Upload failed: " + err.message);
+            toastRef.current?.show({ severity: "error", summary: "Upload Failed", detail: err.message });
         } finally {
             setUploading(false);
         }
@@ -134,12 +148,13 @@ export default function CaregiverDocument({ sidebarOpen }) {
 
     const openDocument = (docId) => {
         const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-        const url = `http://localhost:8080/api/documents/file/${docId}?userId=${currentUser.id}`;
+        const url = `${API_BASE_URL}/documents/file/${docId}?userId=${currentUser.id}`;
         window.open(url, "_blank");
     };
 
     return (
         <div className="dashboard-container">
+            <Toast ref={toastRef} />
             <main
                 className={`main-content ${
                     sidebarOpen ? "content-with-sidebar" : ""

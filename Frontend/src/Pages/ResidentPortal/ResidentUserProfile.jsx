@@ -37,7 +37,6 @@ export default function ResidentUserProfile() {
                 }
 
                 const profile = await get(`/user/${currentUserId}/profile?currentUserId=${currentUserId}`);
-                console.log("PROFILE RETURNED:", profile);
                 setResident(profile);
 
             } catch (e) {

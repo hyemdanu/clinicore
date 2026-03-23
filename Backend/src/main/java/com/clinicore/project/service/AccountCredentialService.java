@@ -14,8 +14,9 @@ import com.clinicore.project.entity.UserProfile;
 import com.clinicore.project.repository.AccountCredentialRepository;
 import com.clinicore.project.repository.UserProfileRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
 import java.util.*;
-import com.clinicore.project.service.EmailService;
 import org.springframework.beans.factory.annotation.Value;
 
 @Service
@@ -29,7 +30,6 @@ public class AccountCredentialService {
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
-
     public AccountCredentialService(AccountCredentialRepository accountCredentialRepository,
                                     UserProfileRepository userProfileRepository,
                                     EmailService emailService,
@@ -37,9 +37,8 @@ public class AccountCredentialService {
         this.accountCredentialRepository = accountCredentialRepository;
         this.userProfileRepository = userProfileRepository;
         this.emailService = emailService;
-        this.passwordService = passwordService;  // ← ADD THIS LINE
+        this.passwordService = passwordService;
     }
-
 
     // authenticate user with username and password using ARGON2
     public Map<String, Object> authenticateUser(String username, String plainPassword) {
@@ -58,7 +57,7 @@ public class AccountCredentialService {
             // Argon2 hash - verify properly
             isValidPassword = passwordService.verifyPassword(plainPassword, storedPassword);
         } else {
-            // Plain text - compare directly (fingers crossed)
+            // Plain text - compare directly
             isValidPassword = plainPassword.equals(storedPassword);
 
             // Auto-upgrade to Argon2 on successful login
@@ -68,14 +67,12 @@ public class AccountCredentialService {
                 userProfileRepository.save(userProfile);
             }
         }
-        //
 
         if (!isValidPassword) {
             throw new IllegalArgumentException("Invalid username or password");
         }
 
-
-        // Optional: Check if password needs rehashing (if algorithm parameters changed)
+        // Check if password needs rehashing (if algorithm parameters changed)
         if (passwordService.needsRehash(userProfile.getPasswordHash())) {
             String newHash = passwordService.hashPassword(plainPassword);
             userProfile.setPasswordHash(newHash);
@@ -109,6 +106,7 @@ public class AccountCredentialService {
     }
 
 
+    @Transactional(readOnly = true)
     public boolean checkIfUserExistsByEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
             throw new IllegalArgumentException("Email cannot be empty");
@@ -116,6 +114,7 @@ public class AccountCredentialService {
         return userProfileRepository.findByEmail(email).isPresent();
     }
 
+    @Transactional(readOnly = true)
     public String getUsernameByEmail(String email) {
         return userProfileRepository.findByEmail(email)
                 .map(user -> user.getUsername())
@@ -123,28 +122,35 @@ public class AccountCredentialService {
     }
 
     public void sendPasswordReset(String email) {
-        // verify email exists first
-        if (!userProfileRepository.findByEmail(email).isPresent()) {
-            throw new IllegalArgumentException("Email not found");
-        }
-
-        // encode email to be safe in URL
-        String encodedEmail = java.net.URLEncoder.encode(email, java.nio.charset.StandardCharsets.UTF_8);
-        String resetLink = frontendUrl + "/reset-password?email=" + encodedEmail;
-        emailService.sendPasswordResetLink(email, resetLink);
-    }
-
-    //  Reset password with ARGON2 hashing
-    public void resetPassword(String email, String newPassword) {
         UserProfile user = userProfileRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Email not found"));
 
-        //HASH NEW PASSWORD WITH ARGON2
-        String hashedPassword = passwordService.hashPassword(newPassword);
-        user.setPasswordHash(hashedPassword);
-
-
+        // generate a random token and store it with a 1-hour expiry
+        String token = UUID.randomUUID().toString();
+        user.setPasswordResetToken(token);
+        user.setPasswordResetTokenExpiresAt(LocalDateTime.now().plusHours(24));
         userProfileRepository.save(user);
+
+        String resetLink = frontendUrl + "/reset-password?token=" + token;
+        emailService.sendPasswordResetLink(email, resetLink);
     }
 
+    public void resetPassword(String token, String newPassword) {
+        UserProfile user = userProfileRepository.findByPasswordResetToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid or expired reset link"));
+
+        // check if the token has expired
+        if (user.getPasswordResetTokenExpiresAt() == null
+                || user.getPasswordResetTokenExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Reset link has expired. Please request a new one.");
+        }
+
+        // hash new password with Argon2
+        String hashedPassword = passwordService.hashPassword(newPassword);
+        user.setPasswordHash(hashedPassword);
+        // clear the token so it can't be reused
+        user.setPasswordResetToken(null);
+        user.setPasswordResetTokenExpiresAt(null);
+        userProfileRepository.save(user);
+    }
 }

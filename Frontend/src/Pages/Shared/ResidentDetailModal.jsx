@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
+import { Toast } from "primereact/toast";
 import AddMedicationForm from "../Shared/AddMedicationModal.jsx";
 import { patch } from "../../services/api.js";
 import "../Shared/css/residents.css";
@@ -16,6 +17,7 @@ import "../Shared/css/residents.css";
 dayjs.extend(relativeTime);
 
 export default function ResidentDetailModal({ resident, onClose, onResidentUpdated }) {
+    const toastRef = useRef(null);
     const [activeTab, setActiveTab] = useState(() => {
         return localStorage.getItem('residentDetailActiveTab') || "general";
     });
@@ -41,25 +43,9 @@ export default function ResidentDetailModal({ resident, onClose, onResidentUpdat
         setShowAddMedicationForm(false);
     }, [resident.id]);
 
-    useEffect(() => {
-        const interval = setInterval(async () => {
-            if (!showAddMedicationForm && resident.id) {
-                try {
-                    const { get } = await import('../../services/api.js');
-                    const currentUserStr = localStorage.getItem('currentUser');
-                    if (currentUserStr) {
-                        const currentUserId = JSON.parse(currentUserStr).id;
-                        const data = await get(`/residents/full/${resident.id}?currentUserId=${currentUserId}`);
-                        setMedications(data.medications || []);
-                    }
-                } catch (error) {
-                    console.error('Auto-refresh failed:', error);
-                }
-            }
-        }, 5000);
-
-        return () => clearInterval(interval);
-    }, [resident.id, showAddMedicationForm]);
+    // medications stay in sync via:
+    // 1. resident prop updates from parent (line 42)
+    // 2. local state updates after add/edit/delete/status change
 
     if (!resident) {
         return null;
@@ -96,7 +82,7 @@ export default function ResidentDetailModal({ resident, onClose, onResidentUpdat
             );
         } catch (error) {
             console.error("Error updating medication status:", error);
-            alert("Failed to update medication status.");
+            toastRef.current?.show({ severity: "error", summary: "Error", detail: "Failed to update medication status." });
         } finally {
             setUpdatingMedId(null);
         }
@@ -125,7 +111,7 @@ export default function ResidentDetailModal({ resident, onClose, onResidentUpdat
             if (onResidentUpdated) onResidentUpdated();
         } catch (error) {
             console.error("Error updating medication:", error);
-            alert("Failed to update medication");
+            toastRef.current?.show({ severity: "error", summary: "Error", detail: "Failed to update medication" });
         }
     };
 
@@ -143,12 +129,13 @@ export default function ResidentDetailModal({ resident, onClose, onResidentUpdat
             if (onResidentUpdated) onResidentUpdated();
         } catch (error) {
             console.error("Error deleting medication:", error);
-            alert("Failed to delete medication");
+            toastRef.current?.show({ severity: "error", summary: "Error", detail: "Failed to delete medication" });
         }
     };
 
     return (
         <div className="resident-detail-sidebar">
+            <Toast ref={toastRef} />
             <button className="sidebar-close-btn" onClick={handleClose}>
                 <i className="pi pi-times"></i>
             </button>
@@ -180,8 +167,6 @@ export default function ResidentDetailModal({ resident, onClose, onResidentUpdat
                     <MedicalTab
                         services={services}
                         capability={capability}
-                        allergies={allergies}
-                        diagnoses={diagnoses}
                         allergyDetails={allergyDetails}
                         diagnosisDetails={diagnosisDetails}
                         medicalProfile={resident.medicalProfile}
@@ -246,7 +231,8 @@ function GeneralTab({ details }) {
 
 
 // for displaying a label and value pair
-function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails, diagnosisDetails, medicalProfile, residentId, onResidentUpdated }) {
+function MedicalTab({ services, capability, allergyDetails, diagnosisDetails, medicalProfile, residentId, onResidentUpdated }) {
+    const toastRef = useRef(null);
     const [showAddAllergy, setShowAddAllergy] = useState(false);
     const [showAddDiagnosis, setShowAddDiagnosis] = useState(false);
     const [allergyForm, setAllergyForm] = useState({ allergyType: '', severity: 1, notes: '' });
@@ -265,7 +251,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
 
     const handleAddAllergy = async () => {
         if (!allergyForm.allergyType.trim()) {
-            alert("Please enter allergy type");
+            toastRef.current?.show({ severity: "warn", summary: "Missing Field", detail: "Please enter allergy type" });
             return;
         }
 
@@ -282,7 +268,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
             if (onResidentUpdated) onResidentUpdated();
         } catch (error) {
             console.error("Error adding allergy:", error);
-            alert("Failed to add allergy");
+            toastRef.current?.show({ severity: "error", summary: "Error", detail: "Failed to add allergy" });
         } finally {
             setIsSubmitting(false);
         }
@@ -301,13 +287,13 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
             if (onResidentUpdated) onResidentUpdated();
         } catch (error) {
             console.error("Error deleting allergy:", error);
-            alert("Failed to delete allergy");
+            toastRef.current?.show({ severity: "error", summary: "Error", detail: "Failed to delete allergy" });
         }
     };
 
     const handleAddDiagnosis = async () => {
         if (!diagnosisForm.diagnosis.trim()) {
-            alert("Please enter diagnosis");
+            toastRef.current?.show({ severity: "warn", summary: "Missing Field", detail: "Please enter diagnosis" });
             return;
         }
 
@@ -324,7 +310,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
             if (onResidentUpdated) onResidentUpdated();
         } catch (error) {
             console.error("Error adding diagnosis:", error);
-            alert("Failed to add diagnosis");
+            toastRef.current?.show({ severity: "error", summary: "Error", detail: "Failed to add diagnosis" });
         } finally {
             setIsSubmitting(false);
         }
@@ -343,7 +329,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
             if (onResidentUpdated) onResidentUpdated();
         } catch (error) {
             console.error("Error deleting diagnosis:", error);
-            alert("Failed to delete diagnosis");
+            toastRef.current?.show({ severity: "error", summary: "Error", detail: "Failed to delete diagnosis" });
         }
     };
 
@@ -360,7 +346,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
             if (onResidentUpdated) onResidentUpdated();
         } catch (error) {
             console.error("Error updating insurance:", error);
-            alert("Failed to update insurance");
+            toastRef.current?.show({ severity: "error", summary: "Error", detail: "Failed to update insurance" });
         } finally {
             setIsSubmitting(false);
         }
@@ -379,7 +365,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
             if (onResidentUpdated) onResidentUpdated();
         } catch (error) {
             console.error("Error updating medical notes:", error);
-            alert("Failed to update medical notes");
+            toastRef.current?.show({ severity: "error", summary: "Error", detail: "Failed to update medical notes" });
         } finally {
             setIsSubmitting(false);
         }
@@ -398,7 +384,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
             if (onResidentUpdated) onResidentUpdated();
         } catch (error) {
             console.error("Error updating medical services:", error);
-            alert("Failed to update medical services");
+            toastRef.current?.show({ severity: "error", summary: "Error", detail: "Failed to update medical services" });
         } finally {
             setIsSubmitting(false);
         }
@@ -417,7 +403,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
             if (onResidentUpdated) onResidentUpdated();
         } catch (error) {
             console.error("Error updating capabilities:", error);
-            alert("Failed to update capabilities");
+            toastRef.current?.show({ severity: "error", summary: "Error", detail: "Failed to update capabilities" });
         } finally {
             setIsSubmitting(false);
         }
@@ -425,6 +411,7 @@ function MedicalTab({ services, capability, allergies, diagnoses, allergyDetails
 
     return (
         <div className="tab-content medical-tab">
+            <Toast ref={toastRef} />
             <div className="medical-columns">
                 <div className="medical-column">
                     <div className="medical-section">

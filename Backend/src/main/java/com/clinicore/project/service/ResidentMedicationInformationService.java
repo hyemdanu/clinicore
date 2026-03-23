@@ -4,6 +4,7 @@ import com.clinicore.project.dto.MedicationDTO;
 import com.clinicore.project.entity.*;
 import com.clinicore.project.repository.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
  * handles all resident medication data like dosage, frequency, intake status, etc
  */
 @Service
+@Transactional(readOnly = true)
 public class ResidentMedicationInformationService {
 
     // repositories for db access
@@ -109,9 +111,9 @@ public class ResidentMedicationInformationService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
     }
 
-    // find medication by ID
+    // find medication by ID with medical profile pre-loaded (avoids lazy load)
     private Medication getMedicationById(Long medicationId) {
-        return medicationRepository.findById(medicationId)
+        return medicationRepository.findByIdWithProfile(medicationId)
                 .orElseThrow(() -> new IllegalArgumentException("Medication not found with ID: " + medicationId));
     }
 

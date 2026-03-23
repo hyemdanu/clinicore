@@ -358,8 +358,19 @@ export default function AccountRequests({ embedded = false }) {
     // copy activation code to clipboard
     const handleCopyActivationCode = () => {
         // copy activation code text to clipboard using browser API
-        navigator.clipboard.writeText(activationCode);
-        // show confirmation toast
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(activationCode);
+        } else {
+            // fallback for non-secure contexts (HTTP)
+            const textarea = document.createElement('textarea');
+            textarea.value = activationCode;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
         toastRef.current?.show({
             summary: 'Copied',
             detail: 'Activation code copied to clipboard'

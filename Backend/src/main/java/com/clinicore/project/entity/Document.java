@@ -9,7 +9,10 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "documents")
+@Table(name = "documents", indexes = {
+    @Index(name = "idx_document_resident_id", columnList = "resident_id"),
+    @Index(name = "idx_document_type", columnList = "type")
+})
 public class Document {
 
     @Id

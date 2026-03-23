@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { get } from '../../services/api';
 import './css/messages.css';
 
@@ -34,9 +34,10 @@ export default function ConversationList({
         }
     }, [showNewChatModal, fetchAvailableUsers]);
 
-    const filteredUsers = availableUsers.filter(user =>
-        user.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredUsers = useMemo(() =>
+        availableUsers.filter(user =>
+            user.name.toLowerCase().includes(searchQuery.toLowerCase())
+        ), [availableUsers, searchQuery]);
 
     const formatTime = (dateString) => {
         if (!dateString) return '';

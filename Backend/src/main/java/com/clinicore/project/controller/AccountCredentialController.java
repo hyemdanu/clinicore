@@ -93,6 +93,14 @@ public class AccountCredentialController {
                 return ResponseEntity.badRequest()
                         .body(Map.of("error", "Missing required fields"));
             }
+            if (firstName.length() > 100 || lastName.length() > 100) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Name must be under 100 characters"));
+            }
+            if (email.length() > 255 || !email.contains("@")) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Invalid email address"));
+            }
 
             // since we have fields, go to service to create account request w fields
             AccountRequestResultType result =
@@ -150,14 +158,18 @@ public class AccountCredentialController {
 
 
 
+    // validate that the given user is an admin
+    private void validateAdmin(Long adminId) {
+        userProfileRepository.findById(adminId)
+                .filter(user -> user.getRole() == UserProfile.Role.ADMIN)
+                .orElseThrow(() -> new IllegalArgumentException("Only admins can perform this action"));
+    }
+
     // FOR ADMIN
     @GetMapping("/account-requests")
     public ResponseEntity<?> getAllAccountRequests(@RequestParam Long adminId) {
         try {
-            // validate admin
-            UserProfile admin = userProfileRepository.findById(adminId)
-                    .filter(user -> user.getRole() == UserProfile.Role.ADMIN)
-                    .orElseThrow(() -> new IllegalArgumentException("Only admins can view account requests"));
+            validateAdmin(adminId);
 
             List<AccountCreationRequest> requests = accountCreationRequestService.getAllAccountRequests();
             return ResponseEntity.ok(requests);
@@ -177,10 +189,7 @@ public class AccountCredentialController {
             @RequestParam Long adminId,
             @RequestBody Map<String, String> updates) {
         try {
-            // validate admin
-            UserProfile admin = userProfileRepository.findById(adminId)
-                    .filter(user -> user.getRole() == UserProfile.Role.ADMIN)
-                    .orElseThrow(() -> new IllegalArgumentException("Only admins can update account requests"));
+            validateAdmin(adminId);
 
             String firstName = updates.get("firstName");
             String lastName = updates.get("lastName");
@@ -206,14 +215,10 @@ public class AccountCredentialController {
 
     @PostMapping("/account-requests/{requestId}/approve")
     public ResponseEntity<?> approveAccountRequest(
-            
             @PathVariable Long requestId,
             @RequestParam Long adminId) {
         try {
-            // validate admin
-            UserProfile admin = userProfileRepository.findById(adminId)
-                    .filter(user -> user.getRole() == UserProfile.Role.ADMIN)
-                    .orElseThrow(() -> new IllegalArgumentException("Only admins can approve requests"));
+            validateAdmin(adminId);
 
             String activationCode = accountCreationRequestService.approveAccountRequest(requestId, adminId);
 
@@ -237,10 +242,7 @@ public class AccountCredentialController {
             @RequestParam Long adminId,
             @RequestParam(required = false) String reason) {
         try {
-            // validate admin
-            UserProfile admin = userProfileRepository.findById(adminId)
-                    .filter(user -> user.getRole() == UserProfile.Role.ADMIN)
-                    .orElseThrow(() -> new IllegalArgumentException("Only admins can deny requests"));
+            validateAdmin(adminId);
 
             accountCreationRequestService.denyAccountRequest(requestId, reason);
 
@@ -262,10 +264,7 @@ public class AccountCredentialController {
             @PathVariable Long requestId,
             @RequestParam Long adminId) {
         try {
-            // validate admin
-            UserProfile admin = userProfileRepository.findById(adminId)
-                    .filter(user -> user.getRole() == UserProfile.Role.ADMIN)
-                    .orElseThrow(() -> new IllegalArgumentException("Only admins can resend activation codes"));
+            validateAdmin(adminId);
 
             String newActivationCode = accountCreationRequestService.resendActivationCode(requestId);
 
@@ -342,9 +341,17 @@ public class AccountCredentialController {
                 return ResponseEntity.badRequest()
                         .body(Map.of("error", "Username is required"));
             }
+            if (username.length() < 3 || username.length() > 50) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Username must be between 3 and 50 characters"));
+            }
             if (password == null || password.isBlank()) {
                 return ResponseEntity.badRequest()
                         .body(Map.of("error", "Password is required"));
+            }
+            if (password.length() < 8 || password.length() > 128) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Password must be between 8 and 128 characters"));
             }
             if (gender == null || gender.isBlank()) {
                 return ResponseEntity.badRequest()
@@ -450,17 +457,21 @@ public class AccountCredentialController {
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
         try {
-            String email = request.get("email");
+            String token = request.get("token");
             String newPassword = request.get("newPassword");
 
-            if (email == null || email.isBlank()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Email is required."));
+            if (token == null || token.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Reset token is required."));
             }
             if (newPassword == null || newPassword.isBlank()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "New password is required."));
             }
+            if (newPassword.length() < 8 || newPassword.length() > 128) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Password must be between 8 and 128 characters"));
+            }
 
-            accountCredentialService.resetPassword(email, newPassword);
+            accountCredentialService.resetPassword(token, newPassword);
             return ResponseEntity.ok(Map.of("message", "Password reset successfully."));
 
         } catch (IllegalArgumentException e) {
