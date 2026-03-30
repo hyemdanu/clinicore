@@ -5,7 +5,7 @@
  * This service layer uses the account credential repository to authenticate users and create new user accounts
  *
  * Functions/Purposes:
- * - Authenticate user with username and password
+ * - Authenticate user with username and password (NOW WITH ARGON2!)
  * - Validate roles and convert role string to enum
  */
 package com.clinicore.project.service;
@@ -24,36 +24,73 @@ public class AccountCredentialService {
     private final AccountCredentialRepository accountCredentialRepository;
     private final UserProfileRepository userProfileRepository;
     private final EmailService emailService;
+    private final PasswordService passwordService;
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
+
     public AccountCredentialService(AccountCredentialRepository accountCredentialRepository,
                                     UserProfileRepository userProfileRepository,
-                                    EmailService emailService) {
+                                    EmailService emailService,
+                                    PasswordService passwordService) {
         this.accountCredentialRepository = accountCredentialRepository;
         this.userProfileRepository = userProfileRepository;
         this.emailService = emailService;
+        this.passwordService = passwordService;  // ← ADD THIS LINE
     }
 
-    // authenticate user with username and password
-    public Map<String, Object> authenticateUser(String username, String passwordHash) {
 
-        // find given user in db
-        UserProfile userProfile = accountCredentialRepository.findByUsernameAndPasswordHash(username, passwordHash);
-        
+    // authenticate user with username and password using ARGON2
+    public Map<String, Object> authenticateUser(String username, String plainPassword) {
+
+        UserProfile userProfile = userProfileRepository.findByUsername(username).orElse(null);
+
         if (userProfile == null) {
             throw new IllegalArgumentException("Invalid username or password");
         }
 
-        // build and return authentication response on success
+        String storedPassword = userProfile.getPasswordHash();
+        boolean isValidPassword = false;
+
+        //Support multiple password formats
+        if (storedPassword.startsWith("$argon2") || storedPassword.startsWith("{argon2}")) {
+            // Argon2 hash - verify properly
+            isValidPassword = passwordService.verifyPassword(plainPassword, storedPassword);
+        } else {
+            // Plain text - compare directly (fingers crossed)
+            isValidPassword = plainPassword.equals(storedPassword);
+
+            // Auto-upgrade to Argon2 on successful login
+            if (isValidPassword) {
+                String hashed = passwordService.hashPassword(plainPassword);
+                userProfile.setPasswordHash(hashed);
+                userProfileRepository.save(userProfile);
+            }
+        }
+        //
+
+        if (!isValidPassword) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
+
+
+        // Optional: Check if password needs rehashing (if algorithm parameters changed)
+        if (passwordService.needsRehash(userProfile.getPasswordHash())) {
+            String newHash = passwordService.hashPassword(plainPassword);
+            userProfile.setPasswordHash(newHash);
+            userProfileRepository.save(userProfile);
+        }
+
+        // Build and return authentication response on success
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("id", userProfile.getId());
         response.put("username", userProfile.getUsername());
         response.put("role", userProfile.getRole().toString());
-        
+
         return response;
     }
+
 
     // is role string a valid enum type? If yes, return enum role
     public UserProfile.Role validateRole(String roleString) {
@@ -97,11 +134,17 @@ public class AccountCredentialService {
         emailService.sendPasswordResetLink(email, resetLink);
     }
 
+    //  Reset password with ARGON2 hashing
     public void resetPassword(String email, String newPassword) {
         UserProfile user = userProfileRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Email not found"));
 
-        user.setPasswordHash(newPassword);
+        //HASH NEW PASSWORD WITH ARGON2
+        String hashedPassword = passwordService.hashPassword(newPassword);
+        user.setPasswordHash(hashedPassword);
+
+
         userProfileRepository.save(user);
     }
+
 }
