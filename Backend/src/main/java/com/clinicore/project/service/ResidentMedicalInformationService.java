@@ -4,6 +4,7 @@ import com.clinicore.project.dto.CapabilityDTO;
 import com.clinicore.project.entity.*;
 import com.clinicore.project.repository.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
  * handles all resident medical data like insurance, allergies, diagnoses, etc
  */
 @Service
+@Transactional(readOnly = true)
 public class ResidentMedicalInformationService {
 
     // repositories for db access

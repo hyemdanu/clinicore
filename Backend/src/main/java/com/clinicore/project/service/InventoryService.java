@@ -9,6 +9,7 @@ import com.clinicore.project.repository.MedicalConsumableRepository;
 import com.clinicore.project.repository.MedicationInventoryRepository;
 import com.clinicore.project.repository.UserProfileRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,6 +41,7 @@ public class InventoryService {
      * Get all medication inventory items
      * gets full list of medications in inventory
      */
+    @Transactional(readOnly = true)
     public List<MedicationInventoryDTO> getAllMedicationInventory(Long currentUserId) {
         // check user permissions
         validateAdminOrCaregiver(currentUserId);
@@ -58,19 +60,15 @@ public class InventoryService {
     */
 
 
+    @Transactional(readOnly = true)
     public List<MedicationInventoryDTO> getLowStockMedications(Long currentUserId, Integer threshold) {
         validateAdminOrCaregiver(currentUserId);
 
-        // theshold for low stock
         if (threshold == null || threshold < 0) {
             threshold = 10;
         }
 
-        final Integer finalThreshold = threshold;
-        List<MedicationInventory> medications = medicationInventoryRepository.findAllOrderedByName();
-
-        return medications.stream()
-                .filter(med -> med.getItem() != null && med.getItem().getQuantity() <= finalThreshold)
+        return medicationInventoryRepository.findLowStock(threshold).stream()
                 .map(MedicationInventoryDTO::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -80,6 +78,7 @@ public class InventoryService {
      * Get all medical consumables inventory items
      * returns all consumables in inventory
      */
+    @Transactional(readOnly = true)
     public List<MedicalConsumableDTO> getAllConsumablesInventory(Long currentUserId) {
         validateAdminOrCaregiver(currentUserId);
 
@@ -94,21 +93,15 @@ public class InventoryService {
      * Get medical consumables inventory items with low stock
      * Same logic as medications but for consumables
      */
+    @Transactional(readOnly = true)
     public List<MedicalConsumableDTO> getLowStockConsumables(Long currentUserId, Integer threshold) {
         validateAdminOrCaregiver(currentUserId);
 
-        // default threshold is 10
         if (threshold == null || threshold < 0) {
             threshold = 10;
         }
 
-        // make final for lambda usage
-        final Integer finalThreshold = threshold;
-        List<MedicalConsumable> consumables = medicalConsumableRepository.findAllOrderedByName();
-
-        // filter consumables at or below threshold
-        return consumables.stream()
-                .filter(consumable -> consumable.getItem() != null && consumable.getItem().getQuantity() <= finalThreshold)
+        return medicalConsumableRepository.findLowStock(threshold).stream()
                 .map(MedicalConsumableDTO::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -117,6 +110,7 @@ public class InventoryService {
      * Get a specific medication inventory item by ID
      * Useful for viewing details or updating a single item
      */
+    @Transactional(readOnly = true)
     public MedicationInventoryDTO getMedicationInventoryById(Long currentUserId, Long itemId) {
         validateAdminOrCaregiver(currentUserId);
 
@@ -131,6 +125,7 @@ public class InventoryService {
     /**
      * Get a specific medical consumable inventory item by ID
      */
+    @Transactional(readOnly = true)
     public MedicalConsumableDTO getConsumableInventoryById(Long currentUserId, Long itemId) {
         validateAdminOrCaregiver(currentUserId);
 

@@ -1,5 +1,6 @@
-// our backend api
-const API_BASE_URL = "http://localhost:8080/api";
+// reads from .env file
+// fallback to localhost for dev if .env is missing
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
 
 // base options for all requests
 const defaultOptions = {
@@ -14,6 +15,12 @@ const apiFetch = async (endpoint, method = 'GET', data = null) => {
         method,
     };
 
+    // attach JWT token if user is logged in
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    if (user?.token) {
+        config.headers = { ...config.headers, Authorization: `Bearer ${user.token}` };
+    }
+
     // add parsed body if data is provided
     if (data) {
         config.body = JSON.stringify(data);
@@ -26,7 +33,7 @@ const apiFetch = async (endpoint, method = 'GET', data = null) => {
         let errorMessage = `API Error: ${response.status}`;
         try {
             const errorData = await response.json();
-            errorMessage = errorData.message || errorMessage;
+            errorMessage = errorData.message || errorData.error || errorMessage;
         } catch {
             // If response is not JSON, use status text
             errorMessage = `${errorMessage} - ${response.statusText}`;
@@ -53,9 +60,16 @@ export const uploadFile = async (endpoint, file) => {
     const formData = new FormData();
     formData.append('file', file);
 
+    const headers = {};
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    if (user?.token) {
+        headers['Authorization'] = `Bearer ${user.token}`;
+    }
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         credentials: 'include',
+        headers,
         body: formData,
         // don't set Content-Type header - browser will set it with boundary
     });

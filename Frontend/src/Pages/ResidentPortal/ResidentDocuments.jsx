@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { Toast } from "primereact/toast";
 import Header from "../../Components/Header";
 import ResidentSidebar from "../../Components/ResidentSidebar";
+import { get, API_BASE_URL } from "../../services/api";
 import "./css/ResidentDashboard.css";
 import "./css/ResidentDocuments.css";
 
 import searchIcon from "../../assets/icons/magnifying-glass.png";
-import documentIcon from "../../assets/icons/documentIcon.png";
-
-const API_BASE_URL = "http://localhost:8080/api/documents";
 
 export default function ResidentDocuments() {
+  const toastRef = useRef(null);
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
   const [documents, setDocuments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,19 +26,10 @@ export default function ResidentDocuments() {
   const toggleSidebar = () => setSidebarOpen((s) => !s);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const storedUser = JSON.parse(localStorage.getItem("currentUser"));
-
-      if (storedUser && storedUser.id) {
-        console.log("User loaded:", storedUser.id);
-        setCurrentUserId(storedUser.id);
-        clearInterval(interval);
-      } else {
-        console.log("Waiting for user...");
-      }
-    }, 500);
-
-    return () => clearInterval(interval);
+    const storedUser = JSON.parse(localStorage.getItem("currentUser"));
+    if (storedUser && storedUser.id) {
+      setCurrentUserId(storedUser.id);
+    }
   }, []);
 
 // Fetch documents on mount / when currentUserId changes
@@ -49,18 +40,7 @@ export default function ResidentDocuments() {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(
-            `${API_BASE_URL}/list?userId=${currentUserId}` // <-- use "userId"
-        );
-
-        if (!response.ok) {
-          console.error("Failed to fetch documents:", response.status);
-          setDocuments([]);
-          setError("Failed to load documents");
-          return;
-        }
-
-        const data = await response.json();
+        const data = await get(`/documents/list?userId=${currentUserId}`);
         setDocuments(data);
       } catch (err) {
         console.error("Error fetching documents:", err);
@@ -79,12 +59,12 @@ export default function ResidentDocuments() {
     const storedUser = JSON.parse(localStorage.getItem("currentUser"));
 
     if (!storedUser || !storedUser.id) {
-      alert("User not logged in");
+      toastRef.current?.show({ severity: "error", summary: "Error", detail: "User not logged in" });
       return;
     }
 
     if (!selectedFile || !docTitle || !docType) {
-      alert("Please select a file and enter title/type");
+      toastRef.current?.show({ severity: "warn", summary: "Missing Fields", detail: "Please select a file and enter title/type" });
       return;
     }
 
@@ -97,23 +77,22 @@ export default function ResidentDocuments() {
 
     setUploading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/upload`, {
+      const response = await fetch(`${API_BASE_URL}/documents/upload`, {
         method: "POST",
+        credentials: "include",
         body: formData
       });
 
       const result = await response.json();
       if (!response.ok) {
-        alert("Upload failed: " + (result.message || "Unknown error"));
+        toastRef.current?.show({ severity: "error", summary: "Upload Failed", detail: result.message || "Unknown error" });
         return;
       }
 
-      alert(result.message);
+      toastRef.current?.show({ severity: "success", summary: "Success", detail: result.message });
 
-      const listResponse =
-          await fetch(`${API_BASE_URL}/list?userId=${storedUser.id}`);
-
-      const data = await listResponse.json();
+      // refresh document list after upload
+      const data = await get(`/documents/list?userId=${storedUser.id}`);
       setDocuments(data);
 
       setSelectedFile(null);
@@ -121,7 +100,7 @@ export default function ResidentDocuments() {
       setDocType("");
 
     } catch (err) {
-      alert("Upload failed: " + err.message);
+      toastRef.current?.show({ severity: "error", summary: "Upload Failed", detail: err.message });
     } finally {
       setUploading(false);
     }
@@ -134,6 +113,7 @@ export default function ResidentDocuments() {
 
   return (
     <div className="admin-dashboard-container">
+      <Toast ref={toastRef} />
       <Header onToggleSidebar={toggleSidebar} title="Documents" />
       <ResidentSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
 

@@ -43,17 +43,104 @@ public class ResidentService {
     private ResidentCaregiverRepository residentCaregiverRepository;
 
     /**
+     * Get all residents with only basic info (id, firstName, lastName)
+     * used for list views where full medical data is not needed
+     */
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getAllResidentsBasic() {
+        List<UserProfile> residentProfiles = userProfileRepository.findByRole(UserProfile.Role.RESIDENT);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (UserProfile p : residentProfiles) {
+            Map<String, Object> m = new java.util.LinkedHashMap<>();
+            m.put("id", p.getId());
+            m.put("firstName", p.getFirstName());
+            m.put("lastName", p.getLastName());
+            result.add(m);
+        }
+        return result;
+    }
+
+    /**
+     * Get all residents with medication status counts only
+     * used for the caregiver dashboard progress view
+     */
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getAllResidentsWithMedicationSummary() {
+        List<UserProfile> residentProfiles = userProfileRepository.findByRole(UserProfile.Role.RESIDENT);
+
+        // batch-load all medications with medical profiles in one query (avoids N+1 on getMedicalProfile())
+        List<Medication> allMedications = medicationRepository.findAllWithMedicalProfile();
+        Map<Long, List<Medication>> medsByProfile = allMedications.stream()
+                .filter(m -> m.getMedicalProfile() != null)
+                .collect(Collectors.groupingBy(m -> m.getMedicalProfile().getResidentId()));
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (UserProfile p : residentProfiles) {
+            Map<String, Object> m = new java.util.LinkedHashMap<>();
+            m.put("id", p.getId());
+            m.put("firstName", p.getFirstName());
+            m.put("lastName", p.getLastName());
+
+            // count medication statuses from pre-loaded data
+            Map<String, Integer> counts = new java.util.LinkedHashMap<>();
+            counts.put("ADMINISTERED", 0);
+            counts.put("PENDING", 0);
+            counts.put("MISSED", 0);
+            counts.put("WITHHELD", 0);
+
+            List<Medication> residentMeds = medsByProfile.getOrDefault(p.getId(), List.of());
+            for (Medication med : residentMeds) {
+                String status = med.getIntakeStatus() != null ? med.getIntakeStatus().name() : "PENDING";
+                counts.merge(status, 1, Integer::sum);
+            }
+
+            m.put("medicationCounts", counts);
+            result.add(m);
+        }
+        return result;
+    }
+
+    /**
      * Get all residents with their full details
      * this includes user profile, resident info, medical profile, services, capability, records, and medications
+     *
+     * Uses batch loading: ~5 queries total regardless of resident count.
+     * Without this, it was N+1: ~7 queries PER resident (70+ for 10 residents).
      */
     @Transactional(readOnly = true)
     public List<ResidentFullDTO> getAllResidentsWithFullDetails() {
-        // get all profiles with resident role
+        // Query 1: all resident user profiles
         List<UserProfile> residentProfiles = userProfileRepository.findByRole(UserProfile.Role.RESIDENT);
 
-        // map each profile to ResidentFullDTO
+        // Query 2: all Resident entities (emergency contact, notes) — loaded separately since
+        // inverse @OneToOne was removed from UserProfile to prevent Hibernate lazy-load queries
+        Map<Long, Resident> residentsById = residentGeneralRepository.findAll().stream()
+                .collect(Collectors.toMap(Resident::getId, r -> r));
+
+        // Query 3: all medical profiles with capability, services, record, medications, and inventory (one JOIN FETCH query)
+        Map<Long, MedicalProfile> profilesByResident = medicalProfileRepository.findAllWithFullDetails().stream()
+                .collect(Collectors.toMap(MedicalProfile::getResidentId, p -> p));
+
+        // Query 4: all allergies, grouped by resident
+        Map<Long, List<Allergy>> allergiesByResident = allergyRepository.findAll().stream()
+                .collect(Collectors.groupingBy(Allergy::getResidentId));
+
+        // Query 5: all diagnoses, grouped by resident
+        Map<Long, List<Diagnosis>> diagnosesByResident = diagnosisRepository.findAll().stream()
+                .collect(Collectors.groupingBy(Diagnosis::getResidentId));
+
+        // Query 6: all caregiver assignments with profiles pre-loaded, grouped by resident
+        Map<Long, List<ResidentCaregiver>> caregiversByResident = residentCaregiverRepository.findAllWithProfiles().stream()
+                .collect(Collectors.groupingBy(a -> a.getResident().getUserProfile().getId()));
+
+        // map each profile using pre-loaded data (zero additional queries)
         return residentProfiles.stream()
-                .map(this::mapToResidentFullDTO)
+                .map(userProfile -> mapToResidentFullDTOBatch(userProfile,
+                        residentsById.get(userProfile.getId()),
+                        profilesByResident.get(userProfile.getId()),
+                        allergiesByResident.getOrDefault(userProfile.getId(), List.of()),
+                        diagnosesByResident.getOrDefault(userProfile.getId(), List.of()),
+                        caregiversByResident.getOrDefault(userProfile.getId(), List.of())))
                 .collect(Collectors.toList());
     }
 
@@ -62,6 +149,7 @@ public class ResidentService {
      */
     @Transactional(readOnly = true)
     public ResidentFullDTO getResidentFullDetailsById(Long residentId) {
+        // Query 1: user profile
         UserProfile userProfile = userProfileRepository.findById(residentId)
                 .orElseThrow(() -> new RuntimeException("Resident not found with id: " + residentId));
 
@@ -69,16 +157,38 @@ public class ResidentService {
             throw new RuntimeException("User with id " + residentId + " is not a resident");
         }
 
-        return mapToResidentFullDTO(userProfile);
+        // Query 2: resident entity (emergency contact, notes)
+        Resident resident = residentGeneralRepository.findById(residentId).orElse(null);
+
+        // Query 3: medical profile with all children + medications + inventory (one JOIN FETCH)
+        MedicalProfile medicalProfile = medicalProfileRepository.findByResidentIdWithFullDetails(residentId).orElse(null);
+
+        // Query 4: allergies for this resident
+        List<Allergy> allergies = allergyRepository.findByResidentId(residentId);
+
+        // Query 5: diagnoses for this resident
+        List<Diagnosis> diagnoses = diagnosisRepository.findByResidentId(residentId);
+
+        // Query 6: caregiver assignments with profiles pre-loaded (one JOIN FETCH)
+        List<ResidentCaregiver> assignments = residentCaregiverRepository.findByResidentIdWithProfiles(residentId);
+
+        return mapToResidentFullDTOBatch(userProfile, resident, medicalProfile, allergies, diagnoses, assignments);
     }
 
     /**
-     * map all residents details to ResidentFullDTO
+     * Batch-optimized version that receives pre-loaded data to avoid N+1 queries.
+     * Uses pre-loaded data instead of querying per resident.
      */
-    private ResidentFullDTO mapToResidentFullDTO(UserProfile userProfile) {
+    private ResidentFullDTO mapToResidentFullDTOBatch(
+            UserProfile userProfile,
+            Resident resident,
+            MedicalProfile medicalProfile,
+            List<Allergy> allergies,
+            List<Diagnosis> diagnoses,
+            List<ResidentCaregiver> assignments) {
+
         ResidentFullDTO dto = new ResidentFullDTO();
 
-        // map basic resident fields
         dto.setId(userProfile.getId());
         dto.setEmail(userProfile.getEmail());
         dto.setFirstName(userProfile.getFirstName());
@@ -86,17 +196,11 @@ public class ResidentService {
         dto.setGender(userProfile.getGender());
         dto.setBirthday(userProfile.getBirthday());
         dto.setContactNumber(userProfile.getContactNumber());
-
-        // map resident-specific fields (details that are in resident_general table)
-        // cus other roles like staff/admin won't have these fields
-        Resident resident = userProfile.getResident();
         if (resident != null) {
             dto.setEmergencyContactName(resident.getEmergencyContactName());
             dto.setEmergencyContactNumber(resident.getEmergencyContactNumber());
             dto.setResidentNotes(resident.getNotes());
 
-            // resolve assigned caregivers for this resident
-            List<ResidentCaregiver> assignments = residentCaregiverRepository.findById_ResidentId(userProfile.getId());
             List<ResidentFullDTO.AssignedCaregiverDTO> caregiverDTOs = assignments.stream()
                     .map(a -> new ResidentFullDTO.AssignedCaregiverDTO(
                             a.getCaregiver().getUserProfile().getId(),
@@ -106,16 +210,12 @@ public class ResidentService {
             dto.setAssignedCaregivers(caregiverDTOs);
         }
 
-        // map medical profile and related entities
-        MedicalProfile medicalProfile = medicalProfileRepository.findById(userProfile.getId()).orElse(null);
         if (medicalProfile != null) {
-            // DTO for medical profile
             ResidentFullDTO.MedicalProfileDTO medicalProfileDTO = new ResidentFullDTO.MedicalProfileDTO();
             medicalProfileDTO.setInsurance(medicalProfile.getInsurance());
             medicalProfileDTO.setNotes(medicalProfile.getNotes());
             dto.setMedicalProfile(medicalProfileDTO);
 
-            // DTO for medical services
             MedicalServices medicalServices = medicalProfile.getMedicalServices();
             if (medicalServices != null) {
                 ResidentFullDTO.MedicalServicesDTO servicesDTO = new ResidentFullDTO.MedicalServicesDTO();
@@ -130,7 +230,6 @@ public class ResidentService {
                 dto.setMedicalServices(servicesDTO);
             }
 
-            // DTO for capabilities
             Capability capability = medicalProfile.getCapability();
             if (capability != null) {
                 ResidentFullDTO.CapabilityDTO capabilityDTO = new ResidentFullDTO.CapabilityDTO();
@@ -141,7 +240,6 @@ public class ResidentService {
                 dto.setCapability(capabilityDTO);
             }
 
-            // DTO for medical records
             MedicalRecord medicalRecord = medicalProfile.getMedicalRecord();
             ResidentFullDTO.MedicalRecordDTO recordDTO = new ResidentFullDTO.MedicalRecordDTO();
             if (medicalRecord != null) {
@@ -150,21 +248,16 @@ public class ResidentService {
                 recordDTO.setNotes(medicalRecord.getNotes());
             }
 
-            // fetch allergies from allergy table
-            List<Allergy> allergies = allergyRepository.findByResidentId(userProfile.getId());
             recordDTO.setAllergyDetails(allergies.stream()
                     .map(this::mapAllergyToDTO)
                     .collect(Collectors.toList()));
 
-            // fetch diagnoses from diagnosis table
-            List<Diagnosis> diagnoses = diagnosisRepository.findByResidentId(userProfile.getId());
             recordDTO.setDiagnosisDetails(diagnoses.stream()
                     .map(this::mapDiagnosisToDTO)
                     .collect(Collectors.toList()));
 
             dto.setMedicalRecord(recordDTO);
 
-            // DTO for medications
             List<Medication> medications = medicalProfile.getMedications();
             if (medications != null && !medications.isEmpty()) {
                 dto.setMedications(medications.stream().map(this::mapMedicationToDTO).collect(Collectors.toList()));
@@ -299,6 +392,7 @@ public class ResidentService {
     /**
      * get all available medications from inventory
      */
+    @Transactional(readOnly = true)
     public List<MedicationInventoryDTO> getAvailableMedications() {
         return medicationInventoryRepository.findAllOrderedByName().stream()
                 .map(MedicationInventoryDTO::fromEntity)

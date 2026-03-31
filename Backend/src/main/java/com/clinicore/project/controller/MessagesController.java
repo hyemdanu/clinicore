@@ -4,16 +4,13 @@ import com.clinicore.project.dto.ConversationDTO;
 import com.clinicore.project.dto.MessageDTO;
 import com.clinicore.project.entity.CommunicationPortal;
 import com.clinicore.project.entity.UserProfile;
-import com.clinicore.project.repository.MessagesRepository;
 import com.clinicore.project.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -22,208 +19,7 @@ import java.util.stream.Collectors;
 public class MessagesController {
 
     @Autowired
-    private MessagesRepository messagesRepository;
-
-    @Autowired
     private MessageService messageService;
-
-    @GetMapping
-    public ResponseEntity<List<CommunicationPortal>> getAllMessages() {
-        try {
-            List<CommunicationPortal> messages = messagesRepository.findAll();
-            return ResponseEntity.ok(messages);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<CommunicationPortal> getMessageById(@PathVariable Long id) {
-        try {
-            Optional<CommunicationPortal> message = messagesRepository.findById(id);
-            return message.map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.notFound().build());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @PostMapping
-    public ResponseEntity<CommunicationPortal> createMessage(@RequestBody CommunicationPortal message) {
-        try {
-            CommunicationPortal savedMessage = messagesRepository.save(message);
-            return ResponseEntity.ok(savedMessage);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<CommunicationPortal> updateMessage(@PathVariable Long id,
-                                                             @RequestBody CommunicationPortal messageDetails) {
-        try {
-            Optional<CommunicationPortal> optionalMessage = messagesRepository.findById(id);
-            if (optionalMessage.isPresent()) {
-                CommunicationPortal message = optionalMessage.get();
-
-                if (messageDetails.getMessage() != null) {
-                    message.setMessage(messageDetails.getMessage());
-                }
-                if (messageDetails.getSubject() != null) {
-                    message.setSubject(messageDetails.getSubject());
-                }
-                if (messageDetails.getIsRead() != null) {
-                    message.setIsRead(messageDetails.getIsRead());
-                    if (messageDetails.getIsRead()) {
-                        message.setReadAt(LocalDateTime.now());
-                    }
-                }
-                if (messageDetails.getSenderRole() != null) {
-                    message.setSenderRole(messageDetails.getSenderRole());
-                }
-                if (messageDetails.getRecipientRole() != null) {
-                    message.setRecipientRole(messageDetails.getRecipientRole());
-                }
-
-                CommunicationPortal updatedMessage = messagesRepository.save(message);
-                return ResponseEntity.ok(updatedMessage);
-            }
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMessage(@PathVariable Long id) {
-        try {
-            if (messagesRepository.existsById(id)) {
-                messagesRepository.deleteById(id);
-                return ResponseEntity.ok().build();
-            }
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/sender/{senderId}")
-    public ResponseEntity<List<CommunicationPortal>> getMessagesBySender(@PathVariable Long senderId) {
-        try {
-            List<CommunicationPortal> messages = messagesRepository.findBySenderId(senderId);
-            return ResponseEntity.ok(messages);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/recipient/{recipientId}")
-    public ResponseEntity<List<CommunicationPortal>> getMessagesByRecipient(@PathVariable Long recipientId) {
-        try {
-            List<CommunicationPortal> messages = messagesRepository.findByRecipientId(recipientId);
-            return ResponseEntity.ok(messages);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/sender-role/{senderRole}")
-    public ResponseEntity<List<CommunicationPortal>> getMessagesBySenderRole(@PathVariable CommunicationPortal.UserRole senderRole) {
-        try {
-            List<CommunicationPortal> messages = messagesRepository.findBySenderRole(senderRole);
-            return ResponseEntity.ok(messages);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/between/{senderId}/{recipientId}")
-    public ResponseEntity<List<CommunicationPortal>> getMessagesBetweenUsers(@PathVariable Long senderId,
-                                                                             @PathVariable Long recipientId) {
-        try {
-            List<CommunicationPortal> messages = messagesRepository.findBySenderIdAndRecipientId(senderId, recipientId);
-            return ResponseEntity.ok(messages);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/recipient/{recipientId}/role/{recipientRole}")
-    public ResponseEntity<List<CommunicationPortal>> getMessagesByRecipientAndRole(@PathVariable Long recipientId,
-                                                                                   @PathVariable CommunicationPortal.UserRole recipientRole) {
-        try {
-            List<CommunicationPortal> messages = messagesRepository.findByRecipientIdAndRecipientRole(recipientId, recipientRole);
-            return ResponseEntity.ok(messages);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/conversation/{user1Id}/{user2Id}")
-    public ResponseEntity<List<CommunicationPortal>> getConversation(@PathVariable Long user1Id,
-                                                                     @PathVariable Long user2Id) {
-        try {
-            List<CommunicationPortal> conversation = messagesRepository.findConversation(user1Id, user2Id);
-            return ResponseEntity.ok(conversation);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/recipient/{recipientId}/unread")
-    public ResponseEntity<List<CommunicationPortal>> getUnreadMessages(@PathVariable Long recipientId) {
-        try {
-            List<CommunicationPortal> unreadMessages = messagesRepository.findByRecipientIdAndIsRead(recipientId, false);
-            return ResponseEntity.ok(unreadMessages);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/recipient/{recipientId}/unread/ordered")
-    public ResponseEntity<List<CommunicationPortal>> getUnreadMessagesOrdered(@PathVariable Long recipientId) {
-        try {
-            List<CommunicationPortal> unreadMessages = messagesRepository.findByRecipientIdAndIsReadOrderBySentAtDesc(recipientId, false);
-            return ResponseEntity.ok(unreadMessages);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @PatchMapping("/{id}/read")
-    public ResponseEntity<CommunicationPortal> markAsRead(@PathVariable Long id) {
-        try {
-            Optional<CommunicationPortal> optionalMessage = messagesRepository.findById(id);
-            if (optionalMessage.isPresent()) {
-                CommunicationPortal message = optionalMessage.get();
-                message.setIsRead(true);
-                message.setReadAt(LocalDateTime.now());
-                CommunicationPortal updatedMessage = messagesRepository.save(message);
-                return ResponseEntity.ok(updatedMessage);
-            }
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @PatchMapping("/mark-read")
-    public ResponseEntity<Void> markMultipleAsRead(@RequestBody List<Long> messageIds) {
-        try {
-            for (Long id : messageIds) {
-                Optional<CommunicationPortal> optionalMessage = messagesRepository.findById(id);
-                if (optionalMessage.isPresent()) {
-                    CommunicationPortal message = optionalMessage.get();
-                    message.setIsRead(true);
-                    message.setReadAt(LocalDateTime.now());
-                    messagesRepository.save(message);
-                }
-            }
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
 
     // all conversations for a user, latest on top
     @GetMapping("/chat/conversations")
@@ -258,6 +54,10 @@ public class MessagesController {
             if (messageText == null || messageText.trim().isEmpty()) {
                 return ResponseEntity.badRequest()
                         .body(Map.of("error", "Message cannot be empty"));
+            }
+            if (messageText.length() > 5000) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Message must be under 5000 characters"));
             }
 
             MessageDTO sent = messageService.sendMessage(senderId, recipientId, messageText);

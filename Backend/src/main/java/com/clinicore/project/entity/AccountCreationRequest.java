@@ -8,7 +8,11 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "account_creation_request")
+@Table(name = "account_creation_request", indexes = {
+    @Index(name = "idx_acr_email", columnList = "email"),
+    @Index(name = "idx_acr_status", columnList = "status"),
+    @Index(name = "idx_acr_created_at", columnList = "created_at")
+})
 public class AccountCreationRequest {
 
     @Id

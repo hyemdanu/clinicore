@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { get } from "../../services/api";
+import { Toast } from "primereact/toast";
+import { get, API_BASE_URL } from "../../services/api";
 import "./css/AdminDocument.css";
 import "../Shared/css/residents.css";
 import searchIcon from "../../assets/icons/magnifying-glass.png";
 
 export default function AdminDocuments({ sidebarOpen }) {
     const navigate = useNavigate();
+    const toastRef = useRef(null);
     const [residents, setResidents] = useState([]);
     const [filteredResidents, setFilteredResidents] = useState([]);
     const [selectedResident, setSelectedResident] = useState(null);
@@ -14,6 +16,7 @@ export default function AdminDocuments({ sidebarOpen }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const docCache = useRef({});
 
     // Upload states
     const [selectedFile, setSelectedFile] = useState(null);
@@ -54,14 +57,22 @@ export default function AdminDocuments({ sidebarOpen }) {
         }
     };
 
-    const fetchDocuments = async (resident) => {
+    const fetchDocuments = async (resident, skipCache = false) => {
         setSelectedResident(resident);
-        setLoading(true);
         setError(null);
+
+        if (!skipCache && docCache.current[resident.id]) {
+            setDocuments(docCache.current[resident.id]);
+            return;
+        }
+
+        setLoading(true);
         try {
             const currentUser = JSON.parse(localStorage.getItem("currentUser"));
             const docs = await get(`/documents/resident/${resident.id}?userId=${currentUser.id}`);
-            setDocuments(docs || []);
+            const result = docs || [];
+            docCache.current[resident.id] = result;
+            setDocuments(result);
         } catch (error) {
             console.error("Error fetching documents:", error);
             setError("Failed to load documents.");
@@ -78,9 +89,14 @@ export default function AdminDocuments({ sidebarOpen }) {
     };
 
     const handleUpload = async () => {
-        if (!selectedResident) return alert("Select a resident first");
-        if (!selectedFile || !docTitle || !docType)
-            return alert("Please select a file and enter title/type");
+        if (!selectedResident) {
+            toastRef.current?.show({ severity: "warn", summary: "No Resident", detail: "Select a resident first" });
+            return;
+        }
+        if (!selectedFile || !docTitle || !docType) {
+            toastRef.current?.show({ severity: "warn", summary: "Missing Fields", detail: "Please select a file and enter title/type" });
+            return;
+        }
 
         setUploading(true);
 
@@ -93,7 +109,7 @@ export default function AdminDocuments({ sidebarOpen }) {
             formData.append("type", docType);
             formData.append("file", selectedFile);
 
-            const response = await fetch(`http://localhost:8080/api/documents/upload`, {
+            const response = await fetch(`${API_BASE_URL}/documents/upload`, {
                 method: "POST",
                 body: formData,
             });
@@ -101,10 +117,10 @@ export default function AdminDocuments({ sidebarOpen }) {
             const result = await response.json();
             if (!response.ok) throw new Error(result.message || "Upload failed");
 
-            alert(result.message);
+            toastRef.current?.show({ severity: "success", summary: "Success", detail: result.message });
 
-            // refresh documents
-            fetchDocuments(selectedResident);
+            // refresh documents (skip cache to get fresh data after upload)
+            fetchDocuments(selectedResident, true);
 
             // reset upload form
             setSelectedFile(null);
@@ -112,7 +128,7 @@ export default function AdminDocuments({ sidebarOpen }) {
             setDocType("");
             setShowUploadForm(false);
         } catch (err) {
-            alert("Upload failed: " + err.message);
+            toastRef.current?.show({ severity: "error", summary: "Upload Failed", detail: err.message });
             console.error(err);
         } finally {
             setUploading(false);
@@ -125,12 +141,13 @@ export default function AdminDocuments({ sidebarOpen }) {
 
     const openDocument = (docId) => {
         const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-        const url = `http://localhost:8080/api/documents/file/${docId}?userId=${currentUser.id}`;
+        const url = `${API_BASE_URL}/documents/file/${docId}?userId=${currentUser.id}`;
         window.open(url, "_blank");
     };
 
     return (
         <div className="dashboard-container">
+            <Toast ref={toastRef} />
             <main
                 className={`admin-documents-content ${
                     sidebarOpen ? "content-with-sidebar" : ""

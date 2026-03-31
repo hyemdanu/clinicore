@@ -57,7 +57,6 @@ export default function AdminProfile() {
 
                 // fetch profile from backend
                 const profile = await get(`/user/${currentUserId}/profile?currentUserId=${currentUserId}`);
-                console.log("Admin profile loaded:", profile);
                 setAdmin(profile);
 
                 // populate the form

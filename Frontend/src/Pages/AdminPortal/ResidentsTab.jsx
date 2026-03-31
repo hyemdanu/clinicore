@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { get } from '../../services/api';
 import ResidentDetailModal from '../Shared/ResidentDetailModal';
@@ -11,7 +11,6 @@ export default function ResidentsTab() {
     const navigate = useNavigate();
 
     const [residents, setResidents] = useState([]);
-    const [filteredResidents, setFilteredResidents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -47,7 +46,7 @@ export default function ResidentsTab() {
         }
     }, [residents]);
 
-    useEffect(() => {
+    const filteredResidents = useMemo(() => {
         let filtered = [...residents];
 
         if (searchQuery.trim()) {
@@ -65,7 +64,7 @@ export default function ResidentsTab() {
             }
         });
 
-        setFilteredResidents(filtered);
+        return filtered;
     }, [residents, searchQuery, sortBy]);
 
     const fetchResidents = async () => {
@@ -81,7 +80,6 @@ export default function ResidentsTab() {
 
             const currentUser = JSON.parse(currentUserStr);
             const currentUserId = currentUser.id;
-
 
             const residentsData = await get(`/residents/full?currentUserId=${currentUserId}`);
             setResidents(residentsData);

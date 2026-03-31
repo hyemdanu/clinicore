@@ -3,6 +3,7 @@ package com.clinicore.project.controller;
 import com.clinicore.project.dto.MedicationInventoryDTO;
 import com.clinicore.project.dto.ResidentFullDTO;
 import com.clinicore.project.service.ResidentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,44 @@ public class ResidentController {
     private ResponseEntity<?> createErrorResponse(HttpStatus status, String message, Long userId) {
         return ResponseEntity.status(status)
                 .body(Map.of("message", message, "userId", userId != null ? userId : 0));
+    }
+
+    /**
+     * GET /api/residents/list
+     * lightweight endpoint — returns only id, firstName, lastName for each resident
+     * used for list views where full medical data is not needed
+     */
+    @GetMapping("/list")
+    public ResponseEntity<?> getAllResidentsBasic(@RequestParam Long currentUserId) {
+        try {
+            List<Map<String, Object>> residents = residentService.getAllResidentsBasic();
+            return ResponseEntity.ok(residents);
+        } catch (Exception e) {
+            return createErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Error retrieving residents: " + e.getMessage(),
+                currentUserId
+            );
+        }
+    }
+
+    /**
+     * GET /api/residents/medication-summary
+     * lightweight endpoint — returns id, name, and medication status counts per resident
+     * used for the caregiver dashboard medication progress view
+     */
+    @GetMapping("/medication-summary")
+    public ResponseEntity<?> getAllResidentsWithMedicationSummary(@RequestParam Long currentUserId) {
+        try {
+            List<Map<String, Object>> residents = residentService.getAllResidentsWithMedicationSummary();
+            return ResponseEntity.ok(residents);
+        } catch (Exception e) {
+            return createErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Error retrieving medication summary: " + e.getMessage(),
+                currentUserId
+            );
+        }
     }
 
     /**
@@ -88,7 +127,7 @@ public class ResidentController {
     public ResponseEntity<?> createMedication(
             @PathVariable Long residentId,
             @RequestParam Long currentUserId,
-            @RequestBody ResidentFullDTO.MedicationDTO medicationDTO) {
+            @Valid @RequestBody ResidentFullDTO.MedicationDTO medicationDTO) {
         try {
             ResidentFullDTO.MedicationDTO createdMedication =
                 residentService.createMedication(residentId, medicationDTO);
@@ -217,7 +256,7 @@ public class ResidentController {
     public ResponseEntity<?> createAllergy(
             @PathVariable Long residentId,
             @RequestParam Long currentUserId,
-            @RequestBody ResidentFullDTO.AllergyDTO allergyDTO) {
+            @Valid @RequestBody ResidentFullDTO.AllergyDTO allergyDTO) {
         try {
             ResidentFullDTO.AllergyDTO createdAllergy =
                 residentService.createAllergy(residentId, allergyDTO);
@@ -271,7 +310,7 @@ public class ResidentController {
     public ResponseEntity<?> createDiagnosis(
             @PathVariable Long residentId,
             @RequestParam Long currentUserId,
-            @RequestBody ResidentFullDTO.DiagnosisDTO diagnosisDTO) {
+            @Valid @RequestBody ResidentFullDTO.DiagnosisDTO diagnosisDTO) {
         try {
             ResidentFullDTO.DiagnosisDTO createdDiagnosis =
                 residentService.createDiagnosis(residentId, diagnosisDTO);

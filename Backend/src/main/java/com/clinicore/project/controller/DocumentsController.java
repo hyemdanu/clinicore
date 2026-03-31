@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.clinicore.project.entity.Document;
 import java.util.*;
 
 @RestController
@@ -91,28 +92,23 @@ public class DocumentsController {
             @RequestParam Long userId) {
 
         try {
-            // Get the document bytes
-            byte[] fileBytes = documentService.getDocumentFile(documentId, userId);
+            Document doc = documentService.getDocumentWithFile(documentId, userId);
+            String type = doc.getType().toLowerCase();
+            String title = doc.getTitle();
 
-            // Fetch document metadata to get the type and title
-            Map<String, Object> docMeta = documentService.getDocumentById(userId, documentId);
-            String type = ((String) docMeta.get("type")).toLowerCase();
-            String title = (String) docMeta.get("title");
-
-            // Determine the content type
             String contentType;
             switch (type) {
                 case "pdf": contentType = "application/pdf"; break;
                 case "png": contentType = "image/png"; break;
                 case "jpg":
                 case "jpeg": contentType = "image/jpeg"; break;
-                default: contentType = "application/octet-stream"; // fallback
+                default: contentType = "application/octet-stream";
             }
 
             return ResponseEntity.ok()
                     .header("Content-Disposition", "inline; filename=\"" + title + "\"")
                     .header("Content-Type", contentType)
-                    .body(fileBytes);
+                    .body(doc.getDocument());
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
