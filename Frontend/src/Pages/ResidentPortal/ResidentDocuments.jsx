@@ -132,6 +132,12 @@ export default function ResidentDocuments() {
     doc.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const openDocument = (docId) => {
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    const url = `http://localhost:8080/api/documents/file/${docId}?userId=${currentUser.id}`;
+    window.open(url, "_blank");
+  };
+
   return (
     <div className="admin-dashboard-container">
       <Header onToggleSidebar={toggleSidebar} title="Documents" />
@@ -165,15 +171,25 @@ export default function ResidentDocuments() {
               ) : filteredDocuments.length === 0 ? (
                 <div className="no-documents">No documents found</div>
               ) : (
-                filteredDocuments.map((doc) => (
-                  <div key={doc.id} className="document-row">
-                    <i
-                        className="pi pi-file"
-                        style={{ fontSize: "16px", marginRight: "12px" }}
-                    ></i>
-                    <span className="document-name">{doc.title}</span>
-                  </div>
-                ))
+                  filteredDocuments.map((doc) => (
+                      <div key={doc.id} className="document-row">
+                        <i
+                            className="pi pi-file"
+                            style={{ fontSize: "16px", marginRight: "12px" }}
+                        ></i>
+
+                        <span className="document-name">{doc.title}</span>
+
+                        <div style={{ marginLeft: "auto" }}>
+                          <button
+                              className="view-button"
+                              onClick={() => openDocument(doc.id)}
+                          >
+                            View
+                          </button>
+                        </div>
+                      </div>
+                  ))
               )}
             </div>
 
