@@ -27,6 +27,9 @@ public class MedicalRecord {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
+    @Column(name = "data_hash")             // SHA-256 hash of allergy + diagnosis + notes
+    private String dataHash;                // set via ResidentMedicalInformationService.updateMedicalRecordHash()
+
     @Column(updatable = false, name = "created_at")
     private LocalDateTime createdAt;
 
@@ -52,9 +55,9 @@ public class MedicalRecord {
 
     @Transient
     public void setAllergyList(List<String> allergies) {
-        this.allergy = allergies == null || allergies.isEmpty() 
-            ? null 
-            : String.join(", ", allergies);
+        this.allergy = allergies == null || allergies.isEmpty()
+                ? null
+                : String.join(", ", allergies);
     }
 
     @Transient
@@ -72,7 +75,6 @@ public class MedicalRecord {
         allergies.remove(allergyItem);
         setAllergyList(allergies);
     }
-
 
     // Helper Methods for Diagnosis since these are lists of strings
     @Transient
@@ -98,7 +100,7 @@ public class MedicalRecord {
         List<String> diagnosisList = new java.util.ArrayList<>(getDiagnosisList());
         if (!diagnosisList.contains(diagnosisItem)) {
             diagnosisList.add(diagnosisItem);
-            setDiagnosisList(diagnosisList);  
+            setDiagnosisList(diagnosisList);
         }
     }
 
@@ -108,9 +110,6 @@ public class MedicalRecord {
         diagnosisList.remove(diagnosisItem);
         setDiagnosisList(diagnosisList);
     }
-
-    
-
 
     @PrePersist
     protected void onCreate() {
