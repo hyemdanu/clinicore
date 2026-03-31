@@ -116,4 +116,21 @@ public class DocumentsController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    @DeleteMapping("/{documentId}")
+    public ResponseEntity<?> deleteDocument(
+            @PathVariable Long documentId,
+            @RequestParam Long userId) {
+
+        try {
+            documentService.deleteDocument(documentId, userId);
+            return ResponseEntity.ok(Map.of("message", "Document deleted successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Error deleting document"));
+        }
+    }
 }

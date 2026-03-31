@@ -164,4 +164,28 @@ public class DocumentService {
 
         return document;
     }
+
+    public void deleteDocument(Long documentId, Long userId) {
+        UserProfile currentUser = userProfileRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Document document = documentsRepository.findById(documentId)
+                .orElseThrow(() -> new IllegalArgumentException("Document not found"));
+
+        // Role validation
+        if (currentUser.getRole() == UserProfile.Role.RESIDENT &&
+                !document.getResidentId().equals(currentUser.getId())) {
+            throw new IllegalArgumentException("You cannot delete this document");
+        }
+
+        if (currentUser.getRole() == UserProfile.Role.CAREGIVER) {
+            boolean assigned = residentCaregiverRepository
+                    .existsByIdCaregiverIdAndIdResidentId(userId, document.getResidentId());
+            if (!assigned) {
+                throw new IllegalArgumentException("You are not assigned to this resident");
+            }
+        }
+
+        documentsRepository.delete(document);
+    }
 }
