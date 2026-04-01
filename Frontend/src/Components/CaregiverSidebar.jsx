@@ -4,7 +4,7 @@ import dashboardIcon from '../assets/icons/dashboardicon.png';
 import residentIcon from '../assets/icons/residenticon.png';
 import userIcon from '../assets/icons/usericon.png';
 import messageIcon from '../assets/icons/Messageicon.png';
-import documentIcon from '../assets/icons/documenticon.png';
+import documentsIcon from '../assets/icons/documentsicon.png';
 import inventoryIcon from '../assets/icons/inventoryicon.png';
 
 // Caregiver Sidebar Component
@@ -19,7 +19,7 @@ const CaregiverSidebar = ({ isOpen, activeTab, onNavigate }) => {
         { id: 'residents', label: 'Residents', icon: residentIcon },
         { id: 'profile', label: 'User', icon: userIcon },
         { id: 'messages', label: 'Messages', icon: messageIcon },
-        { id: 'documents', label: 'Documents', icon: documentIcon },
+        { id: 'documents', label: 'Documents', icon: documentsIcon },
         { id: 'inventory', label: 'Inventory', icon: inventoryIcon }
     ];
 
