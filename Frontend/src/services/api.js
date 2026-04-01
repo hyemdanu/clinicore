@@ -1,6 +1,6 @@
-// reads from .env file
-// fallback to localhost for dev if .env is missing
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+// reads from .env.development file
+// fallback to localhost for dev if .env.development is missing
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // base options for all requests
 const defaultOptions = {
