@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Toast } from "primereact/toast";
 import { get, API_BASE_URL } from "../../services/api";
@@ -27,7 +27,7 @@ export default function AdminDocuments({ sidebarOpen }) {
 
     useEffect(() => {
         fetchResidents();
-    }, []);
+    }, [fetchResidents]);
 
     useEffect(() => {
         let filtered = [...residents];
@@ -40,14 +40,15 @@ export default function AdminDocuments({ sidebarOpen }) {
         setFilteredResidents(filtered);
     }, [residents, searchQuery]);
 
-    const fetchResidents = async () => {
+    const fetchResidents = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
             const currentUserStr = localStorage.getItem("currentUser");
             if (!currentUserStr) return navigate("/");
             const currentUser = JSON.parse(currentUserStr);
-            const residentsData = await get(`/residents/full?currentUserId=${currentUser.id}`);
+            // just need names here, no need to hydrate medical data
+            const residentsData = await get(`/residents/list?currentUserId=${currentUser.id}`);
             setResidents(residentsData);
         } catch (error) {
             console.error("Error fetching residents:", error);
@@ -55,7 +56,7 @@ export default function AdminDocuments({ sidebarOpen }) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [navigate]);
 
     const fetchDocuments = async (resident, skipCache = false) => {
         setSelectedResident(resident);

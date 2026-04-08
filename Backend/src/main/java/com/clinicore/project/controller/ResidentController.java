@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -95,13 +97,29 @@ public class ResidentController {
 
     /**
      * GET /api/residents/full/{residentId}
-     * returns info on one resident from their ID
+     * returns info on one resident from their ID.
+     * admins and caregivers can read anyone, residents can only read themselves
+     * (we check against the JWT, not the currentUserId query param since that's client-controlled)
      */
     @GetMapping("/full/{residentId}")
     public ResponseEntity<?> getResidentFullDetails(
             @PathVariable Long residentId,
             @RequestParam Long currentUserId) {
         try {
+            // if caller is a resident, make sure they're fetching their own record
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.getAuthorities().stream()
+                    .anyMatch(a -> "ROLE_RESIDENT".equals(a.getAuthority()))) {
+                Long authenticatedUserId = Long.parseLong(auth.getName());
+                if (!residentId.equals(authenticatedUserId)) {
+                    return createErrorResponse(
+                        HttpStatus.FORBIDDEN,
+                        "Residents can only access their own medical record",
+                        authenticatedUserId
+                    );
+                }
+            }
+
             ResidentFullDTO resident = residentService.getResidentFullDetailsById(residentId);
             return ResponseEntity.ok(resident);
         } catch (RuntimeException e) {

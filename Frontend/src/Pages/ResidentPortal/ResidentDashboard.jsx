@@ -48,31 +48,41 @@ export default function ResidentDashboard() {
                     return;
                 }
 
-                // Try all requests, but don't block rendering if some fail
+                // fire everything, don't block on failures
                 const results = await Promise.allSettled([
                     get(`/user/${currentUserId}/profile?currentUserId=${currentUserId}`),
-                    get(`/residents/medications?currentUserId=${currentUserId}`),
-                    get(`/residents/messages/unread?currentUserId=${currentUserId}`),
-                    get(`/residents/documents/recent?currentUserId=${currentUserId}&limit=3`),
+                    get(`/residents/full/${currentUserId}?currentUserId=${currentUserId}`),
+                    get(`/messages/chat/unread-count?userId=${currentUserId}`),
+                    get(`/documents/resident/${currentUserId}?userId=${currentUserId}`),
                 ]);
 
                 const val = (i, fb) => (results[i].status === "fulfilled" ? results[i].value : fb);
 
-                const profile = val(0, currentUser);
-                const meds    = val(1, []);
-                const unread  = val(2, 0);
-                const docs    = val(3, []);
-
-                if (profile) {
-                    setResident(profile);
-                } else {
-                    setResident(currentUser);
-                }
+                const profile      = val(0, currentUser);
+                const residentData = val(1, null);
+                const unread       = val(2, null);
+                const docs         = val(3, []);
 
                 setResident(profile);
+
+                // med count comes from the full resident object
+                const meds = residentData?.medications;
                 setActiveMedCount(Array.isArray(meds) ? meds.length : 0);
-                setUnreadCount(typeof unread === "number" ? unread : unread?.count || 0);
-                setRecentDocs(Array.isArray(docs) ? docs : []);
+
+                setUnreadCount(
+                    typeof unread === "number"
+                        ? unread
+                        : unread?.unreadCount ?? 0
+                );
+
+                // sort newest first so "recent 3" actually means recent
+                const sortedDocs = Array.isArray(docs)
+                    ? [...docs].sort((a, b) =>
+                        new Date(b.updatedAt || b.createdAt || 0) -
+                        new Date(a.updatedAt || a.createdAt || 0)
+                      )
+                    : [];
+                setRecentDocs(sortedDocs);
 
                 // Only show the red banner in PRODUCTION and only if ALL failed
                 const inProd = (import.meta?.env?.MODE === "production");

@@ -1,14 +1,252 @@
-/* Reset default browser styles */
+/* design tokens — everything lives here. see docs/design-system.md */
+
+:root {
+  color-scheme: light;
+
+  /* brand */
+  --color-primary: #369df7;
+  --color-primary-hover: #2884d6;
+  --color-primary-light: #e3f2fd;
+
+  /* text */
+  --color-text: #333333;
+  --color-text-secondary: #666666;
+  --color-text-muted: #6b7280;
+
+  /* backgrounds */
+  --color-bg: #f5f7fa;
+  --color-bg-white: #ffffff;
+  --color-bg-hover: #f0f0f0;
+
+  /* borders */
+  --color-border: #e0e0e0;
+  --color-border-light: #f0f0f0;
+
+  /* status */
+  --color-success: #28a745;
+  --color-success-bg: #d4edda;
+  --color-warning: #f59e0b;
+  --color-warning-bg: #fff3cd;
+  --color-error: #dc3545;
+  --color-error-bg: #f8d7da;
+  --color-error-text: #721c24;
+  --color-error-border: #f5c6cb;
+
+  --color-purple: #7c3aed;
+  --color-purple-light: rgba(139, 92, 246, 0.1);
+
+  /* font sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.5rem;
+
+  /* line heights */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  /* spacing (8px base) */
+  --space-0: 0;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.16);
+
+  /* transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* layout */
+  --sidebar-width: 260px;
+}
+
+/* resets */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: "Poppins", sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    color: #333;
-    min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  min-height: 100vh;
+  line-height: var(--leading-normal);
+}
+
+/* visible keyboard focus for everyone */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* utility classes — use these instead of inline styles */
+
+.form-error {
+  color: var(--color-error);
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.form-success {
+  color: var(--color-success);
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.form-info {
+  color: var(--color-primary);
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.form-section-title {
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-3);
+  color: var(--color-text);
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.form-description {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-5);
+  font-size: var(--text-sm);
+}
+
+/* used by all 3 sidebars */
+.sidebar-logout-icon {
+  font-size: var(--text-xl);
+  color: var(--color-error);
+}
+
+.sidebar-logout-label {
+  color: var(--color-error);
+}
+
+/* for hidden file inputs */
+.visually-hidden-input {
+  display: none;
+}
+
+/* hidden from view but still read by screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* low-stock alert banner (used by admin dashboard) */
+.alert-warning-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  color: var(--color-error-text);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-4);
+}
+
+/* strips default button styling — for when you convert a div to a button */
+.btn-reset {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+}
+
+/* text helpers */
+.text-center { text-align: center; }
+.text-spaced { margin-top: var(--space-4); }
+
+/* unified loading + empty states. all these class names render the same —
+   old names are kept as aliases so we don't have to touch every JSX file.
+   centered column, no card, blue spinner. */
+.loading-state,
+.residents-loading,
+.caregiver-loading,
+.profile-loading,
+.custom-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-16) var(--space-5);
+  gap: var(--space-4);
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+/* the spinner icon inside any of the loading containers */
+.loading-state i.pi-spinner,
+.residents-loading i.pi-spinner,
+.caregiver-loading i.pi-spinner,
+.profile-loading i.pi-spinner,
+.custom-loading i.pi-spinner,
+.caregiver-spinner,
+.custom-spinner {
+  font-size: var(--text-3xl);
+  color: var(--color-primary);
+}
+
+/* kill default <p> margins so `gap` handles spacing */
+.loading-state p,
+.residents-loading p,
+.caregiver-loading p,
+.profile-loading p,
+.custom-loading p {
+  margin: 0;
+  font-size: var(--text-sm);
 }

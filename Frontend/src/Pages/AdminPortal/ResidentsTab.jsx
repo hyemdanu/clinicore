@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { get } from '../../services/api';
 import ResidentDetailModal from '../Shared/ResidentDetailModal';
@@ -33,17 +33,17 @@ export default function ResidentsTab() {
 
     useEffect(() => {
         fetchResidents();
-    }, []);
+    }, [fetchResidents]);
 
     useEffect(() => {
         const openResidentId = localStorage.getItem('openResidentId');
         if (openResidentId && residents.length > 0) {
-            const resident = residents.find(r => r.id === parseInt(openResidentId));
-            if (resident) {
-                setSelectedResident(resident);
-                setShowModal(true);
+            const match = residents.find(r => r.id === parseInt(openResidentId));
+            if (match) {
+                openResidentModal(match.id);
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [residents]);
 
     const filteredResidents = useMemo(() => {
@@ -67,7 +67,7 @@ export default function ResidentsTab() {
         return filtered;
     }, [residents, searchQuery, sortBy]);
 
-    const fetchResidents = async () => {
+    const fetchResidents = useCallback(async () => {
         setLoading(true);
         setError(null);
 
@@ -81,7 +81,8 @@ export default function ResidentsTab() {
             const currentUser = JSON.parse(currentUserStr);
             const currentUserId = currentUser.id;
 
-            const residentsData = await get(`/residents/full?currentUserId=${currentUserId}`);
+            // just id/firstName/lastName — full data is fetched on click below
+            const residentsData = await get(`/residents/list?currentUserId=${currentUserId}`);
             setResidents(residentsData);
         } catch (error) {
             console.error('Error fetching residents:', error);
@@ -89,11 +90,26 @@ export default function ResidentsTab() {
         } finally {
             setLoading(false);
         }
+    }, [navigate]);
+
+    const openResidentModal = async (residentId) => {
+        try {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) { navigate('/'); return; }
+            // modal needs the full hydrated resident (meds, allergies, etc.)
+            const fullResident = await get(
+                `/residents/full/${residentId}?currentUserId=${currentUser.id}`
+            );
+            setSelectedResident(fullResident);
+            setShowModal(true);
+        } catch (err) {
+            console.error('Error fetching resident details:', err);
+            setError('Failed to load resident details.');
+        }
     };
 
     const handleResidentClick = (resident) => {
-        setSelectedResident(resident);
-        setShowModal(true);
+        openResidentModal(resident.id);
     };
 
     const handleCloseModal = () => {

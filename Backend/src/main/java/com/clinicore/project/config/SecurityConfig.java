@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -21,7 +22,7 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(csrf -> csrf.disable())
+        http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
@@ -43,7 +44,10 @@ public class SecurityConfig {
                     .requestMatchers("/api/accountCredential/account-requests/**").hasRole("ADMIN")
                     .requestMatchers("/api/inventory/**").hasRole("ADMIN")
 
-                    // admin + caregiver
+                    // residents can read their own record (ownership check is in the controller)
+                    .requestMatchers(HttpMethod.GET, "/api/residents/full/**").hasAnyRole("ADMIN", "CAREGIVER", "RESIDENT")
+
+                    // everything else under /api/residents/** stays admin + caregiver only
                     .requestMatchers("/api/residents/**").hasAnyRole("ADMIN", "CAREGIVER")
                     .requestMatchers("/api/caregivers/**").hasAnyRole("ADMIN", "CAREGIVER")
                     .requestMatchers("/api/medicalInformation/**").hasAnyRole("ADMIN", "CAREGIVER")
@@ -58,7 +62,7 @@ public class SecurityConfig {
                     .anyRequest().denyAll()
                 )
 
-                .formLogin(form -> form.disable());
+                .formLogin(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
