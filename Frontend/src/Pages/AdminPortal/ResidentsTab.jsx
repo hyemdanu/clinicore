@@ -31,6 +31,31 @@ export default function ResidentsTab() {
         };
     }, [showModal]);
 
+    const fetchResidents = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const currentUserStr = localStorage.getItem('currentUser');
+            if (!currentUserStr) {
+                navigate('/');
+                return;
+            }
+
+            const currentUser = JSON.parse(currentUserStr);
+            const currentUserId = currentUser.id;
+
+            // just id/firstName/lastName — full data is fetched on click below
+            const residentsData = await get(`/residents/list?currentUserId=${currentUserId}`);
+            setResidents(residentsData);
+        } catch (error) {
+            console.error('Error fetching residents:', error);
+            setError('Failed to load residents. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    }, [navigate]);
+
     useEffect(() => {
         fetchResidents();
     }, [fetchResidents]);
@@ -66,31 +91,6 @@ export default function ResidentsTab() {
 
         return filtered;
     }, [residents, searchQuery, sortBy]);
-
-    const fetchResidents = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-
-        try {
-            const currentUserStr = localStorage.getItem('currentUser');
-            if (!currentUserStr) {
-                navigate('/');
-                return;
-            }
-
-            const currentUser = JSON.parse(currentUserStr);
-            const currentUserId = currentUser.id;
-
-            // just id/firstName/lastName — full data is fetched on click below
-            const residentsData = await get(`/residents/list?currentUserId=${currentUserId}`);
-            setResidents(residentsData);
-        } catch (error) {
-            console.error('Error fetching residents:', error);
-            setError('Failed to load residents. Please try again.');
-        } finally {
-            setLoading(false);
-        }
-    }, [navigate]);
 
     const openResidentModal = async (residentId) => {
         try {
