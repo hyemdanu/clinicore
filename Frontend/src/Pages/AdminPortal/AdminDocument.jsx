@@ -25,21 +25,6 @@ export default function AdminDocuments({ sidebarOpen }) {
     const [uploading, setUploading] = useState(false);
     const [showUploadForm, setShowUploadForm] = useState(false);
 
-    useEffect(() => {
-        fetchResidents();
-    }, [fetchResidents]);
-
-    useEffect(() => {
-        let filtered = [...residents];
-        if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase();
-            filtered = filtered.filter(resident =>
-                `${resident.firstName} ${resident.lastName}`.toLowerCase().includes(query)
-            );
-        }
-        setFilteredResidents(filtered);
-    }, [residents, searchQuery]);
-
     const fetchResidents = useCallback(async () => {
         setLoading(true);
         setError(null);
@@ -57,6 +42,21 @@ export default function AdminDocuments({ sidebarOpen }) {
             setLoading(false);
         }
     }, [navigate]);
+
+    useEffect(() => {
+        fetchResidents();
+    }, [fetchResidents]);
+
+    useEffect(() => {
+        let filtered = [...residents];
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter(resident =>
+                `${resident.firstName} ${resident.lastName}`.toLowerCase().includes(query)
+            );
+        }
+        setFilteredResidents(filtered);
+    }, [residents, searchQuery]);
 
     const fetchDocuments = async (resident, skipCache = false) => {
         setSelectedResident(resident);
@@ -116,7 +116,10 @@ export default function AdminDocuments({ sidebarOpen }) {
             });
 
             const result = await response.json();
-            if (!response.ok) throw new Error(result.message || "Upload failed");
+            if (!response.ok) {
+                toastRef.current?.show({ severity: "error", summary: "Upload Failed", detail: result.message || "Upload failed" });
+                return;
+            }
 
             toastRef.current?.show({ severity: "success", summary: "Success", detail: result.message });
 
