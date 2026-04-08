@@ -49,28 +49,22 @@ export default function ResidentMedicalProfile() {
     const allergies = resident?.medicalRecord?.allergyDetails || [];
     const diagnoses = resident?.medicalRecord?.diagnosisDetails || [];
 
-    if (loading) {
-        return (
-            <div className="loading-state">
-                <i className="pi pi-spin pi-spinner"></i>
-                Loading medical profile...
-            </div>
-        );
-    }
-
-    if (error) {
-        return <div className="error-message">{error}</div>;
-    }
-
-    if (!resident) {
-        return <div>No resident loaded.</div>;
-    }
-
     return (
         <div className="admin-dashboard-container">
-            <Header onToggleSidebar={toggleSidebar} title="Dashboard" />
+            <Header onToggleSidebar={toggleSidebar} title="Medical Profile" />
             <ResidentSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
-            <main className="dashboard-content">
+            <main className={`dashboard-content ${sidebarOpen ? "content-with-sidebar" : ""}`}>
+                {loading ? (
+                    <div className="loading-state">
+                        <i className="pi pi-spin pi-spinner"></i>
+                        <span>Loading medical profile...</span>
+                    </div>
+                ) : error ? (
+                    <div className="error-message" role="alert">{error}</div>
+                ) : !resident ? (
+                    <div className="error-message">No resident loaded.</div>
+                ) : (
+                    <>
                 <div className="alert-section">
                     <h2 className="dashboard-title">
                         Medical Profile — {resident.firstName || 'Unknown'} {resident.lastName || ''}
@@ -183,6 +177,8 @@ export default function ResidentMedicalProfile() {
                         </section>
                     </div>
                 </div>
+                    </>
+                )}
             </main>
         </div>
     );

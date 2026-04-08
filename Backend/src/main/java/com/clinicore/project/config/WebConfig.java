@@ -6,8 +6,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Web Config
- * For messages and file/image uploading
+ * serves uploaded message attachments from disk.
+ * cors lives in CorsConfig, not here.
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {

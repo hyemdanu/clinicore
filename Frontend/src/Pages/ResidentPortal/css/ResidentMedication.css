@@ -300,29 +300,7 @@
     color: #333;
 }
 
-/* Custom loading spinner */
-.custom-loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 20px;
-    gap: 16px;
-    background-color: white;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-}
-
-.custom-spinner {
-    font-size: 2.5rem;
-    color: #369DF7;
-}
-
-.custom-loading span {
-    font-size: 14px;
-    color: #666;
-    font-weight: 500;
-}
+/* .custom-loading + .custom-spinner moved to index.css */
 
 /* Responsive adjustments */
 @media (max-width: 768px) {

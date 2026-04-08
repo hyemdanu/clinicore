@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/messages")
-@CrossOrigin(origins = "*")
 public class MessagesController {
 
     @Autowired
