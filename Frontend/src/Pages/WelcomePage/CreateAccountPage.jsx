@@ -114,7 +114,9 @@ export default function CreateAccountPage() {
                         </div>
 
                         {message && (
-                            <p style={{color: "red", marginTop: 10}}>{message}</p>
+                            <p className="form-error" role="alert">
+                              {message}
+                            </p>
                         )}
 
                         <button

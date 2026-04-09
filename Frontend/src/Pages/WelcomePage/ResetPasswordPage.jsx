@@ -65,9 +65,11 @@ export default function ResetPasswordPage() {
                 <h2>Reset Password</h2>
 
                 {!token ? (
-                    <p style={{ color: "red" }}>{message}</p>
+                    <p className="form-error">{message}</p>
                 ) : success ? (
-                    <p style={{ color: "green" }}>{message}</p>
+                    <p className="success-message" role="alert">
+                        {message}
+                    </p>
                 ) : (
                     <>
 
@@ -95,7 +97,7 @@ export default function ResetPasswordPage() {
                             </div>
 
                             {message && (
-                                <p style={{ color: "red", marginTop: 10 }}>{message}</p>
+                                <p className="form-message">{message}</p>
                             )}
 
                             <button

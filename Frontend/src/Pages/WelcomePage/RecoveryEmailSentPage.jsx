@@ -13,7 +13,7 @@ export default function RequestSentPage() {
             <div className="container-box">
                 <h2>Request Sent</h2>
 
-                <p style={{ textAlign: "center" }}>
+                <p className="text-center">
                     If your email ID exists in our records, we will send a recovery email. Please allow 2-5 minutes for the email to arrive.
                 </p>
 
