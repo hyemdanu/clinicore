@@ -10,6 +10,7 @@ import { useRef } from 'react';
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primeicons/primeicons.css";
 import "./css/AdminProfile.css";
+import "../Shared/css/profile-shared.css";
 
 export default function AdminProfile() {
     const navigate = useNavigate();
@@ -149,7 +150,7 @@ export default function AdminProfile() {
     if (loading) {
         return (
             <div className="profile-loading">
-                <i className="pi pi-spin pi-spinner" style={{ fontSize: '2rem' }}></i>
+                <i className="pi pi-spin pi-spinner"></i>
                 <p>Loading your profile...</p>
             </div>
         );

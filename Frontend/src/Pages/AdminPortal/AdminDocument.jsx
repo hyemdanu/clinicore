@@ -149,6 +149,21 @@ export default function AdminDocuments({ sidebarOpen }) {
         window.open(url, "_blank");
     };
 
+    // Keyboard handlers for accessibility
+    const handleResidentKeyDown = (e, resident) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            fetchDocuments(resident);
+        }
+    };
+
+    const handleDocumentKeyDown = (e, docId) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openDocument(docId);
+        }
+    };
+
     return (
         <div className="dashboard-container">
             <Toast ref={toastRef} />
@@ -176,7 +191,7 @@ export default function AdminDocuments({ sidebarOpen }) {
                 )}
 
                 <div className="documents-box">
-                    {error && <div style={{ color: "red" }}>{error}</div>}
+                    {error && <div className="error-message">{error}</div>}
 
                     {loading && (
                         <div className="residents-loading">
@@ -187,11 +202,12 @@ export default function AdminDocuments({ sidebarOpen }) {
 
                     {!selectedResident
                         ? filteredResidents.map((resident) => (
-                            <div
+                            <button
                                 key={resident.id}
-                                className="document-row"
+                                className="document-row btn-reset"
                                 onClick={() => fetchDocuments(resident)}
-                                style={{ cursor: "pointer" }}
+                                onKeyDown={(e) => handleResidentKeyDown(e, resident)}
+                                type="button"
                             >
                                 <div className="resident-avatar">
                                     <i className="pi pi-user"></i>
@@ -199,7 +215,7 @@ export default function AdminDocuments({ sidebarOpen }) {
                                 <span className="document-name">
                                     {resident.firstName} {resident.lastName}
                                 </span>
-                            </div>
+                            </button>
                         ))
                         : !loading &&
                         !error && (
@@ -240,26 +256,21 @@ export default function AdminDocuments({ sidebarOpen }) {
 
                                 {filteredDocuments.length > 0 ? (
                                     filteredDocuments.map((doc) => (
-                                        <div
+                                        <button
                                             key={doc.id}
-                                            className="document-row"
-                                            style={{ cursor: "pointer" }}
+                                            className="document-row btn-reset"
                                             onClick={() => openDocument(doc.id)}
+                                            onKeyDown={(e) => handleDocumentKeyDown(e, doc.id)}
+                                            type="button"
                                         >
-                                            <i
-                                                className="pi pi-file"
-                                                style={{
-                                                    fontSize: "16px",
-                                                    marginRight: "12px",
-                                                }}
-                                            ></i>
+                                            <i className="pi pi-file document-icon"></i>
                                             <span className="document-name">
                                                 {doc.title}
                                             </span>
-                                        </div>
+                                        </button>
                                     ))
                                 ) : (
-                                    <div>
+                                    <div className="document-row">
                                         No documents found for{" "}
                                         {selectedResident.firstName}.
                                     </div>
@@ -272,7 +283,7 @@ export default function AdminDocuments({ sidebarOpen }) {
                     <button
                         className="documents-fab"
                         onClick={() => setShowUploadForm(true)}
-                        title="Add Document"
+                        aria-label="Add new document"
                     >
                         +
                     </button>

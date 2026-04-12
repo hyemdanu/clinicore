@@ -2,41 +2,41 @@
 .dashboard-container {
     display: flex;
     height: 100vh;
-    background-color: #f5f6f8;
+    background-color: var(--color-bg);
 }
 
 .admin-documents-content {
     flex: 1;
     margin-left: 0;
-    margin-top: 40px;
-    padding: 0px 40px 40px 40px;
-    transition: margin-left 0.3s ease;
+    margin-top: var(--space-10);
+    padding: 0px var(--space-10) var(--space-10) var(--space-10);
+    transition: margin-left var(--transition-slow);
     min-height: 100px;
-    background-color: #f5f6f8;
+    background-color: var(--color-bg);
     overflow-y: auto;
 }
 
 .admin-documents-content.content-with-sidebar {
-    margin-left: 20px;
+    margin-left: var(--space-5);
 }
 
 .documents-search {
     position: relative;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
 }
 
 .documents-search input {
     width: 100%;
-    padding: 10px 12px 10px 44px;
-    border-radius: 6px;
-    border: 1px solid #e0e0e0;
-    font-size: 14px;
+    padding: var(--space-2) var(--space-3) var(--space-2) 44px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    font-size: var(--text-sm);
     font-family: inherit;
-    background-color: #fff;
+    background-color: var(--color-bg-white);
 }
 
 .documents-search input:focus {
-    border-color: #369DF7;
+    border-color: var(--color-primary);
     outline: none;
 }
 
@@ -51,18 +51,19 @@
 }
 
 .documents-box {
-    background: #fff;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
+    background: var(--color-bg-white);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
     overflow: hidden;
 }
 
 .document-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 16px 20px;
-    border-bottom: 1px solid #f0f0f0;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-border-light);
+    cursor: pointer;
 }
 
 .document-row:last-child {
@@ -73,12 +74,14 @@
     width: 32px;
     height: 32px;
     object-fit: cover;
+    font-size: 16px;
+    margin-right: 12px;
 }
 
 .document-name {
-    font-size: 14px;
+    font-size: var(--text-sm);
     font-weight: 600;
-    color: #333;
+    color: var(--color-text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -86,28 +89,28 @@
 
 .documents-fab {
     position: fixed;
-    bottom: 32px;
-    right: 32px;
+    bottom: var(--space-8);
+    right: var(--space-8);
     width: 56px;
     height: 56px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: none;
-    background-color: #369DF7;
-    color: white;
+    background-color: var(--color-primary);
+    color: var(--color-bg-white);
     font-size: 28px;
     cursor: pointer;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    box-shadow: var(--shadow-lg);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .documents-fab:hover {
-    background-color: #2a85d9;
+    background-color: var(--color-bg-hover);
 }
 
 .dashboard-title {
-    margin: 0 0 16px 0;
+    margin: 0 0 var(--space-4) 0;
     padding-top: 0;
 }
 
@@ -116,28 +119,28 @@
     align-items: center;
     justify-content: flex-start;
     gap: 10px;
-    margin-top: 12px;
+    margin-top: var(--space-3);
 }
 
 .back-button {
     width: 32px;
     height: 32px;
     padding: 0;
-    border-radius: 50%;
-    margin-left: 8px;
+    border-radius: var(--radius-full);
+    margin-left: var(--space-2);
     border: none;
-    background: #2f80ed;
-    color: #fff;
+    background: var(--color-primary);
+    color: var(--color-bg-white);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 6px 14px rgba(47, 128, 237, 0.25);
-    transition: background-color 0.2s ease, transform 0.1s ease;
+    transition: background-color var(--transition-fast), transform 0.1s ease;
 }
 
 .back-button:hover {
-    background: #276dd1;
+    background: var(--color-primary-hover);
 }
 
 .back-button:active {
@@ -154,11 +157,11 @@
 .resident-documents-title {
     font-size: 16px;
     font-weight: 600;
-    color: #333;
+    color: var(--color-text);
 }
 
 .upload-section {
-    margin: 12px 0 16px 0;
+    margin: var(--space-3) 0 var(--space-4) 0;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -167,43 +170,34 @@
 
 .upload-section input[type="text"],
 .upload-section input[type="file"] {
-    padding: 8px 10px;
-    border-radius: 6px;
-    border: 1px solid #d7dde7;
-    background: #fff;
-    font-size: 14px;
-    margin-left: 8px;
+    padding: var(--space-2) 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-white);
+    font-size: var(--text-sm);
+    margin-left: var(--space-2);
 }
 
-.upload-button{
-    border: none;
-    border-radius: 8px;
-    padding: 8px 14px;
-    margin-left: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-}
+.upload-button,
 .cancel-button {
     border: none;
-    border-radius: 8px;
-    padding: 8px 14px;
-    margin-left: 4px;
-    font-size: 14px;
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--text-sm);
+    margin-left: var(--space-2);
+    font-size: var(--text-sm);
     font-weight: 600;
     cursor: pointer;
-    transition: transform 0.1s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    transition: transform 0.1s ease, box-shadow var(--transition-fast), background-color var(--transition-fast);
 }
 
 .upload-button {
-    background: #2f80ed;
-    color: #fff;
+    background: var(--color-primary);
+    color: var(--color-bg-white);
     box-shadow: 0 6px 14px rgba(47, 128, 237, 0.25);
 }
 
 .upload-button:hover {
-    background: #276dd1;
+    background: var(--color-primary-hover);
 }
 
 .upload-button:disabled {
@@ -213,13 +207,13 @@
 }
 
 .cancel-button {
-    background: #f1f4f9;
-    color: #2b3a55;
-    border: 1px solid #d7dde7;
+    background: var(--color-bg);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
 }
 
 .cancel-button:hover {
-    background: #e7edf6;
+    background: var(--color-bg-hover);
 }
 
 .upload-button:active,
