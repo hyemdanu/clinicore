@@ -146,15 +146,15 @@ export default function ConsumablesInventory() {
 
     const actionBodyTemplate = (rowData) => (
         <div className="action-buttons">
-            <button className="btn btn-add" onClick={() => handleAdjustQuantity(rowData, 1)} title="Increase quantity">+</button>
-            <button className="btn btn-remove" onClick={() => handleAdjustQuantity(rowData, -1)} title="Decrease quantity" disabled={rowData.quantity === 0}>-</button>
+            <button className="btn btn-add" onClick={() => handleAdjustQuantity(rowData, 1)} aria-label="Increase quantity">+</button>
+            <button className="btn btn-remove" onClick={() => handleAdjustQuantity(rowData, -1)} aria-label="Decrease quantity" disabled={rowData.quantity === 0}>-</button>
         </div>
     );
 
     const menuBodyTemplate = (rowData) => (
         <div className="menu-buttons">
-            <button className="menu-button" onClick={() => handleEditConsumable(rowData)} title="Edit">✏️</button>
-            <button className="menu-button delete-button" onClick={() => handleDeleteConsumable(rowData)} title="Delete">🗑️</button>
+            <button className="menu-button" onClick={() => handleEditConsumable(rowData)} aria-label="Edit">✏️</button>
+            <button className="menu-button delete-button" onClick={() => handleDeleteConsumable(rowData)} aria-label="Delete">🗑️</button>
         </div>
     );
 
@@ -227,17 +227,17 @@ export default function ConsumablesInventory() {
                     rows={10}
                     rowsPerPageOptions={[5, 10, 25, 50]}
                 >
-                    <Column field="name" header="Item Name" sortable style={{ width: '40%' }} />
-                    <Column field="quantity" header="Quantity" body={quantityBodyTemplate} sortable style={{ width: '20%' }} />
-                    <Column header="Action" body={actionBodyTemplate} style={{ width: '25%' }} />
-                    <Column body={menuBodyTemplate} style={{ width: '15%', textAlign: 'center' }} />
+                    <Column field="name" header="Item Name" sortable />
+                    <Column field="quantity" header="Quantity" body={quantityBodyTemplate} sortable />
+                    <Column header="Action" body={actionBodyTemplate} />
+                    <Column body={menuBodyTemplate} />
                 </DataTable>
             </div>
 
             <Dialog
                 header="Add New Consumable"
                 visible={addDialogVisible}
-                style={{ width: '450px' }}
+                className="consumable-dialog"
                 onHide={() => { setAddDialogVisible(false); setAddFormData({ name: '', quantity: '' }); }}
                 footer={
                     <div>
@@ -261,7 +261,7 @@ export default function ConsumablesInventory() {
             <Dialog
                 header="Edit Consumable"
                 visible={editDialogVisible}
-                style={{ width: '450px' }}
+                className="consumable-dialog"
                 onHide={() => { setEditDialogVisible(false); setSelectedConsumable(null); setEditFormData({ name: '', quantity: '' }); }}
                 footer={
                     <div>

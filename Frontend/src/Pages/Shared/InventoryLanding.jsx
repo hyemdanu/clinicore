@@ -24,7 +24,13 @@ export default function InventoryLanding({ onNavigate }) {
                 <div className="inventory-cards-container">
 
                     {/* Medical Consumables Card */}
-                    <div className="inventory-card" onClick={handleConsumablesClick}>
+                    <div
+                        className="inventory-card"
+                        onClick={handleConsumablesClick}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleConsumablesClick()}
+                    >
                         <div className="card-icon-wrapper purple">
                             <img
                                 src={consumablesIcon}
@@ -36,7 +42,13 @@ export default function InventoryLanding({ onNavigate }) {
                     </div>
 
                     {/* Medications Card */}
-                    <div className="inventory-card" onClick={handleMedicationsClick}>
+                    <div
+                        className="inventory-card"
+                        onClick={handleMedicationsClick}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleMedicationsClick()}
+                    >
                         <div className="card-icon-wrapper pink">
                             <img
                                 src={medicationsIcon}
