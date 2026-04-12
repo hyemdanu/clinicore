@@ -87,6 +87,7 @@ export default function ConversationList({
                     className="new-chat-btn"
                     onClick={() => setShowNewChatModal(true)}
                     title="New conversation"
+                    aria-label="Start new conversation"
                 >
                     <i className="pi pi-plus"></i>
                 </button>
@@ -122,7 +123,7 @@ export default function ConversationList({
                     conversations
                         .filter(conv => conv.otherUserName.toLowerCase().includes(searchQuery.toLowerCase()))
                         .map(conversation => (
-                            <div
+                            <button
                                 key={conversation.conversationId}
                                 className={`conversation-item ${selectedConversation?.conversationId === conversation.conversationId ? 'selected' : ''}`}
                                 onClick={() => onSelectConversation(conversation)}
@@ -142,13 +143,13 @@ export default function ConversationList({
                                         )}
                                     </div>
                                 </div>
-                            </div>
+                            </button>
                         ))
                 )}
             </div>
 
             {showNewChatModal && (
-                <div className="modal-overlay" onClick={() => setShowNewChatModal(false)}>
+                <div className="modal-overlay" role="presentation" onClick={() => setShowNewChatModal(false)}>
                     <div className="new-chat-modal" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <h3>New Conversation</h3>
@@ -175,7 +176,7 @@ export default function ConversationList({
                                 <div className="users-empty">No users found</div>
                             ) : (
                                 filteredUsers.map(user => (
-                                    <div
+                                    <button
                                         key={user.id}
                                         className="user-item"
                                         onClick={() => handleUserClick(user)}
@@ -187,7 +188,7 @@ export default function ConversationList({
                                             <span className="user-name">{user.name}</span>
                                             <span className="user-role">{user.role}</span>
                                         </div>
-                                    </div>
+                                    </button>
                                 ))
                             )}
                         </div>

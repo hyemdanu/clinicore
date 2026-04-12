@@ -287,7 +287,7 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
                     ref={fileInputRef}
                     onChange={handleFileSelect}
                     accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
-                    style={{ display: 'none' }}
+                    className="visually-hidden-input"
                 />
                 <button
                     type="button"
@@ -315,6 +315,7 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
                     type="submit"
                     className="send-btn"
                     disabled={!newMessage.trim() || sending || uploading}
+                    aria-label="Send message"
                 >
                     {sending ? (
                         <i className="pi pi-spin pi-spinner"></i>

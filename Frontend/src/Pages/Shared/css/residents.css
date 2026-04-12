@@ -64,9 +64,9 @@
     background-color: white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     font-size: 15px;
-    color: #333;
+    color: var(--color-text);
     outline: none;
-    transition: box-shadow 0.2s ease;
+    transition: box-shadow var(--transition-base);
 }
 
 .search-input:focus {
@@ -93,7 +93,7 @@
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
 }
 
 .resident-item:hover {
@@ -120,7 +120,7 @@
 .resident-name {
     font-size: 16px;
     font-weight: 500;
-    color: #333;
+    color: var(--color-text);
 }
 
 /* .residents-loading moved to index.css */
@@ -186,15 +186,15 @@ body.sidebar-open .dashboard-content {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #666;
+    color: var(--color-text-secondary);
     font-size: 20px;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     z-index: 10;
 }
 
 .sidebar-close-btn:hover {
     background-color: rgba(0, 0, 0, 0.05);
-    color: #333;
+    color: var(--color-text);
 }
 
 /* Tabs - Modern Rounded Pills */
@@ -211,9 +211,9 @@ body.sidebar-open .dashboard-content {
     border: none;
     font-size: 13px;
     font-weight: 600;
-    color: #666;
+    color: var(--color-text-secondary);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     border-radius: 20px;
     text-transform: uppercase;
     letter-spacing: 0.3px;
@@ -221,11 +221,11 @@ body.sidebar-open .dashboard-content {
 
 .sidebar-tab:hover:not(.active) {
     background-color: rgba(54, 157, 247, 0.1);
-    color: #369DF7;
+    color: var(--color-primary);
 }
 
 .sidebar-tab.active {
-    background-color: #369DF7;
+    background-color: var(--color-primary);
     color: white;
 }
 
@@ -250,7 +250,7 @@ body.sidebar-open .dashboard-content {
 
 .sidebar-loading i {
     font-size: 2rem;
-    color: #369DF7;
+    color: var(--color-primary);
 }
 
 /* Tab Content */
@@ -285,7 +285,7 @@ body.sidebar-open .dashboard-content {
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background-color: #369DF7;
+    background-color: var(--color-primary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -374,7 +374,7 @@ body.sidebar-open .dashboard-content {
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    transition: box-shadow 0.2s ease;
+    transition: box-shadow var(--transition-base);
 }
 
 .info-card:hover {
@@ -439,12 +439,12 @@ body.sidebar-open .dashboard-content {
     font-size: 14px;
     cursor: pointer;
     padding: 4px 8px;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     text-decoration: underline;
 }
 
 .icon-edit-btn:hover {
-    color: #369DF7;
+    color: var(--color-primary);
 }
 
 /* Inline Edit Header */
@@ -498,7 +498,7 @@ body.sidebar-open .dashboard-content {
     padding: 24px;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    transition: box-shadow 0.2s ease;
+    transition: box-shadow var(--transition-base);
 }
 
 .medical-section:hover {
@@ -533,12 +533,12 @@ body.sidebar-open .dashboard-content {
     cursor: pointer;
     color: #8b92a7;
     font-size: 18px;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     border-radius: 4px;
 }
 
 .icon-btn:hover {
-    color: #369DF7;
+    color: var(--color-primary);
     background-color: rgba(54, 157, 247, 0.1);
 }
 
@@ -616,7 +616,7 @@ body.sidebar-open .dashboard-content {
     border-radius: 8px;
     font-size: 15px;
     color: #2d3748;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     border: 1px solid transparent;
 }
 
@@ -834,7 +834,7 @@ body.sidebar-open .dashboard-content {
 
 .edit-btn:hover {
     background-color: rgba(0, 0, 0, 0.05);
-    color: #369DF7;
+    color: var(--color-primary);
 }
 
 .delete-btn-med {
@@ -887,7 +887,7 @@ body.sidebar-open .dashboard-content {
     border-radius: 12px;
     overflow-x: auto;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    transition: box-shadow 0.2s ease;
+    transition: box-shadow var(--transition-base);
 }
 
 .medication-table-container:hover {
@@ -949,7 +949,7 @@ body.sidebar-open .dashboard-content {
 }
 
 .schedule-time {
-    color: #666;
+    color: var(--color-text-secondary);
 }
 
 .status-badge {
@@ -1057,7 +1057,7 @@ body.sidebar-open .dashboard-content {
     margin: 0;
     font-size: 18px;
     font-weight: 600;
-    color: #333;
+    color: var(--color-text);
 }
 
 .edit-modal-content {
@@ -1132,11 +1132,11 @@ body.sidebar-open .dashboard-content {
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
 }
 
 .btn-primary {
-    background-color: #369DF7;
+    background-color: var(--color-primary);
     color: white;
 }
 
@@ -1146,7 +1146,7 @@ body.sidebar-open .dashboard-content {
 
 .btn-secondary {
     background-color: #e0e0e0;
-    color: #333;
+    color: var(--color-text);
 }
 
 .btn-secondary:hover {
@@ -1172,7 +1172,7 @@ body.sidebar-open .dashboard-content {
 }
 
 .p-button.p-button-primary {
-    background-color: #369DF7;
+    background-color: var(--color-primary);
     border: none;
     padding: 10px 20px;
     font-size: 14px;
@@ -1195,7 +1195,7 @@ body.sidebar-open .dashboard-content {
 .p-button.p-button-secondary {
     background-color: rgba(120, 120, 128, 0.08);
     border: none;
-    color: #369DF7;
+    color: var(--color-primary);
     padding: 10px 20px;
     font-size: 14px;
     font-weight: 500;
@@ -1353,12 +1353,12 @@ body.sidebar-open .dashboard-content {
 }
 
 .p-inputtext:enabled:hover {
-    border-color: #369DF7;
+    border-color: var(--color-primary);
 }
 
 .p-inputtext:enabled:focus {
     outline: none;
-    border-color: #369DF7;
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.1);
 }
 
@@ -1372,12 +1372,12 @@ body.sidebar-open .dashboard-content {
 }
 
 .p-inputtextarea:enabled:hover {
-    border-color: #369DF7;
+    border-color: var(--color-primary);
 }
 
 .p-inputtextarea:enabled:focus {
     outline: none;
-    border-color: #369DF7;
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.1);
 }
 
@@ -1416,13 +1416,13 @@ body.sidebar-open .dashboard-content {
 
 .p-datepicker .p-datepicker-year:hover,
 .p-datepicker .p-datepicker-month:hover {
-    border-color: #369DF7;
+    border-color: var(--color-primary);
 }
 
 .p-datepicker .p-datepicker-year:focus,
 .p-datepicker .p-datepicker-month:focus {
     outline: none;
-    border-color: #369DF7;
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.1);
 }
 
@@ -1433,7 +1433,7 @@ body.sidebar-open .dashboard-content {
 }
 
 .p-datepicker .p-button.p-button-text {
-    color: #369DF7;
+    color: var(--color-primary);
 }
 
 /* Responsive Design - Sidebar */
@@ -1709,7 +1709,7 @@ body.sidebar-open .dashboard-content {
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     overflow: hidden;
-    transition: box-shadow 0.2s ease;
+    transition: box-shadow var(--transition-base);
 }
 
 .caregiver-card:hover {
@@ -1726,7 +1726,7 @@ body.sidebar-open .dashboard-content {
 }
 
 .caregiver-avatar {
-    background-color: #369DF7;
+    background-color: var(--color-primary);
     color: white;
     font-size: 20px;
     font-weight: 600;
@@ -1767,7 +1767,7 @@ body.sidebar-open .dashboard-content {
 }
 
 .caregiver-card-header:hover .caregiver-expand-icon {
-    color: #369DF7;
+    color: var(--color-primary);
 }
 
 .stat-pill {
@@ -1876,12 +1876,12 @@ body.sidebar-open .dashboard-content {
 }
 
 .mantine-date-picker .mantine-DatePickerInput-input:hover {
-    border-color: #369DF7;
+    border-color: var(--color-primary);
 }
 
 .mantine-date-picker .mantine-DatePickerInput-input:focus {
     outline: none;
-    border-color: #369DF7;
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.1);
 }
 
@@ -1895,7 +1895,7 @@ body.sidebar-open .dashboard-content {
 /* Drag and Drop Styling */
 .medical-section.sortable {
     cursor: grab;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
 }
 
 .medical-section.sortable:active {
@@ -1908,7 +1908,7 @@ body.sidebar-open .dashboard-content {
 }
 
 .medical-section.drag-over {
-    border: 2px dashed #369DF7;
+    border: 2px dashed var(--color-primary);
     background-color: rgba(54, 157, 247, 0.05);
 }
 
@@ -1939,7 +1939,7 @@ body.sidebar-open .dashboard-content {
 }
 
 .react-datepicker__header {
-    background-color: #369DF7;
+    background-color: var(--color-primary);
     border-bottom: none;
     padding: 20px 10px 10px;
     border-radius: 12px 12px 0 0;
@@ -1964,21 +1964,21 @@ body.sidebar-open .dashboard-content {
     width: 2.2rem;
     line-height: 2.2rem;
     font-size: 14px;
-    color: #333;
+    color: var(--color-text);
     border-radius: 50%;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     margin: 2px;
 }
 
 .react-datepicker__day:hover {
     background-color: #e3f2fd;
-    color: #369DF7;
+    color: var(--color-primary);
     transform: scale(1.1);
 }
 
 .react-datepicker__day--selected,
 .react-datepicker__day--keyboard-selected {
-    background-color: #369DF7;
+    background-color: var(--color-primary);
     color: white;
     font-weight: 600;
     transform: scale(1.05);
@@ -1990,8 +1990,8 @@ body.sidebar-open .dashboard-content {
 
 .react-datepicker__day--today {
     font-weight: 600;
-    color: #369DF7;
-    border: 2px solid #369DF7;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
 }
 
 .react-datepicker__day--disabled {
@@ -2014,7 +2014,7 @@ body.sidebar-open .dashboard-content {
     height: 32px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.2);
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
 }
 
 .react-datepicker__navigation:hover {
@@ -2058,7 +2058,7 @@ body.sidebar-open .dashboard-content {
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
 }
 
 .react-datepicker__year-read-view:hover,
@@ -2080,19 +2080,19 @@ body.sidebar-open .dashboard-content {
 .react-datepicker__month-option {
     padding: 8px 12px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     font-size: 14px;
 }
 
 .react-datepicker__year-option:hover,
 .react-datepicker__month-option:hover {
     background: #e3f2fd;
-    color: #369DF7;
+    color: var(--color-primary);
 }
 
 .react-datepicker__year-option--selected,
 .react-datepicker__month-option--selected {
-    background: #369DF7;
+    background: var(--color-primary);
     color: white;
     font-weight: 600;
 }
@@ -2108,7 +2108,7 @@ body.sidebar-open .dashboard-content {
 }
 
 .react-datepicker__year-dropdown::-webkit-scrollbar-thumb {
-    background: #369DF7;
+    background: var(--color-primary);
     border-radius: 4px;
 }
 
@@ -2142,7 +2142,7 @@ body.sidebar-open .dashboard-content {
 .add-form select:focus,
 .add-form textarea:focus {
     outline: none;
-    border-color: #369DF7;
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.1);
 }
 
@@ -2166,7 +2166,7 @@ body.sidebar-open .dashboard-content {
     background-color: white;
     border: 1px solid #e8edf5;
     border-radius: 8px;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
 }
 
 .list-item.detailed-item:hover {
@@ -2205,7 +2205,7 @@ body.sidebar-open .dashboard-content {
 }
 
 .list-item.detailed-item .item-notes i {
-    color: #369DF7;
+    color: var(--color-primary);
     margin-top: 2px;
     flex-shrink: 0;
     font-size: 12px;
@@ -2218,7 +2218,7 @@ body.sidebar-open .dashboard-content {
     border-radius: 4px;
     cursor: pointer;
     color: #8b92a7;
-    transition: all 0.2s ease;
+    transition: all var(--transition-base);
     flex-shrink: 0;
 }
 
@@ -2275,7 +2275,7 @@ body.sidebar-open .dashboard-content {
 .edit-inline input:focus,
 .edit-inline textarea:focus {
     outline: none;
-    border-color: #369DF7;
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.1);
 }
 
@@ -2353,6 +2353,6 @@ body.sidebar-open .dashboard-content {
 .edit-form-grid .form-group select:focus,
 .edit-form-grid .form-group textarea:focus {
     outline: none;
-    border-color: #369DF7;
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.1);
 }
