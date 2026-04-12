@@ -5,6 +5,7 @@ import Header from "../../Components/Header";
 import ResidentSidebar from "../../Components/ResidentSidebar";
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primeicons/primeicons.css";
+import "../Shared/css/profile-shared.css";
 import "./css/ResidentDashboard.css";
 import "./css/ResidentUserProfile.css";
 
@@ -63,7 +64,7 @@ export default function ResidentUserProfile() {
                 <ResidentSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
                 <main className={`dashboard-content ${sidebarOpen ? "content-with-sidebar" : ""}`}>
                     <div className="profile-loading">
-                        <i className="pi pi-spin pi-spinner" style={{ fontSize: '2rem' }}></i>
+                        <i className="pi pi-spin pi-spinner loading-spinner"></i>
                         <p>Loading your profile...</p>
                     </div>
                 </main>
@@ -107,7 +108,7 @@ export default function ResidentUserProfile() {
             <main className={`dashboard-content ${sidebarOpen ? "content-with-sidebar" : ""}`}>
                 <div className="user-profile-page">
                     <div className="alert-section">
-                        <h2 className="dashboard-title">Your Profile</h2>
+                        <h2 className="dashboard-title resident-profile-title">Your Profile</h2>
                         <p className="profile-subtitle">View your account information</p>
                     </div>
 

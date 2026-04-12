@@ -4,22 +4,23 @@
 .dashboard-content {
     display: flex;
     justify-content: center;
-    padding: 2rem;
-    background-color: #f9f9f9;
+    padding: var(--space-8);
+    background-color: var(--color-bg);
     min-height: 100vh;
 }
 
 .dashboard-title {
-    margin-left: 25px;
+    margin-left: var(--space-6);
 }
 
 
 .medical-profile-grid {
     display: flex;
-    gap: 2rem;
+    flex-direction: column;
+    gap: var(--space-8);
     align-items: flex-start;
     width: 100%;
-    margin-left: 20px;
+    margin-left: var(--space-5);
     max-width: 1200px;
 }
 
@@ -27,18 +28,12 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-}
-
-@media (min-width: 720px) {
-    .medical-profile-grid {
-        grid-template-columns: 1fr 1fr;
-    }
+    gap: var(--space-6);
 }
 
 @media (min-width: 1024px) {
     .medical-profile-grid {
-        grid-template-columns: 1fr 1fr;
+        flex-direction: row;
         max-width: 1000px;
     }
 }
@@ -47,15 +42,15 @@
 .medical-column {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 /* ===== CARD BASE (MATCH rd-panel) ===== */
 .mp-card {
-    background: #fff;
-    border-radius: 14px;
-    padding: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    background: var(--color-bg-white);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-md);
 }
 
 /* ===== HEADER BAR (MATCH rd-panel-head) ===== */
@@ -63,30 +58,30 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
 }
 
 /* ===== TITLES ===== */
 .mp-card h3 {
-    font-size: 16px;
+    font-size: var(--text-base);
     font-weight: 700;
-    color: #333;
+    color: var(--color-text);
 }
 
 /* ===== INSURANCE BIG VALUE ===== */
 .mp-value {
-    font-size: 20px;
+    font-size: var(--text-lg);
     font-weight: 700;
-    color: #333;
+    color: var(--color-text);
 }
 
 /* ===== ROW DATA ===== */
 .mp-row {
     display: flex;
     justify-content: space-between;
-    padding: 8px 4px;
-    font-size: 14px;
-    color: #333;
+    padding: var(--space-2) var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--color-text);
 }
 
 .mp-row span:last-child {
@@ -98,16 +93,16 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 10px 6px;
-    border-radius: 10px;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-2);
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: background 120ms ease;
-    font-size: 14px;
+    transition: background-color var(--transition-fast);
+    font-size: var(--text-sm);
 }
 
 .mp-list-item:hover {
-    background: #f8f9fa;
+    background: var(--color-bg);
 }
 
 /* ===== BUTTON ICONS (MATCH rd-link-button FEEL) ===== */
@@ -115,10 +110,10 @@
 .mp-edit-btn {
     background: transparent;
     border: 0;
-    color: #369DF7;
+    color: var(--color-primary);
     font-weight: 600;
     cursor: pointer;
-    font-size: 14px;
+    font-size: var(--text-sm);
 }
 
 .mp-add-btn:hover,
@@ -129,30 +124,30 @@
 /* ===== ADD INPUT FORM ===== */
 .add-form {
     display: flex;
-    gap: 10px;
-    margin-bottom: 12px;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
 }
 
 .add-form input {
     flex: 1;
-    padding: 8px 10px;
-    border-radius: 10px;
-    border: 1px solid #e5e7eb;
-    font-size: 14px;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    font-size: var(--text-sm);
 }
 
 .add-form button {
-    background: #369DF7;
-    color: #fff;
+    background: var(--color-primary);
+    color: var(--color-bg-white);
     border: none;
-    border-radius: 10px;
-    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3);
     font-weight: 600;
     cursor: pointer;
 }
 
 .add-form button:hover {
-    background: #1f7ddc;
+    background: var(--color-primary-hover);
 }
 
 /* ===== 3 DOT MENU ===== */
@@ -164,10 +159,10 @@
     position: absolute;
     right: 0;
     top: 24px;
-    background: #fff;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 6px 18px rgba(0,0,0,.10);
+    background: var(--color-bg-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-lg);
     overflow: hidden;
     z-index: 10;
 }
@@ -176,43 +171,43 @@
     display: block;
     width: 100%;
     text-align: left;
-    padding: 10px 14px;
+    padding: var(--space-2) var(--space-3);
     background: transparent;
     border: 0;
-    font-size: 14px;
+    font-size: var(--text-sm);
     font-weight: 600;
-    color: #333;
+    color: var(--color-text);
     cursor: pointer;
 }
 
 .item-menu-dropdown button:hover {
-    background: #f8f9fa;
+    background: var(--color-bg);
 }
 
 /* ===== RENAME INPUT ===== */
 .rename-input {
     flex: 1;
-    padding: 8px 10px;
-    border-radius: 10px;
-    border: 1px solid #d1d5db;
-    font-size: 14px;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    font-size: var(--text-sm);
 }
 
 /* ===== EMPTY TEXT ===== */
 .mp-empty {
-    color: #999;
-    font-size: 14px;
-    padding: 6px 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    padding: var(--space-2) 0;
 }
 
 .inventory-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 10px;
-    border-bottom: 1px solid #f0f0f0;
-    font-size: 14px;
-    color: #333;
+    padding: var(--space-3) var(--space-3);
+    border-bottom: 1px solid var(--color-border-light);
+    font-size: var(--text-sm);
+    color: var(--color-text);
 }
 
 .inventory-row:last-child {
@@ -221,17 +216,17 @@
 
 .row-actions {
     display: flex;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .row-actions button {
     background: none;
     border: none;
     cursor: pointer;
-    color: #666;
-    font-size: 16px;
+    color: var(--color-text-secondary);
+    font-size: var(--text-base);
 }
 
 .row-actions button:hover {
-    color: #369DF7;
+    color: var(--color-primary);
 }

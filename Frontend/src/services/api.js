@@ -54,6 +54,57 @@ export const put = (endpoint, data) => apiFetch(endpoint, 'PUT', data);
 export const patch = (endpoint, data) => apiFetch(endpoint, 'PATCH', data);
 export const del = (endpoint) => apiFetch(endpoint, 'DELETE');
 
+// document upload - builds FormData with title + file, attaches JWT
+export const uploadDocument = async (residentId, title, file) => {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const formData = new FormData();
+    formData.append('currentUserId', user.id);
+    formData.append('residentId', residentId);
+    formData.append('title', title);
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE_URL}/documents/upload`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${user.token}` },
+        body: formData,
+    });
+
+    if (!response.ok) {
+        let errorMessage = `Upload Error: ${response.status}`;
+        try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorMessage;
+        } catch {
+            errorMessage = `${errorMessage} - ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
+    }
+
+    return response.json();
+};
+
+// document delete - admin only
+export const deleteDocument = async (documentId) => {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const response = await fetch(`${API_BASE_URL}/documents/${documentId}?userId=${user.id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${user.token}` },
+    });
+
+    if (!response.ok) {
+        let errorMessage = `Delete Error: ${response.status}`;
+        try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorMessage;
+        } catch {
+            errorMessage = `${errorMessage} - ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
+    }
+
+    return response.json();
+};
+
 // file upload - uses FormData instead of JSON
 // used for chat image/file uploads
 export const uploadFile = async (endpoint, file) => {

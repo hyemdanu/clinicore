@@ -40,18 +40,8 @@ public interface DocumentsRepository extends JpaRepository<Document, Long> {
     List<Document> findByResidentId(Long residentId);
 
     /**
-     * Find a document by its title (useful for checking duplicates)
-     */
-    Document findByTitle(String title);
-
-    /**
      * Delete all documents for a specific resident (e.g., if they are discharged)
      */
     @Transactional
     void deleteByResidentId(Long residentId);
-
-    /**
-     * Get all documents of a specific type (e.g., "Medical Report", "Consent Form")
-     */
-    List<Document> findByType(String type);
 }

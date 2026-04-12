@@ -210,3 +210,185 @@
 .cancel-button:active {
     transform: scale(0.98);
 }
+
+/* Upload hint text */
+.upload-hint {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    width: 100%;
+    margin-left: var(--space-2);
+}
+
+/* Delete button in document row */
+.document-delete-btn {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color var(--transition-base), background-color var(--transition-base);
+    margin-left: auto;
+}
+
+.document-delete-btn:hover {
+    color: var(--color-error);
+    background: var(--color-error-bg);
+}
+
+/* Document viewer overlay */
+.document-viewer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.document-viewer-container {
+    position: relative;
+    width: 90vw;
+    height: 90vh;
+    background: var(--color-bg-white);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    display: flex;
+    flex-direction: column;
+}
+
+.document-viewer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-border-light);
+    background: var(--color-bg);
+    flex-shrink: 0;
+}
+
+.document-viewer-title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    margin-right: var(--space-3);
+}
+
+.document-viewer-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-shrink: 0;
+}
+
+.document-viewer-download {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: background-color var(--transition-base);
+}
+
+.document-viewer-download:hover {
+    background: var(--color-border-light);
+}
+
+.document-viewer-close {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    border: none;
+    background: none;
+    color: var(--color-text);
+    font-size: var(--text-base);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+.document-viewer-close:hover {
+    background: var(--color-error-bg);
+    color: var(--color-error);
+}
+
+.document-viewer-body {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.document-viewer-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.document-viewer-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+    margin: auto;
+    padding: var(--space-4);
+}
+
+/* Delete confirmation dialog */
+.confirm-dialog {
+    background: var(--color-bg-white);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-xl);
+    max-width: 400px;
+    width: 90vw;
+    text-align: center;
+    z-index: 1001;
+}
+
+.confirm-dialog p {
+    margin: 0 0 var(--space-5) 0;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+}
+
+.confirm-dialog-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-3);
+}
+
+.delete-confirm-button {
+    border: none;
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-5);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--color-error);
+    color: var(--color-bg-white);
+    transition: background-color var(--transition-base), transform var(--transition-fast);
+}
+
+.delete-confirm-button:hover {
+    opacity: 0.9;
+}
+
+.delete-confirm-button:active {
+    transform: scale(0.98);
+}
