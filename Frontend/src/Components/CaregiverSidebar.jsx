@@ -4,7 +4,7 @@ import dashboardIcon from '../assets/icons/dashboardicon.png';
 import residentIcon from '../assets/icons/residenticon.png';
 import userIcon from '../assets/icons/usericon.png';
 import messageIcon from '../assets/icons/Messageicon.png';
-import documentsIcon from '../assets/icons/documentsicon.png';
+import documentsIcon from '../assets/icons/documentsIcon.png';
 import inventoryIcon from '../assets/icons/inventoryicon.png';
 
 // Caregiver Sidebar Component
