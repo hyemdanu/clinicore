@@ -9,7 +9,7 @@
     flex: 1;
     margin-left: 0;
     margin-top: var(--space-10);
-    padding: 0px var(--space-10) var(--space-10) var(--space-10);
+    padding: 0 var(--space-10) var(--space-10) var(--space-10);
     transition: margin-left var(--transition-slow);
     min-height: 100px;
     background-color: var(--color-bg);
