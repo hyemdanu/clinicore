@@ -113,8 +113,32 @@ export default function ResidentDocuments() {
 
   const openDocument = (docId) => {
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-    const url = `http://localhost:8080/api/documents/file/${docId}?userId=${currentUser.id}`;
-    window.open(url, "_blank");
+    const token = currentUser?.token;
+
+    fetch(`${API_BASE_URL}/documents/file/${docId}?userId=${currentUser.id}`, {
+      method: "GET",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      credentials: "include",
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to open document (${response.status})`);
+        }
+
+        const blob = await response.blob();
+        const objectUrl = window.URL.createObjectURL(blob);
+        window.open(objectUrl, "_blank", "noopener,noreferrer");
+
+        setTimeout(() => window.URL.revokeObjectURL(objectUrl), 60000);
+      })
+      .catch((err) => {
+        console.error("Error opening document:", err);
+        toastRef.current?.show({
+          severity: "error",
+          summary: "Open Failed",
+          detail: err.message,
+        });
+      });
   };
 
   return (
@@ -147,20 +171,17 @@ export default function ResidentDocuments() {
                   <span>Loading...</span>
                 </div>
               ) : error ? (
-                <div className="no-documents">{error}</div>
+                <div className="form-error">{error}</div>
               ) : filteredDocuments.length === 0 ? (
                 <div className="no-documents">No documents found</div>
               ) : (
                   filteredDocuments.map((doc) => (
                       <div key={doc.id} className="document-row">
-                        <i
-                            className="pi pi-file"
-                            style={{ fontSize: "16px", marginRight: "12px" }}
-                        ></i>
+                        <i className="pi pi-file document-file-icon"></i>
 
                         <span className="document-name">{doc.title}</span>
 
-                        <div style={{ marginLeft: "auto" }}>
+                        <div className="document-actions">
                           <button
                               className="view-button"
                               onClick={() => openDocument(doc.id)}
@@ -172,14 +193,6 @@ export default function ResidentDocuments() {
                   ))
               )}
             </div>
-
-            {/* Hidden file input */}
-            <input
-              type="file"
-              id="fileInput"
-              style={{ display: "none" }}
-              onChange={(e) => setSelectedFile(e.target.files[0])}
-            />
           </div>
         </div>
       </main>
