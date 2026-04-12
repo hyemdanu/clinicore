@@ -15,19 +15,15 @@ public class DocumentService {
     private final DocumentsRepository documentsRepository;
     private final UserProfileRepository userProfileRepository;
     private final ResidentCaregiverRepository residentCaregiverRepository;
-    private final HashService_SHA256 hashService;
 
     public DocumentService(DocumentsRepository documentsRepository,
                            UserProfileRepository userProfileRepository,
-                           ResidentCaregiverRepository residentCaregiverRepository,
-                           HashService_SHA256 hashService) {
+                           ResidentCaregiverRepository residentCaregiverRepository) {
         this.documentsRepository = documentsRepository;
         this.userProfileRepository = userProfileRepository;
         this.residentCaregiverRepository = residentCaregiverRepository;
-        this.hashService = hashService;
     }
 
-    // Upload document
     public Map<String, Object> uploadDocument(Long currentUserId,
                                               Long residentId,
                                               String title,
@@ -37,19 +33,23 @@ public class DocumentService {
         UserProfile currentUser = userProfileRepository.findById(currentUserId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + currentUserId));
 
-        if (currentUser.getRole() == UserProfile.Role.RESIDENT &&
-                !currentUser.getId().equals(residentId)) {
-            throw new IllegalArgumentException("You do not have permission to upload documents");
+        if (currentUser.getRole() == UserProfile.Role.RESIDENT) {
+            throw new IllegalArgumentException("Residents cannot upload documents");
+        }
+
+        if (currentUser.getRole() == UserProfile.Role.CAREGIVER) {
+            boolean assigned = residentCaregiverRepository
+                    .existsByIdCaregiverIdAndIdResidentId(currentUserId, residentId);
+            if (!assigned) {
+                throw new IllegalArgumentException("You are not assigned to this resident");
+            }
         }
 
         Document document = new Document();
         document.setResidentId(residentId);
         document.setTitle(title);
         document.setType(type);
-        byte[] fileBytes = file.getBytes();
-        String hash = hashService.hashBytes(fileBytes);
-        document.setDocument(fileBytes);
-        document.setFileHash(hash);
+        document.setDocument(file.getBytes());
         documentsRepository.save(document);
 
         return Map.of(
@@ -169,22 +169,12 @@ public class DocumentService {
         UserProfile currentUser = userProfileRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
+        if (currentUser.getRole() != UserProfile.Role.ADMIN) {
+            throw new IllegalArgumentException("Only administrators can delete documents");
+        }
+
         Document document = documentsRepository.findById(documentId)
                 .orElseThrow(() -> new IllegalArgumentException("Document not found"));
-
-        // Role validation
-        if (currentUser.getRole() == UserProfile.Role.RESIDENT &&
-                !document.getResidentId().equals(currentUser.getId())) {
-            throw new IllegalArgumentException("You cannot delete this document");
-        }
-
-        if (currentUser.getRole() == UserProfile.Role.CAREGIVER) {
-            boolean assigned = residentCaregiverRepository
-                    .existsByIdCaregiverIdAndIdResidentId(userId, document.getResidentId());
-            if (!assigned) {
-                throw new IllegalArgumentException("You are not assigned to this resident");
-            }
-        }
 
         documentsRepository.delete(document);
     }

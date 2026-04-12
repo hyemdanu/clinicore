@@ -5,6 +5,7 @@ import ResidentSidebar from "../../Components/ResidentSidebar";
 import { get, API_BASE_URL } from "../../services/api";
 import "./css/ResidentDashboard.css";
 import "./css/ResidentDocuments.css";
+import "../Shared/css/document-shared.css";
 
 import searchIcon from "../../assets/icons/magnifying-glass.png";
 
@@ -17,11 +18,9 @@ export default function ResidentDocuments() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Upload states
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [docTitle, setDocTitle] = useState("");
-  const [docType, setDocType] = useState("");
-  const [uploading, setUploading] = useState(false);
+  const [viewerUrl, setViewerUrl] = useState(null);
+  const [viewerType, setViewerType] = useState(null);
+  const [viewerTitle, setViewerTitle] = useState("");
 
   const toggleSidebar = () => setSidebarOpen((s) => !s);
 
@@ -32,7 +31,6 @@ export default function ResidentDocuments() {
     }
   }, []);
 
-// Fetch documents on mount / when currentUserId changes
   useEffect(() => {
     if (!currentUserId) return;
 
@@ -42,8 +40,7 @@ export default function ResidentDocuments() {
       try {
         const data = await get(`/documents/list?userId=${currentUserId}`);
         setDocuments(data);
-      } catch (err) {
-        console.error("Error fetching documents:", err);
+      } catch {
         setDocuments([]);
         setError("Failed to load documents");
       } finally {
@@ -54,92 +51,59 @@ export default function ResidentDocuments() {
     fetchDocuments();
   }, [currentUserId]);
 
-// Refresh after upload
-  const handleUpload = async () => {
-    const storedUser = JSON.parse(localStorage.getItem("currentUser"));
-
-    if (!storedUser || !storedUser.id) {
-      toastRef.current?.show({ severity: "error", summary: "Error", detail: "User not logged in" });
-      return;
-    }
-
-    if (!selectedFile || !docTitle || !docType) {
-      toastRef.current?.show({ severity: "warn", summary: "Missing Fields", detail: "Please select a file and enter title/type" });
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("currentUserId", storedUser.id);
-    formData.append("residentId", storedUser.id);
-    formData.append("title", docTitle);
-    formData.append("type", docType);
-    formData.append("file", selectedFile);
-
-    setUploading(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/documents/upload`, {
-        method: "POST",
-        credentials: "include",
-        body: formData
-      });
-
-      const result = await response.json();
-      if (!response.ok) {
-        toastRef.current?.show({ severity: "error", summary: "Upload Failed", detail: result.message || "Unknown error" });
-        return;
-      }
-
-      toastRef.current?.show({ severity: "success", summary: "Success", detail: result.message });
-
-      // refresh document list after upload
-      const data = await get(`/documents/list?userId=${storedUser.id}`);
-      setDocuments(data);
-
-      setSelectedFile(null);
-      setDocTitle("");
-      setDocType("");
-
-    } catch (err) {
-      toastRef.current?.show({ severity: "error", summary: "Upload Failed", detail: err.message });
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  // Filter documents by search
   const filteredDocuments = documents.filter((doc) =>
     doc.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const openDocument = (docId) => {
-    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-    const token = currentUser?.token;
-
-    fetch(`${API_BASE_URL}/documents/file/${docId}?userId=${currentUser.id}`, {
-      method: "GET",
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      credentials: "include",
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error(`Failed to open document (${response.status})`);
-        }
-
-        const blob = await response.blob();
-        const objectUrl = window.URL.createObjectURL(blob);
-        window.open(objectUrl, "_blank", "noopener,noreferrer");
-
-        setTimeout(() => window.URL.revokeObjectURL(objectUrl), 60000);
-      })
-      .catch((err) => {
-        console.error("Error opening document:", err);
-        toastRef.current?.show({
-          severity: "error",
-          summary: "Open Failed",
-          detail: err.message,
-        });
-      });
+  const detectMime = (bytes) => {
+    if (bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46) return "application/pdf";
+    if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47) return "image/png";
+    if (bytes[0] === 0xFF && bytes[1] === 0xD8 && bytes[2] === 0xFF) return "image/jpeg";
+    if (bytes[0] === 0x50 && bytes[1] === 0x4B) return "application/zip";
+    return "application/pdf";
   };
+
+  const openDocument = async (doc) => {
+    try {
+      const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+      const response = await fetch(`${API_BASE_URL}/documents/file/${doc.id}?userId=${currentUser.id}`, {
+        headers: { Authorization: `Bearer ${currentUser.token}` },
+      });
+      if (!response.ok) throw new Error("Failed to load document");
+      const buffer = await response.arrayBuffer();
+      const mime = detectMime(new Uint8Array(buffer));
+
+      if (mime === "application/zip") {
+        const blob = new Blob([buffer]);
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = doc.title;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        return;
+      }
+
+      const blob = new Blob([buffer], { type: mime });
+      setViewerType(mime);
+      setViewerTitle(doc.title);
+      setViewerUrl(URL.createObjectURL(blob));
+    } catch {
+      toastRef.current?.show({ severity: "error", summary: "Error", detail: "Could not open document" });
+    }
+  };
+
+  const closeViewer = () => {
+    if (viewerUrl) URL.revokeObjectURL(viewerUrl);
+    setViewerUrl(null);
+    setViewerType(null);
+    setViewerTitle("");
+  };
+
+  useEffect(() => {
+    const handleEscape = (e) => { if (e.key === "Escape") closeViewer(); };
+    if (viewerUrl) window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [viewerUrl]);
 
   return (
     <div className="admin-dashboard-container">
@@ -152,18 +116,16 @@ export default function ResidentDocuments() {
           <h2 className="dashboard-title">Documents</h2>
 
           <div className="inventory-section">
-            {/* Search */}
             <div className="documents-search">
               <img src={searchIcon} alt="Search" className="search-icon" />
               <input
                 type="text"
-                placeholder="Search Document Name or Code"
+                placeholder="Search documents"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
 
-            {/* Document list */}
             <div className="documents-box">
               {loading ? (
                 <div className="documents-loading">
@@ -171,38 +133,49 @@ export default function ResidentDocuments() {
                   <span>Loading...</span>
                 </div>
               ) : error ? (
-                <div className="form-error">{error}</div>
+                <div className="no-documents">{error}</div>
               ) : filteredDocuments.length === 0 ? (
                 <div className="no-documents">No documents found</div>
               ) : (
-                  filteredDocuments.map((doc) => (
-                      <div key={doc.id} className="document-row">
-                        <i className="pi pi-file document-file-icon"></i>
-
-                        <span className="document-name">{doc.title}</span>
-
-                        <div className="document-actions">
-                          <button
-                              className="view-button"
-                              onClick={() => openDocument(doc.id)}
-                          >
-                            View
-                          </button>
-                        </div>
-                      </div>
-                  ))
+                filteredDocuments.map((doc) => (
+                  <div
+                    key={doc.id}
+                    className="document-row"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => openDocument(doc)}
+                  >
+                    <i className="pi pi-file" style={{ fontSize: "16px", marginRight: "12px" }}></i>
+                    <span className="document-name">{doc.title}</span>
+                  </div>
+                ))
               )}
             </div>
           </div>
         </div>
       </main>
+
+      {viewerUrl && (
+        <div className="document-viewer-overlay" onClick={closeViewer}>
+          <div className="document-viewer-container" onClick={(e) => e.stopPropagation()}>
+            <div className="document-viewer-header">
+              <span className="document-viewer-title">{viewerTitle}</span>
+              <div className="document-viewer-actions">
+                <a href={viewerUrl} download={viewerTitle} className="document-viewer-download" title="Download">
+                  <i className="pi pi-download"></i>
+                </a>
+                <button className="document-viewer-close" onClick={closeViewer}>&#10005;</button>
+              </div>
+            </div>
+            <div className="document-viewer-body">
+              {viewerType?.startsWith("image/") ? (
+                <img src={viewerUrl} alt="Document" className="document-viewer-image" />
+              ) : (
+                <iframe src={viewerUrl} title="Document" className="document-viewer-iframe" />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-
-
-
-
-
-
