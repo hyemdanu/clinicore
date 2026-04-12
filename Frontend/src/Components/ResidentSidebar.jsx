@@ -34,11 +34,20 @@ export default function ResidentSidebar({ isOpen, onToggle }) {
 
     return (
         <>
-            {isOpen && <div className="sidebar-backdrop" onClick={onToggle} />}
+            {isOpen && (
+                <button
+                    className="sidebar-backdrop"
+                    onClick={onToggle}
+                    aria-label="Close sidebar"
+                    type="button"
+                />
+            )}
+
             <aside className={`resident-sidebar ${isOpen ? "resident-sidebar-open" : "resident-sidebar-closed"}`}>
                 <div className="resident-sidebar-nav">
                     {items.map((it) => {
                         const active = pathname === it.to;
+
                         return (
                             <div
                                 key={it.to}
@@ -48,22 +57,33 @@ export default function ResidentSidebar({ isOpen, onToggle }) {
                                 <div className="resident-sidebar-icon">
                                     <img src={it.icon} alt="" />
                                 </div>
-                                {isOpen && <span className="resident-sidebar-label">{it.label}</span>}
+
+                                {isOpen && (
+                                    <span className="resident-sidebar-label">
+                                    {it.label}
+                                </span>
+                                )}
                             </div>
                         );
                     })}
                 </div>
 
-                <div className="sidebar-logout" onClick={handleLogout}>
+                <button
+                    className="sidebar-logout"
+                    onClick={handleLogout}
+                    aria-label="Log out"
+                    type="button"
+                >
                     <div className="resident-sidebar-icon">
-                        <i className="pi pi-sign-out" style={{ fontSize: "24px", color: "#e74c3c" }} />
+                        <i className="pi pi-sign-out sidebar-logout-icon" />
                     </div>
+
                     {isOpen && (
-                        <span className="resident-sidebar-label" style={{ color: "#e74c3c" }}>
-              Logout
-            </span>
+                        <span className="resident-sidebar-label">
+                        Logout
+                    </span>
                     )}
-                </div>
+                </button>
             </aside>
         </>
     );

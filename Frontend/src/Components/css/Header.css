@@ -1,29 +1,28 @@
-/* css for the header */
 .admin-header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 56px;
-  background-color: #369df7;
+  background-color: var(--color-primary);
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 var(--space-5);
   z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
 }
 
 .hamburger-btn {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 8px;
-  margin-right: 16px;
+  padding: var(--space-2);
+  margin-right: var(--space-4);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s ease;
-  border-radius: 4px;
+  transition: background-color var(--transition-fast);
+  border-radius: var(--radius-sm);
 }
 
 .hamburger-btn:hover {
@@ -31,14 +30,14 @@
 }
 
 .hamburger-icon {
-  font-size: 24px;
-  color: white;
+  font-size: var(--text-xl);
+  color: var(--color-bg-white);
   line-height: 1;
 }
 
 .header-title {
-  font-size: 20px;
+  font-size: var(--text-lg);
   font-weight: 600;
-  color: white;
+  color: var(--color-bg-white);
   margin: 0;
 }

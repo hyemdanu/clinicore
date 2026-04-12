@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import './css/AdminSidebar.css';  // Reuse the same CSS
+import './css/CaregiverSidebar.css';
 import dashboardIcon from '../assets/icons/dashboardicon.png';
 import residentIcon from '../assets/icons/residenticon.png';
 import userIcon from '../assets/icons/usericon.png';
@@ -7,13 +7,9 @@ import messageIcon from '../assets/icons/Messageicon.png';
 import documentsIcon from '../assets/icons/documentsIcon.png';
 import inventoryIcon from '../assets/icons/inventoryicon.png';
 
-// Caregiver Sidebar Component
 const CaregiverSidebar = ({ isOpen, activeTab, onNavigate }) => {
     const navigate = useNavigate();
-    // activeTab is now controlled by parent component
 
-    // menu items configuration for caregivers
-    // Includes Documents tab
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: dashboardIcon },
         { id: 'residents', label: 'Residents', icon: residentIcon },
@@ -28,38 +24,64 @@ const CaregiverSidebar = ({ isOpen, activeTab, onNavigate }) => {
         navigate('/');
     };
 
-    // update active item when a menu item is clicked
     const handleItemClick = (itemId) => {
         if (onNavigate) {
-
             onNavigate(itemId);
         }
     };
 
     return (
-        // animation and css stuff handled in AdminSidebar.css
-        <div className={`admin-sidebar ${isOpen ? 'admin-sidebar-open' : 'admin-sidebar-closed'}`}>
-            <nav className="admin-sidebar-nav">
-                {menuItems.map((item) => (
-                    <div
-                        key={item.id}
-                        className={`admin-sidebar-item ${activeTab === item.id ? 'admin-sidebar-item-active' : ''}`}
-                        onClick={() => handleItemClick(item.id)}
-                    >
-                        <div className="admin-sidebar-icon">
-                            <img src={item.icon} alt={item.label} />
+        <>
+            {isOpen && (
+                <button
+                    className="sidebar-backdrop"
+                    onClick={() => {}}
+                    aria-label="Close sidebar"
+                    type="button"
+                />
+            )}
+
+            <aside className={`caregiver-sidebar ${isOpen ? 'caregiver-sidebar-open' : 'caregiver-sidebar-closed'}`}>
+                <nav className="caregiver-sidebar-nav">
+                    {menuItems.map((item) => (
+                        <div
+                            key={item.id}
+                            className={`caregiver-sidebar-item ${
+                                activeTab === item.id ? 'caregiver-sidebar-item-active' : ''
+                            }`}
+                            onClick={() => handleItemClick(item.id)}
+                        >
+                            <div className="caregiver-sidebar-icon">
+                                <img src={item.icon} alt={item.label} />
+                            </div>
+
+                            {isOpen && (
+                                <span className="caregiver-sidebar-label">
+                                    {item.label}
+                                </span>
+                            )}
                         </div>
-                        {isOpen && <span className="admin-sidebar-label">{item.label}</span>}
+                    ))}
+                </nav>
+
+                <button
+                    className="sidebar-logout"
+                    onClick={handleLogout}
+                    aria-label="Log out"
+                    type="button"
+                >
+                    <div className="caregiver-sidebar-icon">
+                        <i className="pi pi-sign-out sidebar-logout-icon" />
                     </div>
-                ))}
-            </nav>
-            <div className="sidebar-logout" onClick={handleLogout}>
-                <div className="admin-sidebar-icon">
-                    <i className="pi pi-sign-out" style={{ fontSize: '24px', color: '#e74c3c' }}></i>
-                </div>
-                {isOpen && <span className="admin-sidebar-label" style={{ color: '#e74c3c' }}>Logout</span>}
-            </div>
-        </div>
+
+                    {isOpen && (
+                        <span className="caregiver-sidebar-label">
+                            Logout
+                        </span>
+                    )}
+                </button>
+            </aside>
+        </>
     );
 };
 

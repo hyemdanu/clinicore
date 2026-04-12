@@ -40,32 +40,55 @@ const AdminSidebar = ({ isOpen, activeTab, onNavigate, onToggle }) => {
   };
 
   return (
-    <>
-      {isOpen && <div className="sidebar-backdrop" onClick={onToggle} />}
-      <div className={`admin-sidebar ${isOpen ? 'admin-sidebar-open' : 'admin-sidebar-closed'}`}>
-        <nav className="admin-sidebar-nav">
-          {menuItems.map((item) => (
-            <div
-              key={item.id}
-              className={`admin-sidebar-item ${activeTab === item.id ? 'admin-sidebar-item-active' : ''}`}
-              onClick={() => handleItemClick(item.id)}
-            >
-              <div className="admin-sidebar-icon">
-                <img src={item.icon} alt={item.label} />
-              </div>
-              {isOpen && <span className="admin-sidebar-label">{item.label}</span>}
-            </div>
-          ))}
-        </nav>
+      <>
+        {isOpen && (
+            <button
+                className="sidebar-backdrop"
+                onClick={onToggle}
+                aria-label="Close sidebar"
+                type="button"
+            />
+        )}
 
-        <div className="sidebar-logout" onClick={handleLogout}>
-          <div className="admin-sidebar-icon">
-            <i className="pi pi-sign-out" style={{ fontSize: '24px', color: '#e74c3c' }}></i>
-          </div>
-          {isOpen && <span className="admin-sidebar-label" style={{ color: '#e74c3c' }}>Logout</span>}
-        </div>
-      </div>
-    </>
+        <aside className={`admin-sidebar ${isOpen ? 'admin-sidebar-open' : 'admin-sidebar-closed'}`}>
+          <nav className="admin-sidebar-nav">
+            {menuItems.map((item) => (
+                <div
+                    key={item.id}
+                    className={`admin-sidebar-item ${activeTab === item.id ? 'admin-sidebar-item-active' : ''}`}
+                    onClick={() => handleItemClick(item.id)}
+                >
+                  <div className="admin-sidebar-icon">
+                    <img src={item.icon} alt={item.label} />
+                  </div>
+
+                  {isOpen && (
+                      <span className="admin-sidebar-label">
+                {item.label}
+              </span>
+                  )}
+                </div>
+            ))}
+          </nav>
+
+          <button
+              className="sidebar-logout"
+              onClick={handleLogout}
+              aria-label="Log out"
+              type="button"
+          >
+            <div className="admin-sidebar-icon">
+              <i className="pi pi-sign-out sidebar-logout-icon" />
+            </div>
+
+            {isOpen && (
+                <span className="admin-sidebar-label">
+            Logout
+          </span>
+            )}
+          </button>
+        </aside>
+      </>
   );
 };
 
