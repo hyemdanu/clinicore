@@ -3,11 +3,14 @@ package com.clinicore.project.integration;
 import com.clinicore.project.entity.CommunicationPortal;
 import com.clinicore.project.repository.MessagesRepository;
 import com.clinicore.project.service.EncryptionService;
+import com.clinicore.project.service.JwtService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,10 +40,21 @@ class MessageEncryptionIntegrationTest {
     @Autowired
     private EncryptionService encryptionService;
 
+    @Autowired
+    private JwtService jwtService;
+
     // sender=1 (Admin), recipient=2 (Caregiver) → conversationId = "1_2"
     private static final Long SENDER_ID = 1L;
     private static final Long RECIPIENT_ID = 2L;
     private static final String CONVERSATION_ID = "1_2";
+
+    private String authHeader;
+
+    @BeforeEach
+    void setUpAuth() {
+        String token = jwtService.generateToken(SENDER_ID, "admin", "ROLE_ADMIN");
+        authHeader = "Bearer " + token;
+    }
 
     // --- Scenario 1 ---
 
@@ -50,6 +64,7 @@ class MessageEncryptionIntegrationTest {
         String plaintext = "Hello encryption scenario one";
 
         mockMvc.perform(post("/api/messages/chat/send")
+                        .header(HttpHeaders.AUTHORIZATION, authHeader)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                             {"senderId": 1, "recipientId": 2, "message": "%s"}
@@ -75,13 +90,15 @@ class MessageEncryptionIntegrationTest {
         String plaintext = "Decryption round-trip test";
 
         mockMvc.perform(post("/api/messages/chat/send")
+                        .header(HttpHeaders.AUTHORIZATION, authHeader)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                             {"senderId": 1, "recipientId": 2, "message": "%s"}
                             """.formatted(plaintext)))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/messages/chat/conversation/" + CONVERSATION_ID))
+        mockMvc.perform(get("/api/messages/chat/conversation/" + CONVERSATION_ID)
+                        .header(HttpHeaders.AUTHORIZATION, authHeader))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[*].message", hasItem(plaintext)));
     }
@@ -97,11 +114,13 @@ class MessageEncryptionIntegrationTest {
             """.formatted(plaintext);
 
         mockMvc.perform(post("/api/messages/chat/send")
+                        .header(HttpHeaders.AUTHORIZATION, authHeader)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isOk());
 
         mockMvc.perform(post("/api/messages/chat/send")
+                        .header(HttpHeaders.AUTHORIZATION, authHeader)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isOk());
@@ -134,7 +153,8 @@ class MessageEncryptionIntegrationTest {
         messagesRepository.save(legacy);
 
         // The fetch endpoint runs through decryptSafe which must return plaintext unchanged
-        mockMvc.perform(get("/api/messages/chat/conversation/" + CONVERSATION_ID))
+        mockMvc.perform(get("/api/messages/chat/conversation/" + CONVERSATION_ID)
+                        .header(HttpHeaders.AUTHORIZATION, authHeader))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[*].message", hasItem(legacyPlaintext)));
     }
@@ -146,6 +166,7 @@ class MessageEncryptionIntegrationTest {
     void messageWithAttachmentIsEncrypted() throws Exception {
         // NOTE: if this test fails, encryption may not be wired for the attachment endpoint — flag in PR
         mockMvc.perform(post("/api/messages/chat/send-with-attachment")
+                        .header(HttpHeaders.AUTHORIZATION, authHeader)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                             {
@@ -180,13 +201,15 @@ class MessageEncryptionIntegrationTest {
         String plaintext = "Preview decryption scenario six";
 
         mockMvc.perform(post("/api/messages/chat/send")
+                        .header(HttpHeaders.AUTHORIZATION, authHeader)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                             {"senderId": 1, "recipientId": 2, "message": "%s"}
                             """.formatted(plaintext)))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/messages/chat/conversations?userId=" + SENDER_ID))
+        mockMvc.perform(get("/api/messages/chat/conversations?userId=" + SENDER_ID)
+                        .header(HttpHeaders.AUTHORIZATION, authHeader))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[*].lastMessage", hasItem(plaintext)));
     }
