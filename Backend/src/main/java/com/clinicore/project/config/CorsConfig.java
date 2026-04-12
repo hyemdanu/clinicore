@@ -33,6 +33,9 @@ public class CorsConfig {
         // allow all request headers (what browser is allowed to send)
         config.addAllowedHeader("*");
 
+        // expose response headers so frontend JS can read them (Content-Type for doc viewer, etc.)
+        config.setExposedHeaders(List.of("Content-Type", "Content-Disposition"));
+
         // allow cookies and authentication headers (allows browser to send tokens/credentials)
         config.setAllowCredentials(true);
 
