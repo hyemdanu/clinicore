@@ -1,152 +1,234 @@
 package com.clinicore.project.integration;
 
-import com.clinicore.project.controller.ResidentController;
-import com.clinicore.project.dto.ResidentFullDTO;
-import com.clinicore.project.service.JwtService;
-import com.clinicore.project.service.ResidentService;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(ResidentController.class)
+/**
+ * Integration tests for ResidentController
+ * Hits real endpoints, real service layer, real database
+ */
+@SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ResidentControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private ResidentService residentService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @MockBean
-    private JwtService jwtService;
-
+    // seeded user IDs — adjust if your seed data uses different IDs
     private static final Long ADMIN_ID = 1L;
     private static final Long RESIDENT_ID = 4L;
-    private static final Long NON_EXISTENT_RESIDENT_ID = 999999L;
+
+    // track IDs created during tests so later tests can clean up or reference them
+    private static Long createdMedicationId;
+
+    // ==================== LIST TESTS ====================
 
     @Test
-    @DisplayName("GET all residents returns 200 and a list")
-    void getAllResidentsReturnsList() throws Exception {
-        List<Map<String, Object>> residents = List.of(
-                Map.of("id", RESIDENT_ID, "firstName", "Sean", "lastName", "Bombay"),
-                Map.of("id", 5L, "firstName", "Maya", "lastName", "Rivera")
-        );
-
-        when(residentService.getAllResidentsBasic()).thenReturn(residents);
+    @Order(1)
+    @DisplayName("TEST 1: GET /list returns a list of residents (lightweight)")
+    void testGetResidentList() throws Exception {
+        System.out.println("\n=== TEST 1: Get Resident List ===");
 
         mockMvc.perform(get("/api/residents/list")
-                        .param("currentUserId", String.valueOf(ADMIN_ID)))
+                        .param("currentUserId", ADMIN_ID.toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value(RESIDENT_ID))
-                .andExpect(jsonPath("$[0].firstName").value("Sean"));
+                .andExpect(jsonPath("$").isArray());
+
+        System.out.println("PASSED TEST 1");
     }
 
     @Test
-    @DisplayName("GET resident by id returns hydrated resident with nested medical info and profile")
-    void getResidentByIdReturnsHydratedResident() throws Exception {
-        when(residentService.getResidentFullDetailsById(RESIDENT_ID)).thenReturn(buildResident());
+    @Order(2)
+    @DisplayName("TEST 2: GET /medication-summary returns per-resident medication counts")
+    void testGetMedicationSummary() throws Exception {
+        System.out.println("\n=== TEST 2: Get Medication Summary ===");
 
-        mockMvc.perform(get("/api/residents/full/{residentId}", RESIDENT_ID)
-                        .param("currentUserId", String.valueOf(ADMIN_ID)))
+        mockMvc.perform(get("/api/residents/medication-summary")
+                        .param("currentUserId", ADMIN_ID.toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(RESIDENT_ID))
-                .andExpect(jsonPath("$.firstName").value("Sean"))
-                .andExpect(jsonPath("$.medicalProfile.insurance").value("Blue Shield"))
-                .andExpect(jsonPath("$.medicalRecord.allergies[0]").value("Penicillin"))
-                .andExpect(jsonPath("$.assignedCaregivers[0].caregiverId").value(2))
-                .andExpect(jsonPath("$.medications[0].name").value("Aspirin"));
+                .andExpect(jsonPath("$").isArray());
+
+        System.out.println("PASSED TEST 2");
     }
 
-    @Test
-    @DisplayName("GET non-existent resident returns 404")
-    void getNonExistentResidentReturns404() throws Exception {
-        when(residentService.getResidentFullDetailsById(NON_EXISTENT_RESIDENT_ID))
-                .thenThrow(new RuntimeException("Resident not found"));
-
-        mockMvc.perform(get("/api/residents/full/{residentId}", NON_EXISTENT_RESIDENT_ID)
-                        .param("currentUserId", String.valueOf(ADMIN_ID)))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("Resident not found"))
-                .andExpect(jsonPath("$.userId").value(ADMIN_ID));
-    }
+    // ==================== FULL DETAIL TESTS ====================
 
     @Test
-    @DisplayName("GET all residents with full details returns 200 and hydrated list")
-    void getAllResidentsWithFullDetailsReturnsHydratedList() throws Exception {
-        when(residentService.getAllResidentsWithFullDetails())
-                .thenReturn(List.of(buildResident()));
+    @Order(3)
+    @DisplayName("TEST 3: GET /full returns all residents with hydrated details (JOIN FETCH)")
+    void testGetAllResidentsFull() throws Exception {
+        System.out.println("\n=== TEST 3: Get All Residents Full ===");
 
         mockMvc.perform(get("/api/residents/full")
-                        .param("currentUserId", String.valueOf(ADMIN_ID)))
+                        .param("currentUserId", ADMIN_ID.toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].id").value(RESIDENT_ID))
-                .andExpect(jsonPath("$[0].medicalProfile.insurance").value("Blue Shield"))
-                .andExpect(jsonPath("$[0].medicalRecord.diagnoses[0]").value("Hypertension"));
+                .andExpect(jsonPath("$").isArray());
+
+        System.out.println("PASSED TEST 3");
     }
 
-    private ResidentFullDTO buildResident() {
-        return new ResidentFullDTO(
-                RESIDENT_ID,
-                "resident@example.com",
-                "Sean",
-                "Bombay",
-                "Male",
-                LocalDate.of(1947, 6, 12),
-                "555-111-2222",
-                "Anita Bombay",
-                "555-333-4444",
-                "Requires evening wellness check.",
-                List.of(new ResidentFullDTO.AssignedCaregiverDTO(2L, "Emily Tran")),
-                new ResidentFullDTO.MedicalProfileDTO("Blue Shield", "Diabetic"),
-                new ResidentFullDTO.MedicalServicesDTO(
-                        "Comfort Care",
-                        "General Hospital",
-                        "CVS",
-                        "Home Health Inc.",
-                        "Peaceful Rest",
-                        "DNR on file",
-                        true,
-                        true
-                ),
-                new ResidentFullDTO.CapabilityDTO(true, false, "Assisted", "Walker"),
-                new ResidentFullDTO.MedicalRecordDTO(
-                        List.of("Penicillin"),
-                        List.of("Hypertension"),
-                        "Monitor blood pressure weekly.",
-                        List.of(new ResidentFullDTO.AllergyDTO(10L, RESIDENT_ID, "Penicillin", 3, "Rash")),
-                        List.of(new ResidentFullDTO.DiagnosisDTO(20L, RESIDENT_ID, "Hypertension", "Stable"))
-                ),
-                List.of(new ResidentFullDTO.MedicationDTO(
-                        30L,
-                        40L,
-                        "Aspirin",
-                        "81mg",
-                        "Daily",
-                        12,
-                        "Take with food",
-                        "PENDING",
-                        null,
-                        "2026-04-12T18:00:00",
-                        false
-                ))
-        );
+    @Test
+    @Order(4)
+    @DisplayName("TEST 4: GET /full/{id} returns one resident with medical info, medications, allergies")
+    void testGetResidentByIdFull() throws Exception {
+        System.out.println("\n=== TEST 4: Get Resident By ID Full ===");
+
+        mockMvc.perform(get("/api/residents/full/" + RESIDENT_ID)
+                        .param("currentUserId", ADMIN_ID.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(RESIDENT_ID))
+                .andExpect(jsonPath("$.firstName").exists())
+                .andExpect(jsonPath("$.lastName").exists())
+                // these should be populated by the JOIN FETCH queries
+                .andExpect(jsonPath("$.medications").isArray())
+                .andExpect(jsonPath("$.medicalProfile").exists());
+
+        System.out.println("PASSED TEST 4");
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("TEST 5: GET /full/{nonExistent} returns 404")
+    void testGetNonExistentResident() throws Exception {
+        System.out.println("\n=== TEST 5: Get Non-Existent Resident ===");
+
+        mockMvc.perform(get("/api/residents/full/999999")
+                        .param("currentUserId", ADMIN_ID.toString()))
+                .andExpect(status().isNotFound());
+
+        System.out.println("PASSED TEST 5");
+    }
+
+    // ==================== MEDICATION CRUD ====================
+
+    @Test
+    @Order(6)
+    @DisplayName("TEST 6: POST /{residentId}/medications creates a new medication")
+    void testCreateMedication() throws Exception {
+        System.out.println("\n=== TEST 6: Create Medication ===");
+
+        Map<String, Object> medication = new LinkedHashMap<>();
+        medication.put("name", "Integration Test Med");
+        medication.put("dosage", "50mg");
+        medication.put("schedule", "Twice daily");
+        medication.put("notes", "created by integration test");
+        medication.put("intakeStatus", "PENDING");
+
+        String response = mockMvc.perform(post("/api/residents/" + RESIDENT_ID + "/medications")
+                        .param("currentUserId", ADMIN_ID.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(medication)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Integration Test Med"))
+                .andExpect(jsonPath("$.dosage").value("50mg"))
+                .andReturn().getResponse().getContentAsString();
+
+        // stash the ID so we can update/delete it later
+        Map<?, ?> parsed = objectMapper.readValue(response, Map.class);
+        createdMedicationId = ((Number) parsed.get("id")).longValue();
+
+        System.out.println("PASSED TEST 6 — medicationId=" + createdMedicationId);
+    }
+
+    @Test
+    @Order(7)
+    @DisplayName("TEST 7: PATCH /medications/{id}/status updates medication status")
+    void testUpdateMedicationStatus() throws Exception {
+        System.out.println("\n=== TEST 7: Update Medication Status ===");
+
+        mockMvc.perform(patch("/api/residents/medications/" + createdMedicationId + "/status")
+                        .param("status", "ADMINISTERED")
+                        .param("currentUserId", ADMIN_ID.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.intakeStatus").value("Administered"));
+
+        System.out.println("PASSED TEST 7");
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("TEST 8: DELETE /medications/{id} removes the medication")
+    void testDeleteMedication() throws Exception {
+        System.out.println("\n=== TEST 8: Delete Medication ===");
+
+        mockMvc.perform(delete("/api/residents/medications/" + createdMedicationId)
+                        .param("currentUserId", ADMIN_ID.toString()))
+                .andExpect(status().isOk());
+
+        System.out.println("PASSED TEST 8");
+    }
+
+    // ==================== MEDICAL PROFILE ====================
+
+    @Test
+    @Order(9)
+    @DisplayName("TEST 9: PATCH /{residentId}/medical-profile updates insurance/notes")
+    void testUpdateMedicalProfile() throws Exception {
+        System.out.println("\n=== TEST 9: Update Medical Profile ===");
+
+        // grab current insurance so we can restore it after
+        String before = mockMvc.perform(get("/api/residents/full/" + RESIDENT_ID)
+                        .param("currentUserId", ADMIN_ID.toString()))
+                .andReturn().getResponse().getContentAsString();
+        String originalInsurance = objectMapper.readTree(before)
+                .path("medicalProfile").path("insurance").asText("");
+
+        // update to test value
+        Map<String, String> updates = new LinkedHashMap<>();
+        updates.put("insurance", "Blue Shield Test");
+
+        mockMvc.perform(patch("/api/residents/" + RESIDENT_ID + "/medical-profile")
+                        .param("currentUserId", ADMIN_ID.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updates)))
+                .andExpect(status().isOk());
+
+        // verify it took
+        mockMvc.perform(get("/api/residents/full/" + RESIDENT_ID)
+                        .param("currentUserId", ADMIN_ID.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.medicalProfile.insurance").value("Blue Shield Test"));
+
+        // restore original value
+        Map<String, String> restore = new LinkedHashMap<>();
+        restore.put("insurance", originalInsurance);
+
+        mockMvc.perform(patch("/api/residents/" + RESIDENT_ID + "/medical-profile")
+                        .param("currentUserId", ADMIN_ID.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(restore)))
+                .andExpect(status().isOk());
+
+        System.out.println("PASSED TEST 9");
+    }
+
+    // ==================== AVAILABLE MEDICATIONS ====================
+
+    @Test
+    @Order(10)
+    @DisplayName("TEST 10: GET /medications/available returns medication inventory list")
+    void testGetAvailableMedications() throws Exception {
+        System.out.println("\n=== TEST 10: Get Available Medications ===");
+
+        mockMvc.perform(get("/api/residents/medications/available"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray());
+
+        System.out.println("PASSED TEST 10");
     }
 }
