@@ -1,70 +1,10 @@
 /* Medication Inventory Styles */
-
-.medication-inventory-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    background-color: var(--color-bg);
-}
-
-.inventory-content {
-    margin-left: 0;
-    padding: var(--space-4);
-    transition: margin-left var(--transition-slow);
-    flex: 1;
-    overflow-y: auto;
-}
-
-.inventory-content.content-with-sidebar {
-    margin-left: 250px;
-}
-
-/* When sidebar is closed */
-.inventory-content:not(.content-with-sidebar) {
-    margin-left: 0;
-}
-
-/* Header Section */
-.inventory-header-section {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    color: var(--color-bg-white);
-    padding: var(--space-4);
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--space-8);
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    text-align: center;
-    gap: var(--space-4);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-}
-
-.header-icon-wrapper {
-    background: rgba(255, 255, 255, 0.2);
-    padding: var(--space-3);
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.header-icon {
-    width: var(--space-10);
-    height: var(--space-10);
-    object-fit: contain;
-}
-
-.page-title {
-    font-size: var(--text-xl);
-    font-weight: 600;
-    margin: 0;
-    color: var(--color-bg-white);
-}
+/* Rendered inside .main-content — parent handles sidebar offset, header offset, and padding */
 
 /* Error Message */
 .error-message {
-    background-color: #fee;
-    border: 1px solid #fcc;
+    background-color: var(--color-error-bg);
+    border: 1px solid var(--color-error-border);
     color: var(--color-error);
     padding: var(--space-4);
     border-radius: var(--radius-md);
@@ -113,7 +53,7 @@
 
 .search-input:focus {
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
 /* Adjust search icon position */
@@ -125,11 +65,11 @@
 }
 
 .add-medication-btn {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    background: var(--color-purple);
     border: none;
     padding: var(--space-3) var(--space-6);
     font-weight: 600;
-    box-shadow: 0 2px 6px rgba(139, 92, 246, 0.3);
+    box-shadow: var(--shadow-sm);
     transition: all var(--transition-fast);
     color: var(--color-bg-white);
     width: 100%;
@@ -137,12 +77,13 @@
 
 .add-medication-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    box-shadow: var(--shadow-md);
+    background: var(--color-purple);
+    filter: brightness(0.9);
 }
 
 .add-medication-btn:focus {
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+    box-shadow: 0 0 0 3px var(--color-purple-light);
 }
 
 /* Medication Table */
@@ -157,7 +98,7 @@
 }
 
 .medication-table .p-datatable-thead > tr > th {
-    background-color: #f9fafb;
+    background-color: var(--color-bg);
     color: var(--color-text);
     font-weight: 600;
     padding: var(--space-4) var(--space-5);
@@ -172,28 +113,22 @@
 }
 
 .medication-table .p-datatable-tbody > tr:hover {
-    background-color: #f9fafb;
+    background-color: var(--color-bg);
 }
 
 .medication-table .p-datatable-tbody > tr > td {
     padding: var(--space-5);
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--color-border-light);
     color: var(--color-text);
     font-size: var(--text-base);
 }
 
-/* Column Widths */
-.medication-table .p-datatable-thead > tr > th:nth-child(1),
-.medication-table .p-datatable-tbody > tr > td:nth-child(1) { width: 40%; }
-
-.medication-table .p-datatable-thead > tr > th:nth-child(2),
-.medication-table .p-datatable-tbody > tr > td:nth-child(2) { width: 20%; }
-
-.medication-table .p-datatable-thead > tr > th:nth-child(3),
-.medication-table .p-datatable-tbody > tr > td:nth-child(3) { width: 25%; }
-
-.medication-table .p-datatable-thead > tr > th:nth-child(4),
-.medication-table .p-datatable-tbody > tr > td:nth-child(4) { width: 15%; text-align: center; }
+/* Column Width Utilities */
+.col-15     { width: 15%; }
+.col-20     { width: 20%; }
+.col-25     { width: 25%; }
+.col-40     { width: 40%; }
+.col-center { text-align: center; }
 
 /* Quantity Cell */
 .quantity-cell {
@@ -208,7 +143,7 @@
 }
 
 .quantity-cell .warning-icon {
-    color: #f59e0b;
+    color: var(--color-warning);
     font-size: var(--text-md);
 }
 
@@ -232,12 +167,13 @@
 }
 
 .action-buttons .btn-add {
-    background-color: #22c55e;
+    background-color: var(--color-success);
     color: var(--color-bg-white);
 }
 
 .action-buttons .btn-add:hover {
-    background-color: #16a34a;
+    background-color: var(--color-success);
+    filter: brightness(0.85);
     transform: translateY(-1px);
 }
 
@@ -260,7 +196,7 @@
 }
 
 .action-buttons .btn-remove:disabled {
-    background-color: #fca5a5;
+    background-color: var(--color-error-border);
     cursor: not-allowed;
     transform: none;
 }
@@ -284,11 +220,11 @@
 
 .menu-buttons .menu-button:hover {
     transform: scale(1.2);
-    background-color: #f3f4f6;
+    background-color: var(--color-border-light);
 }
 
 .menu-buttons .delete-button:hover {
-    background-color: #fee;
+    background-color: var(--color-error-bg);
 }
 
 /* Dialog Styles */
@@ -322,7 +258,7 @@
 
 .dialog-content .p-inputtext:focus {
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
 /* .custom-loading + .custom-spinner moved to index.css */
@@ -350,17 +286,6 @@
 
 /* Responsive Design */
 @media (min-width: 768px) {
-    .inventory-content {
-        margin-left: 250px;
-        padding: var(--space-8);
-    }
-
-    .inventory-header-section {
-        padding: var(--space-6) var(--space-8);
-        flex-direction: row;
-        text-align: left;
-    }
-
     .table-header {
         flex-direction: row;
     }
@@ -391,7 +316,7 @@
 
 /* PrimeReact Dialog Override */
 .p-dialog .p-dialog-header {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
     color: var(--color-bg-white);
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     padding: var(--space-5) var(--space-6);

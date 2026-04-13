@@ -10,7 +10,6 @@ import { get, post, put, del } from '../../services/api.js';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 import '../CaregiverPortal/css/CaregiverInventory.css';
-import medicationsIcon from '../../assets/icons/medicationsIcon.png';
 
 export default function MedicationInventory() {
     const navigate = useNavigate();
@@ -141,15 +140,15 @@ export default function MedicationInventory() {
 
     const menuBodyTemplate = (rowData) => (
         <div className="menu-buttons">
-            <button className="menu-button" onClick={() => handleEditMedication(rowData)} aria-label="Edit">✏️</button>
-            <button className="menu-button delete-button" onClick={() => handleDeleteMedication(rowData)} aria-label="Delete">🗑️</button>
+            <button className="menu-button" onClick={() => handleEditMedication(rowData)} aria-label="Edit">&#x270F;&#xFE0F;</button>
+            <button className="menu-button delete-button" onClick={() => handleDeleteMedication(rowData)} aria-label="Delete">&#x1F5D1;&#xFE0F;</button>
         </div>
     );
 
     const quantityBodyTemplate = (rowData) => {
         const isLowStock = rowData.quantity <= 10;
         return (
-            <div className={`quantity-cell ${isLowStock ? 'low-stock' : ''}`}>
+            <div className={`quantity-cell ${isLowStock ? 'low-stock' : ''}`} role={isLowStock ? "status" : undefined}>
                 {isLowStock && <i className="pi pi-exclamation-triangle warning-icon"></i>}
                 <span>{rowData.quantity}</span>
             </div>
@@ -161,7 +160,9 @@ export default function MedicationInventory() {
             <div className="search-container">
                 <span className="p-input-icon-left">
                     <i className="pi pi-search" />
+                    <label htmlFor="search-medications" className="sr-only">Search medications</label>
                     <InputText
+                        id="search-medications"
                         value={globalFilter}
                         onChange={(e) => setGlobalFilter(e.target.value)}
                         placeholder="Search medications..."
@@ -178,25 +179,21 @@ export default function MedicationInventory() {
         </div>
     );
 
-    const loadingIcon = (
-        <div className="custom-loading">
-            <i className="pi pi-spin pi-spinner custom-spinner"></i>
-            <span>Loading medications...</span>
-        </div>
-    );
+    if (loading) {
+        return (
+            <div className="custom-loading">
+                <i className="pi pi-spin pi-spinner custom-spinner"></i>
+                <span>Loading medications...</span>
+            </div>
+        );
+    }
 
     return (
         <div className="medication-inventory-content">
             <Toast ref={toastRef} />
-            <div className="inventory-header-section">
-                <div className="header-icon-wrapper">
-                    <img src={medicationsIcon} alt="Medication" className="header-icon" />
-                </div>
-                <h1 className="page-title">Inventory: Medication</h1>
-            </div>
 
             {error && (
-                <div className="error-message">
+                <div className="error-message" role="alert">
                     <i className="pi pi-exclamation-circle"></i>
                     {error}
                 </div>
@@ -205,8 +202,6 @@ export default function MedicationInventory() {
             <div className="inventory-table-wrapper">
                 <DataTable
                     value={medications}
-                    loading={loading}
-                    loadingIcon={loadingIcon}
                     header={renderHeader()}
                     globalFilter={globalFilter}
                     emptyMessage="No medications found"
@@ -215,10 +210,10 @@ export default function MedicationInventory() {
                     rows={10}
                     rowsPerPageOptions={[5, 10, 25, 50]}
                 >
-                    <Column field="name" header="Medication" sortable />
-                    <Column field="quantity" header="Quantity" body={quantityBodyTemplate} sortable />
-                    <Column header="Action" body={actionBodyTemplate} />
-                    <Column body={menuBodyTemplate} />
+                    <Column field="name" header="Medication" className="col-40" sortable />
+                    <Column field="quantity" header="Quantity" className="col-25" body={quantityBodyTemplate} sortable />
+                    <Column header="Action" className="col-20" body={actionBodyTemplate} />
+                    <Column className="col-15 col-center" body={menuBodyTemplate} />
                 </DataTable>
             </div>
 

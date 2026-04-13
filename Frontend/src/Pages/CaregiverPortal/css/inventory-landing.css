@@ -1,28 +1,18 @@
 /* Inventory Landing Page Styles */
+/* Rendered inside .main-content — parent handles sidebar offset, header offset, and padding */
 
 .inventory-landing-container {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    background-color: var(--color-bg);
+    min-height: 60vh;
 }
 
 .landing-content {
-    margin-left: 0;
-    padding: var(--space-6);
-    transition: margin-left var(--transition-slow);
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.landing-content.content-with-sidebar {
-    margin-left: 250px;
-}
-
-.landing-content:not(.content-with-sidebar) {
-    margin-left: 0;
+    padding: var(--space-6);
 }
 
 /* Cards Container */
@@ -47,6 +37,7 @@
 
     gap: var(--space-8);
     cursor: pointer;
+    text-align: left;
     transition: all var(--transition-fast);
 
     box-shadow: var(--shadow-md);
@@ -101,11 +92,6 @@
 
 /* Responsive Design */
 @media (min-width: 768px) {
-    .landing-content {
-        margin-left: 250px;
-        padding: 0;
-    }
-
     .inventory-cards-container {
         grid-template-columns: repeat(2, minmax(280px, 1fr));
         gap: var(--space-12);
