@@ -23,12 +23,11 @@ export default function InventoryLanding({ onNavigate }) {
                 <div className="inventory-cards-container">
 
                     {/* Medical Consumables Card */}
-                    <div
-                        className="inventory-card"
+                    <button
+                        type="button"
+                        className="inventory-card btn-reset"
                         onClick={handleConsumablesClick}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleConsumablesClick()}
+                        aria-label="Go to medical consumables inventory"
                     >
                         <div className="card-icon-wrapper purple">
                             <img
@@ -38,15 +37,14 @@ export default function InventoryLanding({ onNavigate }) {
                             />
                         </div>
                         <h2 className="card-title">Medical<br/>Consumables</h2>
-                    </div>
+                    </button>
 
                     {/* Medications Card */}
-                    <div
-                        className="inventory-card"
+                    <button
+                        type="button"
+                        className="inventory-card btn-reset"
                         onClick={handleMedicationsClick}
-                        role="button"
-                        tabIndex={0}
-                        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleMedicationsClick()}
+                        aria-label="Go to medication inventory"
                     >
                         <div className="card-icon-wrapper pink">
                             <img
@@ -56,7 +54,7 @@ export default function InventoryLanding({ onNavigate }) {
                             />
                         </div>
                         <h2 className="card-title">Medications</h2>
-                    </div>
+                    </button>
 
                 </div>
 
