@@ -43,7 +43,7 @@ export default function MedicationInventory() {
             if (!currentUser) { navigate('/'); return; }
             const data = await get(`/inventory/medication?currentUserId=${currentUser.id}`);
             setMedications(data);
-        } catch (error) {
+        } catch {
             setError('Failed to load medication inventory. Please try again.');
         } finally {
             setLoading(false);
@@ -62,7 +62,7 @@ export default function MedicationInventory() {
                 quantity: newQuantity
             });
             setMedications(prev => prev.map(m => m.id === medication.id ? { ...m, quantity: newQuantity } : m));
-        } catch (error) {
+        } catch {
             toastRef.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to adjust quantity. Please try again.' });
         }
     };
@@ -93,7 +93,7 @@ export default function MedicationInventory() {
             setEditDialogVisible(false);
             setSelectedMedication(null);
             setEditFormData({ name: '', quantity: '' });
-        } catch (error) {
+        } catch {
             toastRef.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to update medication. Please try again.' });
         }
     };
@@ -103,7 +103,7 @@ export default function MedicationInventory() {
         try {
             await del(`/inventory/medication/${medication.id}?currentUserId=${currentUser.id}`);
             setMedications(prev => prev.filter(m => m.id !== medication.id));
-        } catch (error) {
+        } catch {
             toastRef.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to delete medication. Please try again.' });
         }
     };
@@ -126,7 +126,7 @@ export default function MedicationInventory() {
             setMedications(prev => [...prev, created]);
             setAddDialogVisible(false);
             setAddFormData({ name: '', quantity: '' });
-        } catch (error) {
+        } catch {
             toastRef.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to add medication. Please try again.' });
         }
     };

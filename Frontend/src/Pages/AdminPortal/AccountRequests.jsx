@@ -122,7 +122,7 @@ export default function AccountRequests({ embedded = false }) {
             return;
         }
 
-        // store admin ID in state for later use (like appproving, denying, etc._
+        // store admin ID in state for later use (like appproving, denying, etc._)
         setCurrentUserId(user.id);
 
         // call function to fetch account requests
@@ -156,6 +156,7 @@ export default function AccountRequests({ embedded = false }) {
 
             // Show error toast notification to user
             toastRef.current?.show({
+                severity: 'error',
                 summary: 'Error',
                 detail: 'Failed to load account requests'
             });
@@ -214,6 +215,7 @@ export default function AccountRequests({ embedded = false }) {
             );
             // Show success notification
             toastRef.current?.show({
+                severity: 'success',
                 summary: 'Success',
                 detail: 'Account request updated successfully'
             });
@@ -227,6 +229,7 @@ export default function AccountRequests({ embedded = false }) {
         } catch (err) {
             // Show error notification if save fails
             toastRef.current?.show({
+                severity: 'error',
                 summary: 'Error',
                 detail: err.message || 'Failed to update request'
             });
@@ -255,6 +258,7 @@ export default function AccountRequests({ embedded = false }) {
 
             // show success notification
             toastRef.current?.show({
+                severity: 'success',
                 summary: 'Approved',
                 detail: 'Account request approved and email sent to the user.'
             });
@@ -265,6 +269,7 @@ export default function AccountRequests({ embedded = false }) {
         } catch (err) {
             // Show error notification if approval fails
             toastRef.current?.show({
+                severity: 'error',
                 summary: 'Error',
                 detail: err.message || 'Failed to approve request'
             });
@@ -295,6 +300,7 @@ export default function AccountRequests({ embedded = false }) {
 
             // show success notification
             toastRef.current?.show({
+                severity: 'success',
                 summary: 'Denied',
                 detail: 'Account request has been denied.'
             });
@@ -307,6 +313,7 @@ export default function AccountRequests({ embedded = false }) {
         } catch (err) {
             // Show error notification if deny fails
             toastRef.current?.show({
+                severity: 'error',
                 summary: 'Error',
                 detail: err.message || 'Failed to deny request'
             });
@@ -341,6 +348,7 @@ export default function AccountRequests({ embedded = false }) {
             setActivationCodeDialogVisible(true);
             // show success notification
             toastRef.current?.show({
+                severity: 'success',
                 summary: 'Code Resent',
                 detail: 'Activation code resent and email sent to the user.'
             });
@@ -349,6 +357,7 @@ export default function AccountRequests({ embedded = false }) {
         } catch (err) {
             // Show error notification if resend fails
             toastRef.current?.show({
+                severity: 'error',
                 summary: 'Error',
                 detail: err.message || 'Failed to resend activation code'
             });
@@ -372,6 +381,7 @@ export default function AccountRequests({ embedded = false }) {
             document.body.removeChild(textarea);
         }
         toastRef.current?.show({
+            severity: 'success',
             summary: 'Copied',
             detail: 'Activation code copied to clipboard'
         });
@@ -398,19 +408,16 @@ export default function AccountRequests({ embedded = false }) {
         const isApproved = rowData.status === 'APPROVED';
 
         return (
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-
+            <div className="dialog-actions">
                 {/* Edit button - disabled for completed/denied/approved requests */}
                 <Button
                     icon="pi pi-pencil"
                     className="p-button-rounded p-button-warning"
-
                     // when button clicked, call edit handler with current row data
                     onClick={() => handleEditRequest(rowData)}
-
                     // hide button if request is completed or denied
                     disabled={isCompleteOrDenied}
-                    title="Edit request"
+                    tooltip="Edit request"
                 />
 
                 {/* Approve and Deny buttons - only show for PENDING requests */}
@@ -422,7 +429,7 @@ export default function AccountRequests({ embedded = false }) {
                             className="p-button-rounded p-button-success"
                             // Call approve handler with request ID
                             onClick={() => handleApproveRequest(rowData.id)}
-                            title="Approve request"
+                            tooltip="Approve request"
                         />
 
                         {/* Deny button */}
@@ -431,7 +438,7 @@ export default function AccountRequests({ embedded = false }) {
                             className="p-button-rounded p-button-danger"
                             // Call deny handler with request object
                             onClick={() => handleOpenDenyDialog(rowData)}
-                            title="Deny request"
+                            tooltip="Deny request"
                         />
                     </>
                 )}
@@ -443,7 +450,7 @@ export default function AccountRequests({ embedded = false }) {
                         className="p-button-rounded p-button-info"
                         // Call resend handler with request ID
                         onClick={() => handleResendActivationCode(rowData.id)}
-                        title="Resend activation code"
+                        tooltip="Resend activation code"
                     />
                 )}
             </div>
@@ -466,61 +473,59 @@ export default function AccountRequests({ embedded = false }) {
                 </p>
             </div>
 
-                {/* Display error message if API call fails */}
-                {error && <div className="error-message">{error}</div>}
+            {/* Display error message if API call fails */}
+            {error && <div className="error-message">{error}</div>}
 
-                {/* Requests data table section */}
-                <section className="inventory-section" style={{ marginTop: '2rem' }}>
-                    <div className="inventory-header">
-                        <h3>Requests</h3>
-                        {/* Status filter dropdown menu */}
-                        <div className="sort-dropdown-wrapper">
-                            <label>Filter by Status:</label>
-                            <Dropdown
-                                // Current selected status value
-                                value={selectedStatus}
-                                // Dropdown options (All Statuses, Pending, Approved, etc.)
-                                options={STATUS_OPTIONS}
-                                // Update state when user selects a status
-                                onChange={(e) => setSelectedStatus(e.value)}
-                                className="sort-dropdown"
-                            />
-                        </div>
+            {/* Requests data table section */}
+            <section className="inventory-section">
+                <div className="inventory-header">
+                    <h3>Requests</h3>
+                    {/* Status filter dropdown menu */}
+                    <div className="sort-dropdown-wrapper">
+                        <label>Filter by Status:</label>
+                        <Dropdown
+                            // Current selected status value
+                            value={selectedStatus}
+                            // Dropdown options (All Statuses, Pending, Approved, etc.)
+                            options={STATUS_OPTIONS}
+                            // Update state when user selects a status
+                            onChange={(e) => setSelectedStatus(e.value)}
+                            className="sort-dropdown"
+                        />
                     </div>
+                </div>
 
-                    {/* DataTable displaying filtered account requests */}
-                    <DataTable
-                        // Pass filtered requests to table
-                        value={filteredRequests}
-                        // Show loading spinner while fetching
-                        loading={loading}
-                        className="inventory-table modern-table"
-                        emptyMessage="No account requests found"
-                        // Enable pagination
-                        paginator
-                        // Show 10 rows per page
-                        rows={10}
-                        style={{ fontSize: '0.95rem' }}
-                    >
-                        {/* Column for first name */}
-                        <Column field="firstName" header="First Name" style={{ width: '12%' }} />
-                        {/* Column for last name */}
-                        <Column field="lastName" header="Last Name" style={{ width: '12%' }} />
-                        {/* Column for email */}
-                        <Column field="email" header="Email" style={{ width: '20%' }} />
-                        {/* Column for role (resident, caregiver, admin) */}
-                        <Column field="role" header="Role" style={{ width: '10%' }} />
-                        {/* Column for status (pending, approved, denied, completed) */}
-                        <Column field="status" header="Status" style={{ width: '12%' }} />
-                        {/* Column for creation date */}
-                        <Column field="createdAt" header="Created" style={{ width: '12%' }} />
-                        {/* Column for expiration date */}
-                        <Column field="expiresAt" header="Expires" style={{ width: '12%' }} />
-
-                        {/* Column for action buttons (edit, approve, deny, resend code) */}
-                        <Column body={actionTemplate} header="Actions" style={{ width: '10%' }} />
-                    </DataTable>
-                </section>
+                {/* DataTable displaying filtered account requests */}
+                <DataTable
+                    // Pass filtered requests to table
+                    value={filteredRequests}
+                    // Show loading spinner while fetching
+                    loading={loading}
+                    className="inventory-table modern-table"
+                    emptyMessage="No account requests found"
+                    // Enable pagination
+                    paginator
+                    // Show 10 rows per page
+                    rows={10}
+                >
+                    {/* Column for first name */}
+                    <Column field="firstName" header="First Name" className="col-first-name" />
+                    {/* Column for last name */}
+                    <Column field="lastName" header="Last Name" className="col-last-name" />
+                    {/* Column for email */}
+                    <Column field="email" header="Email" className="col-email" />
+                    {/* Column for role (resident, caregiver, admin) */}
+                    <Column field="role" header="Role" className="col-role" />
+                    {/* Column for status (pending, approved, denied, completed) */}
+                    <Column field="status" header="Status" className="col-status" />
+                    {/* Column for creation date */}
+                    <Column field="createdAt" header="Created" className="col-created" />
+                    {/* Column for expiration date */}
+                    <Column field="expiresAt" header="Expires" className="col-expires" />
+                    {/* Column for action buttons (edit, approve, deny, resend code) */}
+                    <Column body={actionTemplate} header="Actions" className="col-actions" />
+                </DataTable>
+            </section>
         </>
     );
 
@@ -591,7 +596,7 @@ export default function AccountRequests({ embedded = false }) {
                     </div>
 
                     {/* Cancel and Save buttons */}
-                    <div className="dialog-actions dialog-actions--right">
+                    <div className="dialog-actions--right">
                         <Button
                             label="Cancel"
                             onClick={() => handleEditRequest(null, true)}
@@ -632,7 +637,7 @@ export default function AccountRequests({ embedded = false }) {
                     </p>
 
                     {/* Cancel and Deny buttons */}
-                    <div className="dialog-actions dialog-actions--right">
+                    <div className="dialog-actions--right">
                         <Button
                             label="Cancel"
                             onClick={handleCloseDenyDialog}
@@ -658,7 +663,7 @@ export default function AccountRequests({ embedded = false }) {
                 // Make dialog modal (blocks background interactions)
                 modal
                 closable={false}
-                className="modern-dialog"
+                className="modern-dialog activation-code-dialog"
                 // Make dialog responsive on different screen sizes
                 breakpoints={{ '960px': '80vw', '640px': '95vw' }}
                 // Set dialog width to 40% of viewport

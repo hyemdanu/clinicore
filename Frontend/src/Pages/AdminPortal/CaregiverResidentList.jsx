@@ -109,6 +109,14 @@ export default function CaregiverResidentList() {
         setSortBy(prev => prev === 'firstName' ? 'lastName' : 'firstName');
     };
 
+    // keyboard handler for accessibility
+    const handleCardHeaderKeyDown = (e, id) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleExpanded(id);
+        }
+    };
+
     // ── Remove ────────────────────────────────────────────────────────────────
     const handleRemoveResident = async (caregiverId, residentId) => {
         if (!window.confirm('Remove this resident from the caregiver?')) return;
@@ -194,6 +202,13 @@ export default function CaregiverResidentList() {
         }
     };
 
+    // handle escape key for modals
+    const handleModalKeyDown = (e, closeHandler) => {
+        if (e.key === 'Escape') {
+            closeHandler();
+        }
+    };
+
     // residents not yet assigned to the target caregiver (for add dropdown)
     const unassignedResidents = addTargetCaregiver
         ? allResidents.filter(r => !addTargetCaregiver.residents?.some(ar => ar.id === r.id))
@@ -243,10 +258,13 @@ export default function CaregiverResidentList() {
 
                             return (
                                 <div key={caregiver.id} className="caregiver-card">
-                                    {/* Caregiver header row */}
-                                    <div
-                                        className="caregiver-card-header"
+                                    {/* Caregiver header row - converted from div to button */}
+                                    <button
+                                        className="caregiver-card-header btn-reset"
                                         onClick={() => toggleExpanded(caregiver.id)}
+                                        onKeyDown={(e) => handleCardHeaderKeyDown(e, caregiver.id)}
+                                        aria-expanded={isExpanded}
+                                        type="button"
                                     >
                                         <div className="caregiver-avatar">
                                             <span>{caregiver.firstName?.[0]}</span>
@@ -264,7 +282,7 @@ export default function CaregiverResidentList() {
                                             </span>
                                         </div>
                                         <i className={`pi ${isExpanded ? 'pi-chevron-up' : 'pi-chevron-down'} caregiver-expand-icon`}></i>
-                                    </div>
+                                    </button>
 
                                     {/* Expanded resident panel */}
                                     {isExpanded && (
@@ -274,7 +292,8 @@ export default function CaregiverResidentList() {
                                                 <span className="caregiver-panel-label">Assigned Residents</span>
                                                 <button
                                                     className="action-btn add-resident-btn"
-                                                    onClick={(e) => { e.stopPropagation(); handleOpenAddModal(caregiver); }}
+                                                    onClick={() => handleOpenAddModal(caregiver)}
+                                                    type="button"
                                                 >
                                                     <i className="pi pi-plus"></i>
                                                     Add Resident
@@ -305,6 +324,7 @@ export default function CaregiverResidentList() {
                                                                 className="resident-action-btn switch-btn"
                                                                 title="Switch caregiver"
                                                                 onClick={() => handleOpenSwitchModal(caregiver, resident)}
+                                                                type="button"
                                                             >
                                                                 <i className="pi pi-arrow-right-arrow-left"></i>
                                                                 Switch
@@ -313,6 +333,7 @@ export default function CaregiverResidentList() {
                                                                 className="resident-action-btn remove-btn"
                                                                 title="Remove from caregiver"
                                                                 onClick={() => handleRemoveResident(caregiver.id, resident.id)}
+                                                                type="button"
                                                             >
                                                                 <i className="pi pi-times"></i>
                                                                 Remove
@@ -332,16 +353,21 @@ export default function CaregiverResidentList() {
 
             {/* ── Add Resident Modal ─────────────────────────────────────────── */}
             {showAddModal && (
-                <div className="edit-modal-backdrop" onClick={handleCloseAddModal}>
+                <div
+                    className="edit-modal-backdrop"
+                    onClick={handleCloseAddModal}
+                    role="presentation"
+                    onKeyDown={(e) => handleModalKeyDown(e, handleCloseAddModal)}
+                >
                     <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="edit-modal-header">
                             <h3>Add Resident to {addTargetCaregiver?.firstName} {addTargetCaregiver?.lastName}</h3>
-                            <button className="sidebar-close-btn" onClick={handleCloseAddModal}>
+                            <button className="sidebar-close-btn" onClick={handleCloseAddModal} aria-label="Close modal">
                                 <i className="pi pi-times"></i>
                             </button>
                         </div>
                         <div className="edit-modal-content">
-                            {addError && <div className="error-message" style={{ marginBottom: 16 }}>{addError}</div>}
+                            {addError && <div className="error-message form-error">{addError}</div>}
                             <div className="form-group">
                                 <label>Select Resident <span className="required">*</span></label>
                                 <select
@@ -356,7 +382,7 @@ export default function CaregiverResidentList() {
                                     ))}
                                 </select>
                                 {unassignedResidents.length === 0 && (
-                                    <p style={{ fontSize: 13, color: '#8b92a7', marginTop: 8 }}>
+                                    <p className="form-info">
                                         All residents are already assigned to this caregiver.
                                     </p>
                                 )}
@@ -378,19 +404,24 @@ export default function CaregiverResidentList() {
 
             {/* ── Switch Caregiver Modal ─────────────────────────────────────── */}
             {showSwitchModal && (
-                <div className="edit-modal-backdrop" onClick={handleCloseSwitchModal}>
+                <div
+                    className="edit-modal-backdrop"
+                    onClick={handleCloseSwitchModal}
+                    role="presentation"
+                    onKeyDown={(e) => handleModalKeyDown(e, handleCloseSwitchModal)}
+                >
                     <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="edit-modal-header">
                             <h3>Switch Caregiver for {switchTargetResident?.firstName} {switchTargetResident?.lastName}</h3>
-                            <button className="sidebar-close-btn" onClick={handleCloseSwitchModal}>
+                            <button className="sidebar-close-btn" onClick={handleCloseSwitchModal} aria-label="Close modal">
                                 <i className="pi pi-times"></i>
                             </button>
                         </div>
                         <div className="edit-modal-content">
-                            {switchError && <div className="error-message" style={{ marginBottom: 16 }}>{switchError}</div>}
+                            {switchError && <div className="error-message form-error">{switchError}</div>}
                             <div className="form-group">
                                 <label>Current Caregiver</label>
-                                <p style={{ fontSize: 15, color: '#2d3748', margin: '4px 0 16px 0' }}>
+                                <p className="info-value">
                                     {switchTargetCaregiver?.firstName} {switchTargetCaregiver?.lastName}
                                 </p>
                                 <label>Move to <span className="required">*</span></label>

@@ -112,6 +112,14 @@ export default function ResidentsTab() {
         openResidentModal(resident.id);
     };
 
+    // Keyboard handler for accessibility
+    const handleResidentKeyDown = (e, resident) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openResidentModal(resident.id);
+        }
+    };
+
     const handleCloseModal = () => {
         setShowModal(false);
         setSelectedResident(null);
@@ -160,10 +168,12 @@ export default function ResidentsTab() {
                         </div>
                     ) : (
                         filteredResidents.map((resident) => (
-                            <div
+                            <button
                                 key={resident.id}
-                                className="resident-item"
+                                className="resident-item btn-reset"
                                 onClick={() => handleResidentClick(resident)}
+                                onKeyDown={(e) => handleResidentKeyDown(e, resident)}
+                                type="button"
                             >
                                 <div className="resident-avatar">
                                     <i className="pi pi-user"></i>
@@ -171,7 +181,7 @@ export default function ResidentsTab() {
                                 <span className="resident-name">
                                     {resident.firstName} {resident.lastName}
                                 </span>
-                            </div>
+                            </button>
                         ))
                     )}
                 </div>

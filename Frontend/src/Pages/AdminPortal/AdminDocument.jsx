@@ -202,6 +202,21 @@ export default function AdminDocuments({ sidebarOpen }) {
         return () => window.removeEventListener("keydown", handleEscape);
     }, [viewerUrl]);
 
+    // Keyboard handlers for accessibility
+    const handleResidentKeyDown = (e, resident) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            fetchDocuments(resident);
+        }
+    };
+
+    const handleDocumentKeyDown = (e, doc) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openDocument(doc);
+        }
+    };
+
     return (
         <div className="dashboard-container">
             <Toast ref={toastRef} />
@@ -226,7 +241,7 @@ export default function AdminDocuments({ sidebarOpen }) {
                 )}
 
                 <div className="documents-box">
-                    {error && <div style={{ color: "red" }}>{error}</div>}
+                    {error && <div className="error-message">{error}</div>}
 
                     {loading && (
                         <div className="residents-loading">
@@ -237,11 +252,12 @@ export default function AdminDocuments({ sidebarOpen }) {
 
                     {!selectedResident
                         ? filteredResidents.map((resident) => (
-                            <div
+                            <button
                                 key={resident.id}
-                                className="document-row"
+                                className="document-row btn-reset"
                                 onClick={() => fetchDocuments(resident)}
-                                style={{ cursor: "pointer" }}
+                                onKeyDown={(e) => handleResidentKeyDown(e, resident)}
+                                type="button"
                             >
                                 <div className="resident-avatar">
                                     <i className="pi pi-user"></i>
@@ -249,7 +265,7 @@ export default function AdminDocuments({ sidebarOpen }) {
                                 <span className="document-name">
                                     {resident.firstName} {resident.lastName}
                                 </span>
-                            </div>
+                            </button>
                         ))
                         : !loading && !error && (
                             <>
@@ -287,27 +303,33 @@ export default function AdminDocuments({ sidebarOpen }) {
 
                                 {filteredDocuments.length > 0 ? (
                                     filteredDocuments.map((doc) => (
-                                        <div key={doc.id} className="document-row">
-                                            <i className="pi pi-file" style={{ fontSize: "16px", marginRight: "12px" }}></i>
-                                            <span
-                                                className="document-name"
-                                                style={{ cursor: "pointer", flex: 1 }}
-                                                onClick={() => openDocument(doc)}
-                                            >
+                                        <button
+                                            key={doc.id}
+                                            className="document-row btn-reset"
+                                            onClick={() => openDocument(doc)}
+                                            onKeyDown={(e) => handleDocumentKeyDown(e, doc)}
+                                            type="button"
+                                        >
+                                            <i className="pi pi-file doc-row-icon"></i>
+                                            <span className="document-name">
                                                 {doc.title}
                                             </span>
-                                            <button
+                                            <span
                                                 className="document-delete-btn"
+                                                role="button"
+                                                tabIndex={0}
                                                 onClick={(e) => { e.stopPropagation(); setConfirmDelete(doc); }}
+                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); e.preventDefault(); setConfirmDelete(doc); } }}
                                                 title="Delete document"
                                             >
                                                 <i className="pi pi-trash"></i>
-                                            </button>
-                                        </div>
+                                            </span>
+                                        </button>
                                     ))
                                 ) : (
                                     <div className="no-documents">
-                                        No documents found for {selectedResident.firstName}.
+                                        No documents found for{" "}
+                                        {selectedResident.firstName}.
                                     </div>
                                 )}
                             </>
@@ -318,7 +340,7 @@ export default function AdminDocuments({ sidebarOpen }) {
                     <button
                         className="documents-fab"
                         onClick={() => setShowUploadForm(true)}
-                        title="Add Document"
+                        aria-label="Add new document"
                     >
                         +
                     </button>

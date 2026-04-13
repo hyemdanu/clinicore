@@ -1,6 +1,3 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Header from '../../Components/Header.jsx';
 import '../CaregiverPortal/css/inventory-landing.css';
 import consumablesIcon from '../../assets/icons/consumablesIcon.png';
 import medicationsIcon from '../../assets/icons/medicationsIcon.png';

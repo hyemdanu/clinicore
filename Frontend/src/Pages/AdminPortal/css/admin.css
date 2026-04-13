@@ -1,128 +1,136 @@
 .admin-dashboard-container {
-  min-height: 100vh;
-  background-color: #f5f7fb;
-  overflow-x: hidden;
+    min-height: 100vh;
+    background-color: var(--color-bg);
+    overflow-x: hidden;
 }
 
+/* mobile defaults */
 .dashboard-content {
-  margin-top: 56px;
-  margin-left: 0;
-  padding: 40px;
-  transition: margin-left 0.3s ease;
-  min-height: calc(100vh - 56px);
-  background-color: #f5f7fb;
+    margin-top: 56px;
+    margin-left: 0;
+    padding: var(--space-5);
+    transition: margin-left var(--transition-slow);
+    min-height: calc(100vh - 56px);
+    background-color: var(--color-bg);
 }
 
 .dashboard-content.content-with-sidebar {
-  margin-left: 280px;
+    margin-left: 0;
 }
 
 .admin-dashboard-container.messages-active {
-  overflow: hidden;
-  height: 100vh;
-  max-height: 100vh;
-  background-color: #fff;
+    overflow: hidden;
+    height: 100vh;
+    max-height: 100vh;
+    background-color: var(--color-bg-white);
 }
 
 .dashboard-content.messages-content {
-  position: fixed;
-  top: 56px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  height: auto;
-  min-height: 0;
-  max-height: none;
-  background-color: #fff;
-  transition: left 0.3s ease;
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    background-color: var(--color-bg-white);
+    transition: left var(--transition-slow);
 }
 
 .dashboard-content.messages-content.content-with-sidebar {
-  left: 280px;
-  margin-left: 0;
+    left: 0;
 }
 
 .alert-section {
-  margin-bottom: 40px;
+    margin-bottom: var(--space-8);
 }
 
 .dashboard-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: #333;
-  margin: 0 0 30px 0;
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 var(--space-6) 0;
 }
 
 .error-message {
-  background-color: #f8d7da;
-  color: #721c24;
-  padding: 16px 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  border: 1px solid #f5c6cb;
-  font-size: 14px;
+    background-color: var(--color-error-bg);
+    color: var(--color-error-text);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-5);
+    border: 1px solid var(--color-error-border);
+    font-size: var(--text-sm);
 }
 
 .inventory-section {
-  background-color: white;
-  border-radius: 8px;
-  padding: 24px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    background-color: var(--color-bg-white);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-bottom: var(--space-6);
+    box-shadow: var(--shadow-sm);
 }
 
 .inventory-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  flex-wrap: wrap;  /* ADD THIS - allows items to wrap on smaller screens */
-  gap: 20px;  /* ADD THIS - adds space between items */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+    gap: var(--space-3);
 }
 
 .inventory-header h3 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: #333;
-}
-/* Target the actual dropdown root (same element), not a child */
-.sort-dropdown.p-dropdown {
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    background: #fff;
-    box-shadow: none;
-    height: 30px;              /* ✅ adjust this (try 34–40px) */
-    padding: 0;                /* remove any extra padding */
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text);
 }
 
-/* Remove the loud blue focus ring */
+.sort-dropdown-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+}
+
+.sort-dropdown-wrapper label {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+}
+
+.sort-dropdown.p-dropdown {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-white);
+    box-shadow: none;
+    height: 38px;
+    padding: 0;
+    flex: 1;
+}
+
 .sort-dropdown.p-dropdown:not(.p-disabled).p-focus {
     box-shadow: none !important;
-    border-color: #369DF7; /* keep a subtle focus border */
+    border-color: var(--color-primary);
 }
 
-/* Make the label area look clean (no inner box) */
 .sort-dropdown.p-dropdown .p-dropdown-label {
-    padding: 0 12px !important;
+    padding: 0 var(--space-3) !important;
     border: none !important;
     box-shadow: none !important;
     background: transparent !important;
-    font-size: 0.95rem;
-
-    height: 35px;          /* controls total height */
+    font-size: var(--text-sm);
+    height: 35px;
     display: flex;
-    align-items: center;   /* 🔥 vertical center */
+    align-items: center;
 }
 
-
-/* Tidy up the trigger (arrow area) */
 .sort-dropdown.p-dropdown .p-dropdown-trigger {
-    width: 42px;                /* ✅ arrow box width */
-    height: 38px;               /* ✅ match height */
+    width: 42px;
+    height: 38px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -130,187 +138,132 @@
     background: transparent !important;
 }
 
-/* Dropdown panel (the opened list) */
 .p-dropdown-panel {
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     overflow: hidden;
 }
 
-/* Items */
 .p-dropdown-items .p-dropdown-item {
     padding: 0.6rem 0.9rem;
-    font-size: 0.95rem;
+    font-size: var(--text-sm);
 }
 
-/* Selected item highlight (optional: make it softer) */
 .p-dropdown-items .p-dropdown-item.p-highlight {
-    background: #eef6ff;
-    color: #1d4ed8;
+    background: var(--color-primary-light);
+    color: var(--color-primary-hover);
 }
-
 
 .inventory-table {
-  border: none;
+    border: none;
 }
 
 .inventory-table .p-datatable-header {
-  background-color: white;
-  border: none;
-  padding: 0;
+    background-color: var(--color-bg-white);
+    border: none;
+    padding: 0;
 }
 
 .inventory-table .p-datatable-thead > tr > th {
-  background-color: white;
-  color: #666;
-  font-weight: 600;
-  font-size: 14px;
-  border: none;
-  border-bottom: 1px solid #e0e0e0;
-  padding: 16px;
-  text-align: left;
+    background-color: var(--color-bg-white);
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-3);
+    text-align: left;
 }
 
 .inventory-table .p-datatable-tbody > tr {
-  background-color: white;
-  border-bottom: 1px solid #f0f0f0;
+    background-color: var(--color-bg-white);
+    border-bottom: 1px solid var(--color-border-light);
 }
 
 .inventory-table .p-datatable-tbody > tr:last-child {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 .inventory-table .p-datatable-tbody > tr > td {
-  border: none;
-  padding: 16px;
-  color: #333;
-  font-size: 14px;
+    border: none;
+    padding: var(--space-3);
+    color: var(--color-text);
+    font-size: var(--text-sm);
 }
 
 .inventory-table .p-datatable-tbody > tr:hover {
-  background-color: #f8f9fa;
+    background-color: var(--color-bg-hover);
 }
 
 .inventory-table .p-datatable-loading-overlay {
-  background-color: rgba(255, 255, 255, 0.9) !important;
+    background-color: rgba(255, 255, 255, 0.9) !important;
 }
 
-/* .custom-loading + .custom-spinner moved to index.css */
-
 .inventory-table .p-datatable-emptymessage > td {
-  text-align: center;
-  padding: 32px;
-  color: #999;
+    text-align: center;
+    padding: var(--space-6);
+    color: var(--color-text-muted);
 }
 
 .quantity-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 24px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 24px;
 }
 
 .quantity-cell.low-stock {
-  color: #dc3545;
-  font-weight: 600;
+    color: var(--color-error);
+    font-weight: 600;
 }
 
 .quantity-cell span {
-  display: inline-block;
+    display: inline-block;
 }
 
 .warning-icon {
-  color: #dc3545;
-  font-size: 16px;
-  animation: pulse 2s infinite;
-  flex-shrink: 0;
+    color: var(--color-error);
+    font-size: 16px;
+    animation: pulse 2s infinite;
+    flex-shrink: 0;
 }
 
 @keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }
 
-@media (max-width: 768px) {
-  .dashboard-content {
-    padding: 20px;
-  }
-
-  .dashboard-content.content-with-sidebar {
-    margin-left: 0;
-  }
-
-  .dashboard-content.messages-content {
-    padding: 0;
-  }
-
-  .dashboard-title {
-    font-size: 24px;
-  }
-
-  .inventory-section {
-    padding: 16px;
-  }
-
-  .inventory-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .inventory-header h3 {
-    font-size: 18px;
-  }
-
-  .sort-dropdown-wrapper {
-    width: 100%;
-  }
-
-  .sort-dropdown {
-    flex: 10;
-  }
-}
-
-/* Table font size & header styling */
 .inventory-table.modern-table .p-datatable-thead > tr > th {
-    font-size: 0.95rem;
+    font-size: var(--text-sm);
     font-weight: 600;
 }
 
 .inventory-table.modern-table .p-datatable-tbody > tr > td {
-    font-size: 0.95rem; /* slightly bigger data font */
+    font-size: var(--text-sm);
     line-height: 1.5;
 }
 
-/* Subtitle under main title */
 .dashboard-subtitle {
-    color: #666;
+    color: var(--color-text-secondary);
     margin-top: 0.5rem;
-    font-size: 0.95rem;
+    font-size: var(--text-sm);
 }
 
-/* Modern dialog base */
-/* ✅ PrimeReact Dialog root is usually .p-dialog itself */
 .p-dialog.modern-dialog {
     border: none;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+    box-shadow: var(--shadow-lg);
 }
 
 .p-dialog.modern-dialog .p-dialog-header {
     font-weight: 600;
-    font-size: 1rem;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 1rem 1.25rem;
+    font-size: var(--text-base);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-4) var(--space-5);
 }
 
 .p-dialog.modern-dialog .p-dialog-content {
-    padding: 1.25rem;
+    padding: var(--space-5);
 }
 
-/* ✅ Ensure overlay always sits above tables/sidebars */
 .p-dialog-mask {
     z-index: 5000 !important;
 }
@@ -319,107 +272,48 @@
     z-index: 5001 !important;
 }
 
-/* ===== Activation Code dialog layout fix ===== */
-/* Remove the "narrow centered column inside a wide modal" effect */
-.p-dialog.activation-code-dialog .p-dialog-content .dialog-form {
-    max-width: 100%;
-    width: 100%;
-    margin: 0;
-}
-
-/* Make the code card feel tighter + more intentional */
-.p-dialog.activation-code-dialog .activation-code-card {
-    padding: 1rem;
-    margin: 0.25rem 0 0.75rem;
-}
-
-/* Code styling: big but not awkwardly spaced */
-.p-dialog.activation-code-dialog .activation-code-value {
-    font-size: 2rem;
-    letter-spacing: 0.18rem; /* was 0.25rem; less "stretched" */
-}
-
-/* Buttons: consistent width + spacing */
-.p-dialog.activation-code-dialog .p-button {
-    width: 100%;
-}
-
-.p-dialog.activation-code-dialog .p-button + .p-button {
-    margin-top: 0.75rem;
-}
-
-/* Mobile: reduce code size so it doesn't overflow */
-@media (max-width: 640px) {
-    .p-dialog.activation-code-dialog .activation-code-value {
-        font-size: 1.6rem;
-        letter-spacing: 0.12rem;
-    }
-}
-
-/* Button row for activation dialog */
-.activation-code-dialog .dialog-form > .p-button {
-    flex: 1;
-}
-
-.activation-code-dialog .dialog-form {
-    gap: 1rem;
-}
-
-/* Wrap buttons in a flex row */
-.activation-code-dialog .dialog-form {
-    display: flex;
-    flex-direction: column;
-}
-
-.activation-code-dialog .dialog-form .p-button {
-    margin: 0;
-}
-
-/* Create button container */
-.activation-code-dialog .dialog-form::after {
-    content: "";
-}
-
-.activation-buttons {
-    display: flex;
-    gap: 1.25rem;
-    margin-top: 0.75rem;
-    justify-content: center;
-}
-
-.activation-buttons .p-button {
-    padding: 0.8rem 1.4rem;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    min-width: 180px;
-}
-
-
-/* Shared form layout inside dialogs */
 .dialog-form {
     max-width: 480px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;   /* tighter spacing */
+    gap: 0.75rem;
 }
-
-
 
 .dialog-field label {
     font-size: 0.85rem;
     font-weight: 500;
-    color: #4b5563;
+    color: var(--color-text-secondary);
     display: block;
     margin-bottom: 0.35rem;
 }
 
 .dialog-actions {
     display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.dialog-actions--right {
+    display: flex;
     justify-content: flex-end;
     gap: 0.75rem;
-    margin-top: 1.5rem;
+    margin-top: var(--space-6);
+}
+
+.dialog-actions--right .p-button {
+    padding: 0.8rem 1.6rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 600;
+}
+
+.dialog-actions--right .p-button.p-button-danger {
+    min-width: 250px;
+}
+
+.dialog-actions--right .p-button.p-button-secondary {
+    min-width: 160px;
 }
 
 .dialog-confirm {
@@ -429,83 +323,89 @@
 }
 
 .dialog-confirm p {
-    color: #4b5563;
-    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
 }
 
-/* Activation code card */
 .dialog-subtitle {
-    color: #4b5563;
+    color: var(--color-text-secondary);
     font-size: 0.9rem;
 }
 
 .activation-code-card {
-    background-color: #f3f4f6;
-    padding: 0.85rem 1.25rem;  /* tighter vertical padding */
-    border-radius: 0.75rem;
+    background-color: var(--color-bg-hover);
+    padding: 0.85rem var(--space-5);
+    border-radius: var(--radius-md);
     text-align: center;
-    border: 2px dashed #d1d5db;
+    border: 2px dashed var(--color-border);
     margin: 0.5rem 0 0.75rem;
-    display: inline-block;     /* <-- makes border wrap content */
     width: 100%;
 }
 
-
 .activation-code-label {
     font-size: 0.85rem;
-    color: #6b7280;
+    color: var(--color-text-muted);
     margin-bottom: 0.5rem;
 }
 
 .activation-code-value {
-    font-size: 2rem;
+    font-size: var(--text-xl);
     font-weight: 700;
     font-family: monospace;
     letter-spacing: 0.25rem;
-    color: #111827;
+    color: var(--color-text);
 }
-/* Toast container */
+
+.activation-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: 0.75rem;
+}
+
+.activation-buttons .p-button {
+    padding: 0.8rem 1.4rem;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    width: 100%;
+}
+
 .p-toast {
     z-index: 9999 !important;
 }
 
-/* Base toast styling */
 .p-toast-message {
-    background: #ffffff !important;
-    border-left: 6px #ffffff !important;
-    border-radius: 8px !important;
-    padding: 12px 16px !important;
+    background: var(--color-bg-white) !important;
+    border-left: 6px var(--color-bg-white) !important;
+    border-radius: var(--radius-md) !important;
+    padding: var(--space-3) var(--space-4) !important;
     display: flex !important;
     align-items: flex-start !important;
-    gap: 10px; /* space between icon + text */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+    gap: 10px;
+    box-shadow: var(--shadow-md) !important;
     opacity: 1 !important;
 }
 
-/* Message text spacing */
 .p-toast-message .p-toast-message-text {
     margin-left: 4px;
 }
 
-/* ERROR */
 .p-toast-message-error {
-    border-left-color: #dc3545 !important; /* red accent */
-    color: #721c24 !important;
+    border-left-color: var(--color-error) !important;
+    color: var(--color-error-text) !important;
 }
 
-/* SUCCESS */
 .p-toast-message-success {
-    border-left-color: #28a745 !important; /* green accent */
+    border-left-color: var(--color-success) !important;
     color: #155724 !important;
 }
 
-/* INFO */
 .p-toast-message-info {
-    border-left-color: #17a2b8 !important; /* blue accent */
+    border-left-color: var(--color-primary) !important;
     color: #0c5460 !important;
 }
 
-/* Position the close (X) icon properly */
 .p-toast-message .p-toast-icon-close {
     position: absolute !important;
     top: 10px !important;
@@ -513,30 +413,105 @@
     margin: 0 !important;
 }
 
-.dialog-actions--right .p-button {
-    padding: 0.8rem 1.6rem;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    font-weight: 600;
-}
-
-/* Make Deny button wider */
-.dialog-actions--right .p-button.p-button-danger {
-    min-width: 250px;   /* 🔥 increase this */
-}
-
-/* Keep Cancel smaller */
-.dialog-actions--right .p-button.p-button-secondary {
-    min-width: 160px;
-}
-
 .main-content {
     flex: 1;
     margin-top: 56px;
     margin-left: 0;
-    padding: 40px;
-    transition: margin-left 0.3s ease;
+    padding: var(--space-5);
+    transition: margin-left var(--transition-slow);
     min-height: calc(100vh - 56px);
-    background-color: #f5f6f8;
+    background-color: var(--color-bg);
     overflow-y: auto;
 }
+
+/* column width classes for dataTable */
+.col-first-name { width: 12%; }
+.col-last-name { width: 12%; }
+.col-email { width: 20%; }
+.col-role { width: 10%; }
+.col-status { width: 12%; }
+.col-created { width: 12%; }
+.col-expires { width: 12%; }
+.col-actions { width: 10%; }
+.col-name { width: 60%; }
+.col-quantity { width: 40%; }
+
+/* tablet and up (min-width: 640px) */
+@media (min-width: 640px) {
+    .activation-buttons {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .activation-buttons .p-button {
+        width: auto;
+        min-width: 180px;
+    }
+
+    .activation-code-value {
+        font-size: var(--text-2xl);
+    }
+}
+
+/* tablet and up (min-width: 768px) */
+@media (min-width: 768px) {
+    .dashboard-content {
+        padding: var(--space-10);
+    }
+
+    .dashboard-content.content-with-sidebar {
+        margin-left: var(--sidebar-width);
+    }
+
+    .dashboard-content.messages-content.content-with-sidebar {
+        left: var(--sidebar-width);
+    }
+
+    .dashboard-title {
+        font-size: var(--text-2xl);
+        margin: 0 0 var(--space-8) 0;
+    }
+
+    .inventory-section {
+        padding: var(--space-6);
+        margin-bottom: var(--space-8);
+    }
+
+    .inventory-header {
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-5);
+        margin-bottom: var(--space-5);
+    }
+
+    .inventory-header h3 {
+        font-size: var(--text-md);
+    }
+
+    .sort-dropdown-wrapper {
+        width: auto;
+    }
+
+    .sort-dropdown.p-dropdown {
+        flex: none;
+    }
+
+    .inventory-table .p-datatable-thead > tr > th {
+        padding: var(--space-4);
+    }
+
+    .inventory-table .p-datatable-tbody > tr > td {
+        padding: var(--space-4);
+    }
+
+    .main-content {
+        padding: var(--space-10);
+    }
+
+    .dialog-actions {
+        flex-wrap: nowrap;
+    }
+}
+
+/* desktop and up (min-width: 1024px) */
+@media (min-width: 1024px) {  }
