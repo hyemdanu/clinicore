@@ -47,7 +47,7 @@ export default function ForgotPasswordPage() {
                     </div>
 
                     {message && (
-                        <p style={{ color: message.includes("Unable") ? "blue" : "red" }}>
+                        <p className="form-error" role="alert">
                             {message}
                         </p>
                     )}

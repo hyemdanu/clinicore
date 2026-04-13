@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { post } from "../../services/api";
 import "./css/LoginPage.css";
+import "../../index.css";
 
 export default function CompleteAccountCreation() {
     const navigate = useNavigate();
@@ -179,9 +180,7 @@ export default function CompleteAccountCreation() {
         if (accountData.role === "RESIDENT") {
             return (
                 <>
-                    <h3 style={{ marginTop: "20px", marginBottom: "15px", color: "#333", fontSize: "16px" }}>
-                        Resident Information
-                    </h3>
+                    <h3 className="form-section-title">Resident Information</h3>
 
                     {/* Emergency Contact Name */}
                     <label htmlFor="emergencyContactName">Emergency Contact Name *</label>
@@ -217,11 +216,11 @@ export default function CompleteAccountCreation() {
                         <textarea
                             id="residentNotes"
                             name="residentNotes"
+                            className="notes-input"
                             value={accountData.residentNotes}
                             onChange={handleInputChange}
                             placeholder="Any additional medical or personal notes (optional)"
                             rows="4"
-                            style={{ padding: "10px", fontFamily: "inherit" }}
                         />
                     </div>
                 </>
@@ -229,9 +228,7 @@ export default function CompleteAccountCreation() {
         } else if (accountData.role === "CAREGIVER") {
             return (
                 <>
-                    <h3 style={{ marginTop: "20px", marginBottom: "15px", color: "#333", fontSize: "16px" }}>
-                        Caregiver Information
-                    </h3>
+                    <h3 className="form-section-title">Caregiver Information</h3>
 
                     {/* Caregiver Notes */}
                     <label htmlFor="caregiverNotes">Professional Notes</label>
@@ -239,18 +236,18 @@ export default function CompleteAccountCreation() {
                         <textarea
                             id="caregiverNotes"
                             name="caregiverNotes"
+                            className="notes-input"
                             value={accountData.caregiverNotes}
                             onChange={handleInputChange}
                             placeholder="Certifications, specializations, or other relevant information (optional)"
                             rows="4"
-                            style={{ padding: "10px", fontFamily: "inherit" }}
                         />
                     </div>
                 </>
             );
         } else if (accountData.role === "ADMIN") {
             return (
-                <p style={{ marginTop: "20px", color: "#666", fontSize: "14px" }}>
+                <p className="form-description">
                     Admin accounts will be created with full system access.
                 </p>
             );
@@ -269,7 +266,7 @@ export default function CompleteAccountCreation() {
                     // Step 1: Verify Activation Code
                     <>
                         <h2>Activate Your Account</h2>
-                        <p style={{ color: "#666", marginBottom: "20px", fontSize: "14px" }}>
+                        <p className="form-description">
                             Enter your email and the activation code you received to proceed
                         </p>
 
@@ -300,7 +297,7 @@ export default function CompleteAccountCreation() {
                             </div>
 
                             {message && (
-                                <p style={{ color: "red", marginTop: 10 }}>{message}</p>
+                                <p className="form-message">{message}</p>
                             )}
 
                             <button
@@ -324,25 +321,25 @@ export default function CompleteAccountCreation() {
                     // Step 2: Complete Account Creation
                     <>
                         <h2>Complete Your Account</h2>
-                        <p style={{ color: "#666", marginBottom: "20px", fontSize: "14px" }}>
+                        <p className="form-description">
                             Fill in your account details to complete registration
                         </p>
 
                         <form onSubmit={handleCompleteAccount}>
                             {/* Display-only fields */}
-                            <div style={{ backgroundColor: "#f5f5f5", padding: "15px", borderRadius: "8px", marginBottom: "20px" }}>
-                                <p style={{ margin: "5px 0", color: "#666" }}>
+                            <div className="account-details">
+                                <p className="form-subtext">
                                     <strong>Name:</strong> {accountData.firstName} {accountData.lastName}
                                 </p>
-                                <p style={{ margin: "5px 0", color: "#666" }}>
+                                <p className="form-subtext">
                                     <strong>Email:</strong> {email}
                                 </p>
-                                <p style={{ margin: "5px 0", color: "#666" }}>
+                                <p className="form-subtext">
                                     <strong>Role:</strong> {accountData.role}
                                 </p>
                             </div>
 
-                            <h3 style={{ marginBottom: "15px", color: "#333", fontSize: "16px" }}>
+                            <h3 className="form-section-title">
                                 Account Credentials
                             </h3>
 
@@ -385,7 +382,7 @@ export default function CompleteAccountCreation() {
                                 />
                             </div>
 
-                            <h3 style={{ marginTop: "20px", marginBottom: "15px", color: "#333", fontSize: "16px" }}>
+                            <h3 className="form-section-title">
                                 Personal Information
                             </h3>
 
@@ -437,14 +434,13 @@ export default function CompleteAccountCreation() {
                             {renderRoleSpecificFields()}
 
                             {message && (
-                                <p style={{ color: "red", marginTop: 10 }}>{message}</p>
+                                <p className="form-message">{message}</p>
                             )}
 
                             <button
                                 type="submit"
                                 className="login-btn"
                                 disabled={loading}
-                                style={{ marginTop: "20px" }}
                             >
                                 {loading ? <span className="spinner"></span> : "Create Account"}
                             </button>

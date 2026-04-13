@@ -19,7 +19,7 @@ export default function RequestSentPage() {
             <div className="container-box">
                 <h2>Request Status</h2>
 
-                <p style={{ marginTop: "1rem", textAlign: "center" }}>
+                <p className="request-page" role="alert">
                     {message}
                 </p>
 
