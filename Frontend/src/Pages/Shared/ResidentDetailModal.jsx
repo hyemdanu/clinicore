@@ -26,6 +26,8 @@ export default function ResidentDetailModal({ resident, onClose, onResidentUpdat
     const [updatingMedId, setUpdatingMedId] = useState(null);
     const [editingMedId, setEditingMedId] = useState(null);
     const [editForm, setEditForm] = useState({});
+    const dialogRef = useRef(null);
+    const triggerRef = useRef(null);
 
     useEffect(() => {
         localStorage.setItem('residentDetailActiveTab', activeTab);
@@ -46,6 +48,29 @@ export default function ResidentDetailModal({ resident, onClose, onResidentUpdat
     // medications stay in sync via:
     // 1. resident prop updates from parent (line 42)
     // 2. local state updates after add/edit/delete/status change
+
+    useEffect(() => {
+        triggerRef.current = document.activeElement;
+        const firstFocusable = dialogRef.current?.querySelector(
+            'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        (firstFocusable || dialogRef.current)?.focus();
+        return () => {
+            triggerRef.current?.focus();
+        };
+    }, []);
+
+    useEffect(() => {
+        const handler = (e) => {
+            if (e.key === 'Escape') {
+                localStorage.removeItem('residentDetailActiveTab');
+                localStorage.removeItem('openResidentId');
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, [onClose]);
 
     if (!resident) {
         return null;
@@ -134,7 +159,13 @@ export default function ResidentDetailModal({ resident, onClose, onResidentUpdat
     };
 
     return (
-        <div className="resident-detail-sidebar">
+        <div
+            className="resident-detail-sidebar"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Resident Details"
+            ref={dialogRef}
+        >
             <Toast ref={toastRef} />
             <button className="sidebar-close-btn" onClick={handleClose}>
                 <i className="pi pi-times"></i>
