@@ -135,7 +135,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 6px 14px rgba(47, 128, 237, 0.25);
+    box-shadow: var(--shadow-md);
     transition: background-color var(--transition-fast), transform 0.1s ease;
 }
 
@@ -193,7 +193,7 @@
 .upload-button {
     background: var(--color-primary);
     color: var(--color-bg-white);
-    box-shadow: 0 6px 14px rgba(47, 128, 237, 0.25);
+    box-shadow: var(--shadow-md);
 }
 
 .upload-button:hover {
@@ -219,4 +219,13 @@
 .upload-button:active,
 .cancel-button:active {
     transform: scale(0.98);
+}
+
+.document-row {
+    cursor: pointer; width: 100%;
+}
+
+.doc-row-icon {
+    font-size: var(--text-base);
+    margin-right: var(--space-3);
 }

@@ -139,16 +139,15 @@ export default function AdminDashboard() {
             {!loading && error && <div className="error-message">{error}</div>}
 
             {!loading && !error && <>
-                {lowStockCount > 0 && (
-                    <div className="alert-warning-inline" role="alert">
-                        <i className="pi pi-exclamation-triangle"></i>
-                        <div>
-                            <strong>{lowStockCount} low stock item{lowStockCount > 1 ? 's' : ''}</strong>
-                            <div>
-                                {lowStockItems.slice(0, 3).map(i => i.name).join(', ')}{lowStockItems.length > 3 ? ` and ${lowStockItems.length - 3} more` : ''}
-                            </div>
+                <div className="alert-warning-inline" role="alert">
+                    <i className="pi pi-exclamation-triangle alert-warning-icon"></i>
+                    <div className="alert-warning-body">
+                        <strong>{lowStockCount} low stock item{lowStockCount > 1 ? 's' : ''}</strong>
+                        <div className="alert-warning-detail">
+                            {lowStockItems.slice(0, 3).map(i => i.name).join(', ')}{lowStockItems.length > 3 ? ` and ${lowStockItems.length - 3} more` : ''}
                         </div>
                     </div>
+                </div>
                 )}
 
                 <section className="inventory-section">

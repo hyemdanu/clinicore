@@ -398,12 +398,12 @@
 
 .p-toast-message-success {
     border-left-color: var(--color-success) !important;
-    color: #155724 !important;
+    color: var(--color-success) !important;
 }
 
 .p-toast-message-info {
     border-left-color: var(--color-primary) !important;
-    color: #0c5460 !important;
+    color: var(--color-primary-hover) !important;
 }
 
 .p-toast-message .p-toast-icon-close {
@@ -436,8 +436,17 @@
 .col-name { width: 60%; }
 .col-quantity { width: 40%; }
 
-/* tablet and up (min-width: 640px) */
-@media (min-width: 640px) {
+/* dialog width utilities */
+.dialog--md { width: 40vw; }
+.dialog--sm { width: 32vw; }
+
+/* alert helper classes */
+.alert-warning-icon   { font-size: var(--text-md); margin-right: var(--space-2); }
+.alert-warning-body   { flex: 1; }
+.alert-warning-detail { font-size: var(--text-sm); opacity: 0.9; }
+
+/* tablet and up (min-width: 768px) */
+@media (min-width: 768px) {
     .activation-buttons {
         flex-direction: row;
         justify-content: center;
@@ -451,10 +460,7 @@
     .activation-code-value {
         font-size: var(--text-2xl);
     }
-}
 
-/* tablet and up (min-width: 768px) */
-@media (min-width: 768px) {
     .dashboard-content {
         padding: var(--space-10);
     }
@@ -514,4 +520,7 @@
 }
 
 /* desktop and up (min-width: 1024px) */
-@media (min-width: 1024px) {  }
+@media (min-width: 1024px) {
+    .dialog--md { width: 32vw; }
+    .dialog--sm { width: 28vw; }
+}
