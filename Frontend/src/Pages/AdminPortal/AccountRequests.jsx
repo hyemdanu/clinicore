@@ -546,7 +546,7 @@ export default function AccountRequests({ embedded = false }) {
                 // Make dialog responsive on different screen sizes
                 breakpoints={{ '960px': '80vw', '640px': '95vw' }}
                 // Set dialog width to 40% of viewport
-                style={{ width: '40vw' }}
+                className="modern-dialog dialog--md"
             >
                 <div className="dialog-form">
                     {/* First name text entry field */}
@@ -627,7 +627,7 @@ export default function AccountRequests({ embedded = false }) {
                 // Make dialog responsive on different screen sizes
                 breakpoints={{ '960px': '80vw', '640px': '95vw' }}
                 // Set dialog width to 32% of viewport
-                style={{ width: '32vw' }}
+                className="modern-dialog dialog--sm"
             >
                 <div className="dialog-confirm">
                     {/* Confirmation message showing email of request to deny */}
@@ -667,7 +667,7 @@ export default function AccountRequests({ embedded = false }) {
                 // Make dialog responsive on different screen sizes
                 breakpoints={{ '960px': '80vw', '640px': '95vw' }}
                 // Set dialog width to 40% of viewport
-                style={{ width: '40vw' }}
+                className="modern-dialog dialog--md activation-code-dialog"
             >
                 <div className="dialog-form">
                     {/* Info message explaining activation code usage and expiration */}
