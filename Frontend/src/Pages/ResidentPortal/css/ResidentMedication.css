@@ -1,27 +1,27 @@
 @import "../../AdminPortal/css/admin.css";
 
 .dashboard-title {
-    font-size: 32px;
+    font-size: var(--text-2xl);
     font-weight: 700;
-    color: #333;
-    margin: 0 0 30px 0;
+    color: var(--color-text);
+    margin: 0 0 var(--space-8) 0;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 /* Error message */
 .error-message {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 16px 20px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    border: 1px solid #f5c6cb;
-    font-size: 14px;
+    background-color: var(--color-error-bg);
+    color: var(--color-error-text);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-5);
+    border: 1px solid var(--color-error-border);
+    font-size: var(--text-sm);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-2);
 }
 
 .error-icon {
@@ -31,50 +31,55 @@
 /* Inventory header */
 .inventory-header {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
+    gap: var(--space-3);
 }
 
 .inventory-header h3 {
     margin: 0;
-    font-size: 20px;
+    font-size: var(--text-lg);
     font-weight: 600;
-    color: #333;
+    color: var(--color-text);
 }
 
 .sort-dropdown-wrapper {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
+    width: 100%;
+    flex-wrap: wrap;
 }
 
 .sort-dropdown-wrapper label {
-    font-size: 14px;
+    font-size: var(--text-sm);
     font-weight: 500;
-    color: #666;
+    color: var(--color-text-secondary);
     white-space: nowrap;
 }
 
 .sort-dropdown {
-    padding: 8px 12px;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    background-color: white;
-    color: #333;
-    font-size: 14px;
-    min-width: 200px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-bg-white);
+    color: var(--color-text);
+    font-size: var(--text-sm);
+    min-width: unset;
+    flex: 1;
     cursor: pointer;
-    transition: border-color 0.2s ease;
+    transition: border-color var(--transition-fast);
 }
 
 .sort-dropdown:hover {
-    border-color: #369DF7;
+    border-color: var(--color-primary);
 }
 
 .sort-dropdown:focus {
     outline: none;
-    border-color: #369DF7;
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.1);
 }
 
@@ -82,21 +87,21 @@
 .refresh-button {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    background-color: white;
-    border: 1px solid #369DF7;
-    border-radius: 6px;
-    color: #369DF7;
-    font-size: 14px;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--color-bg-white);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-sm);
+    color: var(--color-primary);
+    font-size: var(--text-sm);
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .refresh-button:hover:not(:disabled) {
-    background-color: #369DF7;
-    color: white;
+    background-color: var(--color-primary);
+    color: var(--color-bg-white);
 }
 
 .refresh-button:disabled {
@@ -119,9 +124,9 @@
 /* Table styles */
 .table-container {
     overflow-x: auto;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    background-color: white;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-white);
 }
 
 .medications-table {
@@ -131,27 +136,27 @@
 }
 
 .medications-table thead {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #e0e0e0;
+    background-color: var(--color-bg);
+    border-bottom: 2px solid var(--color-border);
 }
 
 .medications-table th {
-    padding: 16px;
+    padding: var(--space-3) var(--space-2);
     text-align: left;
-    font-size: 14px;
+    font-size: var(--text-sm);
     font-weight: 600;
-    color: #666;
+    color: var(--color-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 .medications-table tbody tr {
-    border-bottom: 1px solid #f0f0f0;
-    transition: background-color 0.2s ease;
+    border-bottom: 1px solid var(--color-border-light);
+    transition: background-color var(--transition-fast);
 }
 
 .medications-table tbody tr:hover {
-    background-color: #f8f9fa;
+    background-color: var(--color-bg);
 }
 
 .medications-table tbody tr:last-child {
@@ -159,16 +164,16 @@
 }
 
 .medications-table td {
-    padding: 16px;
-    font-size: 14px;
-    color: #333;
+    padding: var(--space-3) var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text);
     vertical-align: top;
 }
 
 .empty-message {
     text-align: center;
-    padding: 40px !important;
-    color: #999;
+    padding: var(--space-10) !important;
+    color: var(--color-text-muted);
     font-style: italic;
 }
 
@@ -176,7 +181,7 @@
 .medication-name-cell {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .medication-icon {
@@ -185,19 +190,19 @@
 
 .medication-name {
     font-weight: 600;
-    color: #333;
+    color: var(--color-text);
 }
 
 .dosage, .frequency, .last-administered, .created-date {
-    color: #666;
+    color: var(--color-text-secondary);
 }
 
 /* Status badges */
 .status-badge {
     display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: var(--text-xs);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -205,25 +210,25 @@
 
 .status-badge.administered {
     background-color: rgba(25, 135, 84, 0.1);
-    color: #198754;
+    color: var(--color-success);
     border: 1px solid rgba(25, 135, 84, 0.2);
 }
 
 .status-badge.withheld {
     background-color: rgba(255, 193, 7, 0.1);
-    color: #ffc107;
+    color: var(--color-warning);
     border: 1px solid rgba(255, 193, 7, 0.2);
 }
 
 .status-badge.missed {
     background-color: rgba(220, 53, 69, 0.1);
-    color: #dc3545;
+    color: var(--color-error);
     border: 1px solid rgba(220, 53, 69, 0.2);
 }
 
 .status-badge.pending {
     background-color: rgba(108, 117, 125, 0.1);
-    color: #6c757d;
+    color: var(--color-text-secondary);
     border: 1px solid rgba(108, 117, 125, 0.2);
 }
 
@@ -235,35 +240,35 @@
 
 /* Stats summary */
 .stats-summary {
-    margin-top: 30px;
+    margin-top: var(--space-8);
 }
 
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 20px;
+    gap: var(--space-5);
 }
 
 .stat-card {
-    background: white;
-    border-radius: 8px;
-    padding: 20px;
+    background: var(--color-bg-white);
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
     display: flex;
     align-items: center;
-    gap: 16px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    gap: var(--space-4);
+    box-shadow: var(--shadow-md);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-lg);
 }
 
 .stat-icon {
     width: 48px;
     height: 48px;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -288,66 +293,45 @@
 
 .stat-content h4 {
     margin: 0 0 4px 0;
-    font-size: 14px;
+    font-size: var(--text-sm);
     font-weight: 500;
-    color: #666;
+    color: var(--color-text-secondary);
 }
 
 .stat-value {
     margin: 0;
-    font-size: 28px;
+    font-size: var(--text-xl);
     font-weight: 700;
-    color: #333;
+    color: var(--color-text);
 }
 
 /* .custom-loading + .custom-spinner moved to index.css */
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .dashboard-content {
-        padding: 20px;
-    }
-
-    .dashboard-content.content-with-sidebar {
-        margin-left: 0;
-    }
-
-    .dashboard-title {
-        font-size: 24px;
-    }
-
-    .inventory-section {
-        padding: 16px;
-    }
-
+@media (min-width: 768px) {
     .inventory-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .inventory-header h3 {
-        font-size: 18px;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-5);
     }
 
     .sort-dropdown-wrapper {
-        width: 100%;
-        flex-wrap: wrap;
+        width: auto;
+        flex-wrap: nowrap;
     }
 
     .sort-dropdown {
-        flex: 1;
-        min-width: unset;
+        min-width: 200px;
+        flex: 0 1 auto;
     }
 
     .stats-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     }
 
     .medications-table th,
     .medications-table td {
-        padding: 12px 8px;
-        font-size: 13px;
+        padding: var(--space-4);
+        font-size: var(--text-sm);
     }
 }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { get, post } from "../../services/api.js";
@@ -39,9 +39,29 @@ export default function AddMedicationForm({ residentId, onCancel, onMedicationAd
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    const formRef = useRef(null);
+    const triggerRef = useRef(null);
+
     useEffect(() => {
         fetchMedications();
     }, []);
+
+    useEffect(() => {
+        triggerRef.current = document.activeElement;
+        const firstFocusable = formRef.current?.querySelector(
+            '.p-dropdown, input, select, textarea, button'
+        );
+        (firstFocusable || formRef.current)?.focus();
+        return () => {
+            triggerRef.current?.focus();
+        };
+    }, []);
+
+    useEffect(() => {
+        const handler = (e) => { if (e.key === 'Escape') onCancel(); };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, [onCancel]);
 
     const fetchMedications = async () => {
         try {
@@ -113,9 +133,16 @@ export default function AddMedicationForm({ residentId, onCancel, onMedicationAd
     };
 
     return (
-        <div className="add-medication-form">
+        <div
+            className="add-medication-form"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="add-med-title"
+            ref={formRef}
+            tabIndex={-1}
+        >
             <div className="form-header">
-                <h4>Add New Medication</h4>
+                <h4 id="add-med-title">Add New Medication</h4>
             </div>
 
             <form onSubmit={handleSubmit}>

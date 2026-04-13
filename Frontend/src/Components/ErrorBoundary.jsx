@@ -18,14 +18,15 @@ export default class ErrorBoundary extends Component {
         if (this.state.hasError) {
             return (
                 <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: '100vh',
-                    fontFamily: 'sans-serif',
-                    color: '#333'
-                }}>
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '100vh',
+                        fontFamily: 'sans-serif',
+                        color: 'var(--color-text)'
+                    }}
+                >
                     <h2>Something went wrong.</h2>
                     <p>Please refresh the page or try again later.</p>
                     <button
@@ -35,9 +36,9 @@ export default class ErrorBoundary extends Component {
                             padding: '0.5rem 1.5rem',
                             fontSize: '1rem',
                             cursor: 'pointer',
-                            borderRadius: '6px',
-                            border: '1px solid #ccc',
-                            background: '#f5f5f5'
+                            borderRadius: 'var(--radius-md)',
+                            border: '1px solid var(--color-border)',
+                            background: 'var(--color-bg)'
                         }}
                     >
                         Refresh Page

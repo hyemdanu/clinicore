@@ -1,10 +1,9 @@
-/* css for caregiver sidebar */
 .caregiver-sidebar {
   position: fixed;
   left: 0;
   top: 56px;
   height: calc(100vh - 56px);
-  background-color: #ffffff;
+  background-color: var(--color-bg-white);
   transition: width 0.3s ease;
   z-index: 100;
   overflow: hidden;
@@ -13,7 +12,7 @@
 }
 
 .caregiver-sidebar-open {
-  width: 280px;
+  width: var(--sidebar-width);
 }
 
 .caregiver-sidebar-closed {
@@ -37,12 +36,12 @@
 }
 
 .caregiver-sidebar-item:hover {
-  background-color: #e8eef6;
+  background-color: var(--color-bg);
 }
 
 .caregiver-sidebar-item-active {
-  background-color: #e3f2fd;
-  border-left: 4px solid #369df7;
+  background-color: var(--color-bg);
+  border-left: 4px solid var(--color-primary);
 }
 
 .caregiver-sidebar-icon {
@@ -60,12 +59,11 @@
 
 .caregiver-sidebar-label {
   margin-left: 16px;
-  font-size: 16px;
+  font-size: var(--text-base);
   font-weight: 400;
-  color: #333;
+  color: var(--color-text);
 }
 
-/* logout button at the bottom */
 .sidebar-logout {
   display: flex;
   align-items: center;
@@ -73,11 +71,11 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
   white-space: nowrap;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--color-border);
   margin-top: auto;
   width: 100%;
 }
 
 .sidebar-logout:hover {
-  background-color: #ffe5e5;
+  background-color: var(--color-error-bg);
 }

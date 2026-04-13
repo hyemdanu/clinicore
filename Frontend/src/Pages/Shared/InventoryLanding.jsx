@@ -1,7 +1,3 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Header from '../../Components/Header.jsx';
-import CaregiverSidebar from '../../Components/CaregiverSidebar.jsx';
 import '../CaregiverPortal/css/inventory-landing.css';
 import consumablesIcon from '../../assets/icons/consumablesIcon.png';
 import medicationsIcon from '../../assets/icons/medicationsIcon.png';
@@ -24,7 +20,12 @@ export default function InventoryLanding({ onNavigate }) {
                 <div className="inventory-cards-container">
 
                     {/* Medical Consumables Card */}
-                    <div className="inventory-card" onClick={handleConsumablesClick}>
+                    <button
+                        type="button"
+                        className="inventory-card btn-reset"
+                        onClick={handleConsumablesClick}
+                        aria-label="Go to medical consumables inventory"
+                    >
                         <div className="card-icon-wrapper purple">
                             <img
                                 src={consumablesIcon}
@@ -33,10 +34,15 @@ export default function InventoryLanding({ onNavigate }) {
                             />
                         </div>
                         <h2 className="card-title">Medical<br/>Consumables</h2>
-                    </div>
+                    </button>
 
                     {/* Medications Card */}
-                    <div className="inventory-card" onClick={handleMedicationsClick}>
+                    <button
+                        type="button"
+                        className="inventory-card btn-reset"
+                        onClick={handleMedicationsClick}
+                        aria-label="Go to medication inventory"
+                    >
                         <div className="card-icon-wrapper pink">
                             <img
                                 src={medicationsIcon}
@@ -45,7 +51,7 @@ export default function InventoryLanding({ onNavigate }) {
                             />
                         </div>
                         <h2 className="card-title">Medications</h2>
-                    </div>
+                    </button>
 
                 </div>
 

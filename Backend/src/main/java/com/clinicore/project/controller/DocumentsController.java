@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.clinicore.project.entity.Document;
 import java.util.*;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/documents")
@@ -20,19 +21,38 @@ public class DocumentsController {
         this.documentService = documentService;
     }
 
-    // Upload a document
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of("pdf", "png", "jpg", "jpeg", "docx", "xlsx");
+
     @PostMapping("/upload")
     public ResponseEntity<?> uploadDocument(
             @RequestParam Long currentUserId,
             @RequestParam Long residentId,
             @RequestParam String title,
-            @RequestParam String type,
             @RequestParam("file") MultipartFile file) {
+
+        if (title == null || title.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Title is required"));
+        }
+        if (file == null || file.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "File is required"));
+        }
+
+        String originalName = file.getOriginalFilename();
+        String extension = "";
+        if (originalName != null && originalName.contains(".")) {
+            extension = originalName.substring(originalName.lastIndexOf('.') + 1).toLowerCase();
+        }
+        if (!ALLOWED_EXTENSIONS.contains(extension)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "File type not allowed. Accepted: PDF, PNG, JPG, DOCX, XLSX"));
+        }
 
         try {
             Map<String, Object> response =
-                    documentService.uploadDocument(currentUserId, residentId, title, type, file);
+                    documentService.uploadDocument(currentUserId, residentId, title.trim(), extension, file);
             return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", e.getMessage()));
@@ -93,22 +113,33 @@ public class DocumentsController {
 
         try {
             Document doc = documentService.getDocumentWithFile(documentId, userId);
-            String type = doc.getType().toLowerCase();
+            byte[] data = doc.getDocument();
             String title = doc.getTitle();
 
-            String contentType;
-            switch (type) {
-                case "pdf": contentType = "application/pdf"; break;
-                case "png": contentType = "image/png"; break;
-                case "jpg":
-                case "jpeg": contentType = "image/jpeg"; break;
-                default: contentType = "application/octet-stream";
+            // detect content type from file magic bytes
+            String contentType = "application/octet-stream";
+            String storedType = doc.getType();
+            if (data != null && data.length >= 4) {
+                if (data[0] == 0x25 && data[1] == 0x50 && data[2] == 0x44 && data[3] == 0x46) {
+                    contentType = "application/pdf";
+                } else if ((data[0] & 0xFF) == 0x89 && data[1] == 0x50 && data[2] == 0x4E && data[3] == 0x47) {
+                    contentType = "image/png";
+                } else if ((data[0] & 0xFF) == 0xFF && (data[1] & 0xFF) == 0xD8 && (data[2] & 0xFF) == 0xFF) {
+                    contentType = "image/jpeg";
+                } else if (data[0] == 0x50 && data[1] == 0x4B) {
+                    // ZIP signature — differentiate docx vs xlsx using stored type
+                    if ("xlsx".equals(storedType)) {
+                        contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                    } else {
+                        contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                    }
+                }
             }
 
             return ResponseEntity.ok()
                     .header("Content-Disposition", "inline; filename=\"" + title + "\"")
                     .header("Content-Type", contentType)
-                    .body(doc.getDocument());
+                    .body(data);
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);

@@ -7,109 +7,145 @@ body, html {
 
 main.dashboard-content {
     display: block;
-    margin-left: 250px;
-    padding: 20px;
+    margin-left: var(--sidebar-width);
+    padding: var(--space-5);
 }
 
 .resident-documents-component {
-    margin-top: 20px;
+    margin-top: var(--space-5);
     width: auto;
 }
 
 .documents-search {
     position: relative;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
 }
 
 .documents-search input {
     width: 100%;
-    padding: 10px 12px 10px 44px;
-    border-radius: 6px;
-    border: 1px solid #e0e0e0;
-    font-size: 14px;
+    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-10);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    font-size: var(--text-sm);
 }
 
 .search-icon {
     position: absolute;
-    left: 14px;
+    left: var(--space-3);
     top: 50%;
     transform: translateY(-50%);
-    width: 16px;
-    height: 16px;
+    width: var(--space-4);
+    height: var(--space-4);
     opacity: 0.6;
 }
 
 .documents-box {
-    background: white;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
+    background: var(--color-bg-white);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
 }
 
 .documents-loading {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 20px;
-    color: #666;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    color: var(--color-text-secondary);
 }
 
 .documents-loading i {
-    font-size: 18px;
-    color: #369DF7;
+    font-size: var(--text-md);
+    color: var(--color-primary);
 }
 
 .document-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 16px;
-    border-bottom: 1px solid #f0f0f0;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--color-border-light);
 }
 
 .document-row:last-child {
     border-bottom: none;
 }
 
-.document-icon {
-    width: 32px;
-    height: 32px;
+.document-name {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text);
 }
 
-.document-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: #333;
+.document-file-icon {
+    margin-right: var(--space-3);
+    font-size: var(--text-base);
+    color: var(--color-primary);
+}
+
+.document-actions {
+    margin-left: auto;
 }
 
 .documents-fab {
     position: fixed;
-    bottom: 32px;
-    right: 32px;
+    bottom: var(--space-8);
+    right: var(--space-8);
     width: 56px;
     height: 56px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: none;
-    background-color: #369DF7;
-    color: white;
-    font-size: 28px;
+    background-color: var(--color-primary);
+    color: var(--color-bg-white);
+    font-size: var(--text-xl);
     cursor: pointer;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    box-shadow: var(--shadow-xl);
 }
 
 .view-button {
-    background-color: #007bff;
-    color: white;
+    background-color: var(--color-primary);
+    color: var(--color-bg-white);
     border: none;
-    padding: 6px 16px;
-    border-radius: 20px;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
     cursor: pointer;
-    font-size: 13px;
+    font-size: var(--text-sm);
     font-weight: 600;
+    transition: background-color var(--transition-fast);
 }
 
 .view-button:hover {
-    background-color: #0056b3;
+    background-color: var(--color-primary-hover);
+}
+
+.document-upload-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+
+.document-upload-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    background-color: var(--color-primary);
+    color: var(--color-bg-white);
+    cursor: pointer;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    transition: background-color var(--transition-fast);
+}
+
+.document-upload-label:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.document-selected-file {
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
 }
 
 

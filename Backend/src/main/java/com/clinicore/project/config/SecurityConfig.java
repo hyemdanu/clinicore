@@ -42,7 +42,7 @@ public class SecurityConfig {
 
                     // admin only
                     .requestMatchers("/api/accountCredential/account-requests/**").hasRole("ADMIN")
-                    .requestMatchers("/api/inventory/**").hasRole("ADMIN")
+                    .requestMatchers("/api/inventory/**").hasAnyRole("ADMIN", "CAREGIVER")
 
                     // residents can read their own record (ownership check is in the controller)
                     .requestMatchers(HttpMethod.GET, "/api/residents/full/**").hasAnyRole("ADMIN", "CAREGIVER", "RESIDENT")
