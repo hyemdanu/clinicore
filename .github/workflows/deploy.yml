@@ -38,3 +38,4 @@ jobs:
           version_label: ${{ github.sha }}
           deployment_package: Backend/target/clinicore-0.0.1-SNAPSHOT.jar
           wait_for_environment_recovery: 120
+          use_existing_version_if_available: true
