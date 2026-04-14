@@ -9,7 +9,7 @@ import CaregiverDocument from "./Pages/CaregiverPortal/CaregiverDocument";
 import AdminDashboard from "./Pages/AdminPortal/AdminDashboard";
 import AccountRequests from "./Pages/AdminPortal/AccountRequests";
 import AdminDocuments from "./Pages/AdminPortal/AdminDocument";
-import ForgotUserIdPage from "./Pages/WelcomePage/ForgotUserIdPage";
+import ForgotUserIdPage from "./Pages/WelcomePage/ForgotUserIDPage";
 import ForgotPasswordPage from "./Pages/WelcomePage/ForgotPasswordPage";
 import CreateAccountPage from "./Pages/WelcomePage/CreateAccountPage";
 import RequestSentPage from "./Pages/WelcomePage/RequestSentPage";
