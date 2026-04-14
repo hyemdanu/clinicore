@@ -652,7 +652,7 @@
     color: var(--color-text-secondary);
 }
 
-@media (min-width: 768px) {
+@media (max-width: 767px) {
     .messages-container {
         border-radius: 0;
         box-shadow: none;
