@@ -21,6 +21,7 @@ jobs:
 
       - name: Build JAR
         run: ./mvnw package -DskipTests
+        working-directory: Backend
 
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
