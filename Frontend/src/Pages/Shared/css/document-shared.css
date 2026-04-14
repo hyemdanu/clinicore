@@ -38,15 +38,23 @@
     overflow: hidden;
 }
 
-.document-row {
+button.document-row {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-4) var(--space-5);
-    border-bottom: 1px solid var(--color-border-light);
+    gap: 16px;
+    padding: 20px 24px;
+    background-color: white;
+    border: 1px solid var(--color-border-light);
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     cursor: pointer;
+    transition: box-shadow var(--transition-base);
     width: 100%;
     text-align: left;
+}
+
+button.document-row:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .document-row:last-child {
@@ -391,4 +399,24 @@
 
 .delete-confirm-button:active {
     transform: scale(0.98);
+}
+
+/* Back button — matches messages chat-back-btn style */
+.doc-back-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--color-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: var(--text-base);
+}
+
+.doc-back-btn:hover {
+    background: var(--color-border);
 }

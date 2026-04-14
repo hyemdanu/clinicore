@@ -14,40 +14,41 @@ export default function ResidentMedicalProfile() {
 
     const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
     const toggleSidebar = () => setSidebarOpen((s) => !s);
-  
-      const loadResident = useCallback(async () => {
+
+    const loadResident = useCallback(async () => {
         setLoading(true);
         setError(null);
 
         try {
             const currentUserStr = localStorage.getItem("currentUser");
-            if (!currentUserStr) {
-                navigate("/");
-                return;
-            }
+            if (!currentUserStr) { navigate("/"); return; }
 
             const currentUser = JSON.parse(currentUserStr);
             const currentUserId = currentUser.id;
 
-            const openResidentId = localStorage.getItem("openResidentId");
-            const residentId = openResidentId || currentUserId;
-
-            const data = await get(`/residents/full/${residentId}?currentUserId=${currentUserId}`);
+            const data = await get(`/residents/full/${currentUserId}?currentUserId=${currentUserId}`);
             setResident(data);
-        } catch (err) {
-            console.error("Failed to load resident:", err);
+        } catch {
             setError("Failed to load medical profile.");
         } finally {
             setLoading(false);
         }
     }, [navigate]);
 
-    useEffect(() => {
-        loadResident();
-    }, [loadResident]);
+    useEffect(() => { loadResident(); }, [loadResident]);
 
     const allergies = resident?.medicalRecord?.allergyDetails || [];
     const diagnoses = resident?.medicalRecord?.diagnosisDetails || [];
+    const med = resident?.medicalProfile || {};
+    const svc = resident?.medicalServices || {};
+    const cap = resident?.capability || {};
+
+    const InfoRow = ({ label, value }) => (
+        <div className="mp-row">
+            <span className="mp-label">{label}</span>
+            <span className="mp-value">{value}</span>
+        </div>
+    );
 
     return (
         <div className="admin-dashboard-container">
@@ -55,7 +56,7 @@ export default function ResidentMedicalProfile() {
             <ResidentSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
             <main className={`dashboard-content ${sidebarOpen ? "content-with-sidebar" : ""}`}>
                 {loading ? (
-                    <div className="loading-state">
+                    <div className="residents-loading">
                         <i className="pi pi-spin pi-spinner"></i>
                         <span>Loading medical profile...</span>
                     </div>
@@ -65,118 +66,62 @@ export default function ResidentMedicalProfile() {
                     <div className="error-message">No resident loaded.</div>
                 ) : (
                     <>
-                <div className="alert-section">
-                    <h2 className="dashboard-title">
-                        Medical Profile — {resident.firstName || 'Unknown'} {resident.lastName || ''}
-                    </h2>
-                </div>
+                        <h2 className="dashboard-title">
+                            Medical Profile — {resident.firstName || 'Unknown'} {resident.lastName || ''}
+                        </h2>
 
-                <div className="medical-profile-grid">
-                    <div className="profile-column">
-                        <section className="inventory-section">
-                            <div className="inventory-header">
-                                <h3>Insurance</h3>
-                            </div>
-                            <div className="service-item">
-                                <span className="service-label">{resident.medicalProfile?.insurance || 'No insurance recorded'}</span>
-                            </div>
-                        </section>
+                        <div className="mp-grid">
+                            {/* General Info */}
+                            <section className="mp-card">
+                                <h3>General Information</h3>
+                                <InfoRow label="Insurance" value={med.insurance || 'Not recorded'} />
+                                <InfoRow label="Mobility Status" value={cap.mobilityStatus || 'Unknown'} />
+                                <InfoRow label="Incontinence Status" value={cap.incontinenceStatus || 'Unknown'} />
+                                <InfoRow label="Self-Medicates" value={cap.selfMedicates ? 'Yes' : 'No'} />
+                                <InfoRow label="Verbal" value={cap.verbal ? 'Yes' : 'No'} />
+                            </section>
 
-                        <section className="inventory-section">
-                            <div className="inventory-header">
+                            {/* Medical Services */}
+                            <section className="mp-card">
                                 <h3>Medical Services</h3>
-                            </div>
-                            <div className="medical-services-list">
-                                <div className="service-item">
-                                    <span className="service-label">DNR / POLST</span>
-                                    {resident.medicalServices?.dnrPolst ? "Yes" : "No"}
-                                </div>
-                                <div className="service-item">
-                                    <span className="service-label">On Hospice</span>
-                                    {resident.medicalServices?.hospice ? "Yes" : "No"}
-                                </div>
-                                <div className="service-item">
-                                    <span className="service-label">Hospice Agency</span>
-                                    {resident.medicalServices?.hospiceAgency || 'N/A'}
-                                </div>
-                                <div className="service-item">
-                                    <span className="service-label">Preferred Hospital</span>
-                                    {resident.medicalServices?.preferredHospital || 'N/A'}
-                                </div>
-                                <div className="service-item">
-                                    <span className="service-label">Preferred Pharmacy</span>
-                                    {resident.medicalServices?.preferredPharmacy || 'N/A'}
-                                </div>
-                                <div className="service-item">
-                                    <span className="service-label">On Home Health</span>
-                                    {resident.medicalServices?.homeHealth ? "Yes" : "No"}
-                                </div>
-                                <div className="service-item">
-                                    <span className="service-label">Home Health Agency</span>
-                                    {resident.medicalServices?.homeHealthAgency || 'N/A'}
-                                </div>
-                                <div className="service-item">
-                                    <span className="service-label">Mortuary</span>
-                                    {resident.medicalServices?.mortuary || 'N/A'}
-                                </div>
-                            </div>
-                        </section>
-                    </div>
+                                <InfoRow label="DNR / POLST" value={svc.dnrPolst ? 'Yes' : 'No'} />
+                                <InfoRow label="On Hospice" value={svc.hospice ? 'Yes' : 'No'} />
+                                <InfoRow label="Hospice Agency" value={svc.hospiceAgency || 'N/A'} />
+                                <InfoRow label="Preferred Hospital" value={svc.preferredHospital || 'N/A'} />
+                                <InfoRow label="Preferred Pharmacy" value={svc.preferredPharmacy || 'N/A'} />
+                                <InfoRow label="On Home Health" value={svc.homeHealth ? 'Yes' : 'No'} />
+                                <InfoRow label="Home Health Agency" value={svc.homeHealthAgency || 'N/A'} />
+                                <InfoRow label="Mortuary" value={svc.mortuary || 'N/A'} />
+                            </section>
 
-                    <div className="profile-column">
-                        <section className="inventory-section">
-                            <div className="inventory-header">
-                                <h3>Capabilities</h3>
-                            </div>
-                            <div className="service-item">
-                                <span className="service-label">Mobility Status:</span>
-                                {resident.capability?.mobilityStatus || 'Unknown'}
-                            </div>
-                            <div className="service-item">
-                                <span className="service-label">Incontinence Status:</span>
-                                {resident.capability?.incontinenceStatus || 'Unknown'}
-                            </div>
-                            <div className="service-item">
-                                <span className="service-label">Self-Medicates:</span>
-                                {resident.capability?.selfMedicates ? "Yes" : "No"}
-                            </div>
-                            <div className="service-item">
-                                <span className="service-label">Verbal:</span>
-                                {resident.capability?.verbal ? "Yes" : "No"}
-                            </div>
-                        </section>
-
-                        <section className="inventory-section">
-                            <div className="inventory-header">
+                            {/* Diagnoses */}
+                            <section className="mp-card">
                                 <h3>Diagnoses</h3>
-                            </div>
-                            {diagnoses.length === 0 ? (
-                                <div className="custom-loading"><span>No diagnoses recorded</span></div>
-                            ) : (
-                                diagnoses.map((d) => (
-                                    <div key={d.id} className="inventory-row">
-                                        <span>{d.diagnosis || 'Unknown diagnosis'}</span>
-                                    </div>
-                                ))
-                            )}
-                        </section>
+                                {diagnoses.length === 0 ? (
+                                    <p className="mp-empty">No diagnoses recorded</p>
+                                ) : (
+                                    diagnoses.map((d) => (
+                                        <div key={d.id} className="mp-list-item">
+                                            {d.diagnosis || 'Unknown diagnosis'}
+                                        </div>
+                                    ))
+                                )}
+                            </section>
 
-                        <section className="inventory-section">
-                            <div className="inventory-header">
+                            {/* Allergies */}
+                            <section className="mp-card">
                                 <h3>Allergies</h3>
-                            </div>
-                           {allergies.length === 0 ? (
-                                <div className="custom-loading"><span>No allergies recorded</span></div>
-                            ) : (
-                                allergies.map((a) => (
-                                    <div key={a.id} className="inventory-row">
-                                        <span>{a.allergyType || 'Unknown allergy'}</span>
-                                    </div>
-                                ))
-                            )}
-                        </section>
-                    </div>
-                </div>
+                                {allergies.length === 0 ? (
+                                    <p className="mp-empty">No allergies recorded</p>
+                                ) : (
+                                    allergies.map((a) => (
+                                        <div key={a.id} className="mp-list-item">
+                                            {a.allergyType || 'Unknown allergy'}
+                                        </div>
+                                    ))
+                                )}
+                            </section>
+                        </div>
                     </>
                 )}
             </main>

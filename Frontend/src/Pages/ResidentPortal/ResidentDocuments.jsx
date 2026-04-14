@@ -5,9 +5,9 @@ import ResidentSidebar from "../../Components/ResidentSidebar";
 import { get, API_BASE_URL } from "../../services/api";
 import "./css/ResidentDashboard.css";
 import "./css/ResidentDocuments.css";
+import "../Shared/css/residents.css";
 import "../Shared/css/document-shared.css";
 
-import searchIcon from "../../assets/icons/magnifying-glass.png";
 
 export default function ResidentDocuments() {
   const toastRef = useRef(null);
@@ -115,42 +115,41 @@ export default function ResidentDocuments() {
         <div className="resident-documents-component">
           <h2 className="dashboard-title">Documents</h2>
 
-          <div className="inventory-section">
-            <div className="documents-search">
-              <img src={searchIcon} alt="Search" className="search-icon" />
-              <input
-                type="text"
-                placeholder="Search documents"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-
-            <div className="documents-box">
-              {loading ? (
-                <div className="documents-loading">
-                  <i className="pi pi-spin pi-spinner"></i>
-                  <span>Loading...</span>
-                </div>
-              ) : error ? (
-                <div className="no-documents">{error}</div>
-              ) : filteredDocuments.length === 0 ? (
-                <div className="no-documents">No documents found</div>
-              ) : (
-                filteredDocuments.map((doc) => (
-                  <div
-                    key={doc.id}
-                    className="document-row"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => openDocument(doc)}
-                  >
-                    <i className="pi pi-file" style={{ fontSize: "16px", marginRight: "12px" }}></i>
-                    <span className="document-name">{doc.title}</span>
-                  </div>
-                ))
-              )}
-            </div>
+          <div className="search-container">
+            <i className="pi pi-search search-icon"></i>
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search documents..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
+
+          {loading ? (
+            <div className="residents-loading">
+              <i className="pi pi-spin pi-spinner"></i>
+              <span>Loading documents...</span>
+            </div>
+          ) : error ? (
+            <div className="error-message">{error}</div>
+          ) : filteredDocuments.length === 0 ? (
+            <div className="no-documents">No documents found</div>
+          ) : (
+            <div className="residents-list">
+              {filteredDocuments.map((doc) => (
+                <button
+                  key={doc.id}
+                  type="button"
+                  className="document-row btn-reset"
+                  onClick={() => openDocument(doc)}
+                >
+                  <i className="pi pi-file doc-row-icon"></i>
+                  <span className="document-name">{doc.title}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </main>
 

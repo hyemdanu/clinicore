@@ -12,7 +12,7 @@ import "./css/ResidentDashboard.css";
 import userIcon from "../../assets/icons/usericon.png";
 import medProfileIcon from "../../assets/icons/residenticon.png";   // using resident icon for Medical Profile
 import medicationIcon from "../../assets/icons/inventoryicon.png"; // pill-ish icon
-import messagesIcon from "../../assets/icons/Messageicon.png";
+
 import documentsIcon from "../../assets/icons/dashboardicon.png";   // placeholder for Documents
 
 export default function ResidentDashboard() {
@@ -103,7 +103,6 @@ export default function ResidentDashboard() {
         { label: "User",            img: userIcon,       description: "View your profile and account details", to: "/resident/profile" },
         { label: "Medical Profile", img: medProfileIcon, description: "Conditions, allergies, care plan",      to: "/resident/medical-profile" },
         { label: "Medication",      img: medicationIcon, description: `Active medications${activeMedCount ? ` • ${activeMedCount}` : ""}`, to: "/resident/medications" },
-        { label: "Messages",        img: messagesIcon,   description: unreadCount > 0 ? `Unread • ${unreadCount}` : "Messages with caregivers", to: "/resident/messages", badge: unreadCount > 0 ? unreadCount : null },
         { label: "Documents",       img: documentsIcon,  description: "Care notes, forms, uploads",            to: "/resident/documents" },
     ];
 
@@ -194,17 +193,33 @@ export default function ResidentDashboard() {
                         {loading ? (
                             <div className="rd-skeleton-list">
                                 <div className="rd-skel-line" />
-                                <div className="rd-skel-line" />
                             </div>
                         ) : (
                             <div className="rd-kpis">
                                 <div className="rd-kpi">
                                     <span className="rd-kpi-value">{activeMedCount}</span>
-                                    <span className="rd-kpi-label">Active meds</span>
+                                    <span className="rd-kpi-label">Active medications</span>
                                 </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="rd-panel">
+                        <div className="rd-panel-head">
+                            <h3>Messages</h3>
+                            <button className="rd-link-button" onClick={() => navigate("/resident/messages")}>
+                                View all
+                            </button>
+                        </div>
+                        {loading ? (
+                            <div className="rd-skeleton-list">
+                                <div className="rd-skel-line" />
+                            </div>
+                        ) : (
+                            <div className="rd-kpis">
                                 <div className="rd-kpi">
                                     <span className="rd-kpi-value">{unreadCount}</span>
-                                    <span className="rd-kpi-label">Unread msgs</span>
+                                    <span className="rd-kpi-label">Unread messages</span>
                                 </div>
                             </div>
                         )}

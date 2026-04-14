@@ -3,13 +3,12 @@ import { Toast } from "primereact/toast";
 import "./css/CaregiverDocument.css";
 import "../Shared/css/residents.css";
 import "../Shared/css/document-shared.css";
-import searchIcon from "../../assets/icons/magnifying-glass.png";
 import { get, uploadDocument, API_BASE_URL } from "../../services/api";
 
 const ALLOWED_EXTENSIONS = ["pdf", "png", "jpg", "jpeg", "docx", "xlsx"];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
-export default function CaregiverDocument({ sidebarOpen }) {
+export default function CaregiverDocument() {
     const toastRef = useRef(null);
     const [searchTerm, setSearchTerm] = useState("");
     const [assignedResidents, setAssignedResidents] = useState([]);
@@ -182,15 +181,15 @@ export default function CaregiverDocument({ sidebarOpen }) {
     }, [viewerUrl]);
 
     return (
-        <div className="dashboard-container">
+        <>
             <Toast ref={toastRef} />
-            <main className={`main-content ${sidebarOpen ? "content-with-sidebar" : ""}`}>
                 <h2 className="dashboard-title">Documents</h2>
-                <div className="documents-search">
-                    <img src={searchIcon} alt="Search" className="search-icon" />
+                <div className="search-container">
+                    <i className="pi pi-search search-icon"></i>
                     <input
                         type="text"
-                        placeholder="Search Document Name or Code"
+                        className="search-input"
+                        placeholder="Search documents..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -200,8 +199,7 @@ export default function CaregiverDocument({ sidebarOpen }) {
                     <div className="residents-section-label">Assigned to You</div>
                 )}
 
-                <div className="documents-box">
-                    {error && <div style={{ color: "red" }}>{error}</div>}
+                    {error && <div className="error-message" role="alert">{error}</div>}
                     {loading && (
                         <div className="residents-loading">
                             <i className="pi pi-spin pi-spinner"></i>
@@ -209,13 +207,14 @@ export default function CaregiverDocument({ sidebarOpen }) {
                         </div>
                     )}
 
+                <div className="residents-list">
                     {!selectedResident
                         ? assignedResidents.map((resident) => (
-                            <div
+                            <button
                                 key={resident.id}
-                                className="document-row"
+                                type="button"
+                                className="document-row btn-reset"
                                 onClick={() => handleResidentClick(resident)}
-                                style={{ cursor: "pointer" }}
                             >
                                 <div className="resident-avatar">
                                     <i className="pi pi-user"></i>
@@ -223,13 +222,13 @@ export default function CaregiverDocument({ sidebarOpen }) {
                                 <span className="document-name">
                                     {resident.firstName} {resident.lastName}
                                 </span>
-                            </div>
+                            </button>
                         ))
                         : !loading && !error && (
                             <>
                                 <div className="documents-header">
-                                    <button className="back-button" onClick={handleBack} aria-label="Back">
-                                        <span className="back-arrow">&larr;</span>
+                                    <button className="doc-back-btn" onClick={handleBack} aria-label="Back">
+                                        <i className="pi pi-arrow-left"></i>
                                     </button>
                                     <div className="resident-documents-title">
                                         {selectedResident.firstName} {selectedResident.lastName}
@@ -261,15 +260,15 @@ export default function CaregiverDocument({ sidebarOpen }) {
 
                                 {filteredDocuments.length > 0 ? (
                                     filteredDocuments.map((doc) => (
-                                        <div
+                                        <button
                                             key={doc.id}
-                                            className="document-row"
-                                            style={{ cursor: "pointer" }}
+                                            type="button"
+                                            className="document-row btn-reset"
                                             onClick={() => openDocument(doc)}
                                         >
-                                            <i className="pi pi-file" style={{ fontSize: "16px", marginRight: "12px" }}></i>
+                                            <i className="pi pi-file doc-row-icon"></i>
                                             <span className="document-name">{doc.title}</span>
-                                        </div>
+                                        </button>
                                     ))
                                 ) : (
                                     <div className="no-documents">
@@ -283,7 +282,6 @@ export default function CaregiverDocument({ sidebarOpen }) {
                 {selectedResident && (
                     <button className="documents-fab" onClick={() => setShowUploadForm(true)}>+</button>
                 )}
-            </main>
 
             {viewerUrl && (
                 <div className="document-viewer-overlay" onClick={closeViewer}>
@@ -307,6 +305,6 @@ export default function CaregiverDocument({ sidebarOpen }) {
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 }

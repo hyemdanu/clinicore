@@ -4,16 +4,8 @@
 /* Cards grid */
 .rd-card-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: var(--space-5);
-    max-width: 800px;
-}
-
-@media (min-width: 1024px) {
-    .rd-card-grid {
-        grid-template-columns: 1fr 1fr;
-        max-width: 1000px;
-    }
 }
 
 /* Card look/feel */
@@ -32,7 +24,6 @@
 }
 
 .rd-action-card:hover {
-    transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
 }
 
@@ -91,14 +82,8 @@
 .rd-secondary {
     padding-top: var(--space-6);
     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: var(--space-5);
-}
-
-@media (min-width: 1024px) {
-    .rd-secondary {
-        grid-template-columns: 1fr 1fr;
-        max-width: 1000px;
-    }
 }
 
 .rd-panel {

@@ -473,11 +473,19 @@ export default function AccountRequests({ embedded = false }) {
                 </p>
             </div>
 
+            {/* Display loading spinner */}
+            {loading && (
+                <div className="residents-loading">
+                    <i className="pi pi-spin pi-spinner"></i>
+                    <span>Loading requests...</span>
+                </div>
+            )}
+
             {/* Display error message if API call fails */}
             {error && <div className="error-message">{error}</div>}
 
             {/* Requests data table section */}
-            <section className="inventory-section">
+            {!loading && <section className="inventory-section">
                 <div className="inventory-header">
                     <h3>Requests</h3>
                     {/* Status filter dropdown menu */}
@@ -499,8 +507,6 @@ export default function AccountRequests({ embedded = false }) {
                 <DataTable
                     // Pass filtered requests to table
                     value={filteredRequests}
-                    // Show loading spinner while fetching
-                    loading={loading}
                     className="inventory-table modern-table"
                     emptyMessage="No account requests found"
                     // Enable pagination
@@ -525,7 +531,7 @@ export default function AccountRequests({ embedded = false }) {
                     {/* Column for action buttons (edit, approve, deny, resend code) */}
                     <Column body={actionTemplate} header="Actions" className="col-actions" />
                 </DataTable>
-            </section>
+            </section>}
         </>
     );
 
@@ -542,10 +548,7 @@ export default function AccountRequests({ embedded = false }) {
                 // Make dialog modal (blocks background interactions)
                 modal
                 closable={false}
-                className="modern-dialog"
-                // Make dialog responsive on different screen sizes
                 breakpoints={{ '960px': '80vw', '640px': '95vw' }}
-                // Set dialog width to 40% of viewport
                 className="modern-dialog dialog--md"
             >
                 <div className="dialog-form">
@@ -623,10 +626,7 @@ export default function AccountRequests({ embedded = false }) {
                 // Make dialog modal (blocks background interactions)
                 modal
                 closable={false}
-                className="modern-dialog"
-                // Make dialog responsive on different screen sizes
                 breakpoints={{ '960px': '80vw', '640px': '95vw' }}
-                // Set dialog width to 32% of viewport
                 className="modern-dialog dialog--sm"
             >
                 <div className="dialog-confirm">
@@ -663,10 +663,7 @@ export default function AccountRequests({ embedded = false }) {
                 // Make dialog modal (blocks background interactions)
                 modal
                 closable={false}
-                className="modern-dialog activation-code-dialog"
-                // Make dialog responsive on different screen sizes
                 breakpoints={{ '960px': '80vw', '640px': '95vw' }}
-                // Set dialog width to 40% of viewport
                 className="modern-dialog dialog--md activation-code-dialog"
             >
                 <div className="dialog-form">

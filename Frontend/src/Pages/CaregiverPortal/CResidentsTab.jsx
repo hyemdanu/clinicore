@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { get } from '../../services/api';
 import ResidentDetailModal from '../Shared/ResidentDetailModal';
@@ -9,7 +9,7 @@ import '../Shared/css/residents.css';
  * - "Assigned to You": residents assigned to the logged-in caregiver
  * - "Residents List": all other residents with their assigned caregiver(s) shown
  */
-export default function CaregiverResidentsTab() {
+export default function CaregiverResidentsTab({ initialResidentId }) {
     const navigate = useNavigate();
 
     const [assignedResidents, setAssignedResidents] = useState([]);
@@ -21,6 +21,7 @@ export default function CaregiverResidentsTab() {
     const [showModal, setShowModal] = useState(false);
     const [loadingResident, setLoadingResident] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
+    const initialOpenDone = useRef(false);
 
     useEffect(() => {
         if (showModal) {
@@ -34,6 +35,16 @@ export default function CaregiverResidentsTab() {
     useEffect(() => {
         fetchResidents();
     }, []);
+
+    // Auto-open a resident's detail when navigated from dashboard
+    useEffect(() => {
+        if (initialResidentId && !initialOpenDone.current && !loading) {
+            initialOpenDone.current = true;
+            const all = [...assignedResidents, ...otherResidents];
+            const match = all.find(r => r.id === initialResidentId);
+            if (match) handleResidentClick(match);
+        }
+    }, [initialResidentId, loading, assignedResidents, otherResidents]);
 
     const fetchResidents = async (background = false) => {
         if (background) {
@@ -115,13 +126,6 @@ export default function CaregiverResidentsTab() {
 
     return (
         <div className="residents-tab">
-            {loadingResident && (
-                <div className="residents-loading">
-                    <i className="pi pi-spin pi-spinner"></i>
-                    <span>Loading resident details...</span>
-                </div>
-            )}
-
             {/* Top — assigned to current caregiver */}
             <div className="residents-section-container">
                 <h3 className="residents-section-label">Assigned to You</h3>
@@ -130,9 +134,10 @@ export default function CaregiverResidentsTab() {
                         <div className="no-residents">No residents assigned to you.</div>
                     ) : (
                         assignedResidents.map((resident) => (
-                            <div
+                            <button
                                 key={resident.id}
-                                className="resident-item"
+                                type="button"
+                                className="resident-item btn-reset"
                                 onClick={() => handleResidentClick(resident)}
                             >
                                 <div className="resident-avatar">
@@ -141,7 +146,7 @@ export default function CaregiverResidentsTab() {
                                 <span className="resident-name">
                                     {resident.firstName} {resident.lastName}
                                 </span>
-                            </div>
+                            </button>
                         ))
                     )}
                 </div>
@@ -155,9 +160,10 @@ export default function CaregiverResidentsTab() {
                         <div className="no-residents">No other residents.</div>
                     ) : (
                         otherResidents.map((resident) => (
-                            <div
+                            <button
                                 key={resident.id}
-                                className="resident-item"
+                                type="button"
+                                className="resident-item btn-reset"
                                 onClick={() => handleResidentClick(resident)}
                             >
                                 <div className="resident-avatar">
@@ -178,7 +184,7 @@ export default function CaregiverResidentsTab() {
                                         </span>
                                     )}
                                 </div>
-                            </div>
+                            </button>
                         ))
                     )}
                 </div>

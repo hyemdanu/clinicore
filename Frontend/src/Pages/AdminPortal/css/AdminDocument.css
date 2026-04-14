@@ -1,24 +1,4 @@
-
-.dashboard-container {
-    display: flex;
-    height: 100vh;
-    background-color: var(--color-bg);
-}
-
-.admin-documents-content {
-    flex: 1;
-    margin-left: 0;
-    margin-top: var(--space-10);
-    padding: 0 var(--space-10) var(--space-10) var(--space-10);
-    transition: margin-left var(--transition-slow);
-    min-height: 100px;
-    background-color: var(--color-bg);
-    overflow-y: auto;
-}
-
-.admin-documents-content.content-with-sidebar {
-    margin-left: var(--space-5);
-}
+/* admin-documents-content is rendered inside dashboard's <main> which handles scrolling */
 
 .documents-search {
     position: relative;
@@ -57,13 +37,23 @@
     overflow: hidden;
 }
 
-.document-row {
+button.document-row {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-4) var(--space-5);
-    border-bottom: 1px solid var(--color-border-light);
+    gap: 16px;
+    padding: 20px 24px;
+    background-color: white;
+    border: 1px solid var(--color-border-light);
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     cursor: pointer;
+    transition: box-shadow var(--transition-base);
+    width: 100%;
+    text-align: left;
+}
+
+button.document-row:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .document-row:last-child {
@@ -109,9 +99,8 @@
     background-color: var(--color-bg-hover);
 }
 
-.dashboard-title {
+.admin-documents-content .dashboard-title {
     margin: 0 0 var(--space-4) 0;
-    padding-top: 0;
 }
 
 .documents-header {
@@ -219,10 +208,6 @@
 .upload-button:active,
 .cancel-button:active {
     transform: scale(0.98);
-}
-
-.document-row {
-    cursor: pointer; width: 100%;
 }
 
 .doc-row-icon {

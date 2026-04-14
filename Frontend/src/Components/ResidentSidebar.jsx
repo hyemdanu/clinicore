@@ -7,7 +7,7 @@ import userIcon from "../assets/icons/usericon.png";
 import residentIcon from "../assets/icons/residenticon.png";
 import messagesIcon from "../assets/icons/Messageicon.png";
 import inventoryIcon from "../assets/icons/inventoryicon.png";
-import documentIcon from '../assets/icons/documentIcon.png';
+import documentIcon from '../assets/icons/documentsIcon.png';
 
 export default function ResidentSidebar({ isOpen, onToggle }) {
     const navigate = useNavigate();

@@ -45,6 +45,7 @@
 .search-container {
     position: relative;
     margin-bottom: 24px;
+    width: 100%;
 }
 
 .search-icon {
@@ -58,6 +59,7 @@
 
 .search-input {
     width: 100%;
+    box-sizing: border-box;
     padding: 16px 20px 16px 56px;
     border: none;
     border-radius: 12px;
@@ -84,21 +86,23 @@
     gap: 16px;
 }
 
-.resident-item {
+button.resident-item {
     display: flex;
     align-items: center;
     gap: 16px;
     padding: 20px 24px;
     background-color: white;
+    border: 1px solid var(--color-border-light);
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     cursor: pointer;
-    transition: all var(--transition-base);
+    transition: box-shadow var(--transition-base);
+    width: 100%;
+    text-align: left;
 }
 
 .resident-item:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    transform: translateY(-2px);
 }
 
 .resident-avatar {
@@ -152,18 +156,8 @@
     box-shadow: -2px 0 12px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
-    animation: slideInRight 0.3s ease;
     overflow: hidden;
     z-index: 1000;
-}
-
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-    }
-    to {
-        transform: translateX(0);
-    }
 }
 
 /* Push main content left when sidebar is open - default for large screens */
@@ -1716,13 +1710,17 @@ body.sidebar-open .dashboard-content {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-.caregiver-card-header {
+button.caregiver-card-header {
     display: flex;
     align-items: center;
     gap: 16px;
     padding: 20px 24px;
     cursor: pointer;
     user-select: none;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
 }
 
 .caregiver-avatar {

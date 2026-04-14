@@ -2,8 +2,6 @@ import React from "react";
 import "./css/caregiver.css";
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
 import { get } from '../../services/api';
 import Header from '../../Components/Header';
 import CaregiverSidebar from "../../Components/CaregiverSidebar.jsx";
@@ -12,8 +10,6 @@ import CaregiverProfile from "./CaregiverProfile";
 import CaregiverDocument from "./CaregiverDocument";
 import MessagesTab from '../Shared/MessagesTab';
 import InventoryLanding from '../Shared/InventoryLanding.jsx';
-import MedicationInventory from '../Shared/CaregiverMedicationInventory.jsx';
-import ConsumablesInventory from '../Shared/ConsumablesInventory.jsx';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 
@@ -22,6 +18,7 @@ export default function CaregiverDashboard() {
 
     const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
     const [activeTab, setActiveTab] = useState("dashboard");
+    const [selectedResidentId, setSelectedResidentId] = useState(null);
     const [residents, setResidents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -36,6 +33,25 @@ export default function CaregiverDashboard() {
         'medication-inventory': "Medication Inventory",
         'consumables-inventory': "Medical Consumables Inventory"
     };
+
+    const handleNavigate = (tab, residentId = null) => {
+        setActiveTab(tab);
+        setSelectedResidentId(residentId);
+        window.history.pushState({ tab }, '', `#${tab}`);
+    };
+
+    // Handle browser back/forward buttons
+    useEffect(() => {
+        const handlePopState = (e) => {
+            const tab = e.state?.tab || 'dashboard';
+            setActiveTab(tab);
+        };
+        window.addEventListener('popstate', handlePopState);
+        if (!window.history.state?.tab) {
+            window.history.replaceState({ tab: activeTab }, '', `#${activeTab}`);
+        }
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, []);
 
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
@@ -58,38 +74,33 @@ export default function CaregiverDashboard() {
                     />
                 </div>
 
-                <div className="date">October 1, 2025</div>
-            </div>
-        );
-    };
-
-    const TaskBadge = ({ label, color }) => {
-        return (
-            <div className="task-badge" style={{ backgroundColor: color }}>
-                {label}
+                <div className="date">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
             </div>
         );
     };
 
     const ResidentRow = ({ resident }) => {
-        const tasks = resident.tasks || [];
+        const counts = resident.counts || {};
         return (
-            <div className="resident-row">
-                <div className="resident-info">
-                    <div className="avatar" />
-                    <span>{resident.name}</span>
+            <button
+                type="button"
+                className="dash-resident-card btn-reset"
+                onClick={() => handleNavigate('residents', resident.id)}
+            >
+                <div className="dash-resident-info">
+                    <div className="resident-avatar">
+                        <i className="pi pi-user"></i>
+                    </div>
+                    <span className="resident-name">{resident.name}</span>
                 </div>
-
-                <div className="task-container">
-                    {tasks.map((task, index) => (
-                        <TaskBadge
-                            key={index}
-                            label={task.label}
-                            color={task.color}
-                        />
-                    ))}
+                <div className="dash-badges">
+                    <span className="dash-badge taken"><span className="badge-label">Taken </span>{counts.ADMINISTERED}</span>
+                    <span className="dash-badge pending"><span className="badge-label">Pending </span>{counts.PENDING}</span>
+                    <span className="dash-badge missed"><span className="badge-label">Missed </span>{counts.MISSED}</span>
+                    <span className="dash-badge withheld"><span className="badge-label">Withheld </span>{counts.WITHHELD}</span>
                 </div>
-            </div>
+                <i className="pi pi-chevron-right dash-chevron"></i>
+            </button>
         );
     };
 
@@ -177,16 +188,13 @@ export default function CaregiverDashboard() {
                         <div className="section-header">
                             <h3>Residents</h3>
                         </div>
-                        <DataTable
-                            value={residents}
-                            className="residents-table"
-                            emptyMessage="No residents found"
-                        >
-                            <Column
-                                header="Resident"
-                                body={(rowData) => <ResidentRow resident={rowData} />}
-                            />
-                        </DataTable>
+                        <div className="dash-residents-list">
+                            {residents.length === 0 ? (
+                                <div className="no-residents">No residents found</div>
+                            ) : (
+                                residents.map((r) => <ResidentRow key={r.id} resident={r} />)
+                            )}
+                        </div>
                     </section>
                 </>
             )}
@@ -196,7 +204,7 @@ export default function CaregiverDashboard() {
     const renderContent = () => {
         switch (activeTab) {
             case "residents":
-                return <CaregiverResidentsTab />;
+                return <CaregiverResidentsTab initialResidentId={selectedResidentId} />;
             case "profile":
                 return <CaregiverProfile />;
             case "messages":
@@ -204,11 +212,7 @@ export default function CaregiverDashboard() {
             case "documents":
                 return <CaregiverDocument />;
             case "inventory":
-                return <InventoryLanding onNavigate={setActiveTab} />;
-            case "medication-inventory":
-                return <MedicationInventory />;
-            case "consumables-inventory":
-                return <ConsumablesInventory />;
+                return <InventoryLanding />;
             case "dashboard":
             default:
                 return renderDashboardContent();
@@ -222,7 +226,7 @@ export default function CaregiverDashboard() {
             <CaregiverSidebar
                 isOpen={sidebarOpen}
                 activeTab={activeTab}
-                onNavigate={setActiveTab}
+                onNavigate={handleNavigate}
             />
 
             <main className={`main-content ${sidebarOpen ? "content-with-sidebar" : ""} ${activeTab === 'messages' ? 'messages-content' : ''}`}>

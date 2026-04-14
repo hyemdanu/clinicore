@@ -5,10 +5,8 @@ body, html {
     height: 100%;
 }
 
-main.dashboard-content {
-    display: block;
+main.dashboard-content.content-with-sidebar {
     margin-left: var(--sidebar-width);
-    padding: var(--space-5);
 }
 
 .resident-documents-component {

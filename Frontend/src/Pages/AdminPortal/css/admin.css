@@ -15,7 +15,7 @@
 }
 
 .dashboard-content.content-with-sidebar {
-    margin-left: 0;
+    margin-left: 280px;
 }
 
 .admin-dashboard-container.messages-active {
@@ -42,11 +42,20 @@
 }
 
 .dashboard-content.messages-content.content-with-sidebar {
-    left: 0;
+    left: 280px;
+    margin-left: 0;
 }
 
 .alert-section {
-    margin-bottom: var(--space-8);
+    margin-bottom: var(--space-4);
+}
+
+.alert-section .dashboard-title {
+    margin-bottom: var(--space-1);
+}
+
+.alert-section .dashboard-subtitle {
+    margin-top: 0;
 }
 
 .dashboard-title {
@@ -391,6 +400,13 @@
     margin-left: 4px;
 }
 
+/* PrimeReact tooltip override */
+.p-tooltip .p-tooltip-text {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+}
+
 .p-toast-message-error {
     border-left-color: var(--color-error) !important;
     color: var(--color-error-text) !important;
@@ -471,6 +487,7 @@
 
     .dashboard-content.messages-content.content-with-sidebar {
         left: var(--sidebar-width);
+        margin-left: 0;
     }
 
     .dashboard-title {
