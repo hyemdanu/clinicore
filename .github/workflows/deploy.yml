@@ -19,6 +19,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
+        working-directory: Backend
+
       - name: Build JAR
         run: ./mvnw package -DskipTests
         working-directory: Backend
