@@ -6,7 +6,7 @@ import caregiverIcon from '../assets/icons/caregivericon.png';
 import userIcon from '../assets/icons/usericon.png';
 import messageIcon from '../assets/icons/Messageicon.png';
 import inventoryIcon from '../assets/icons/inventoryicon.png';
-import documentIcon from '../assets/icons/documentIcon.png';
+import documentIcon from '../assets/icons/documentsIcon.png';
 import accountRequestIcon from '../assets/icons/accountRequest.png';
 
 

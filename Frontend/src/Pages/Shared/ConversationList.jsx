@@ -105,9 +105,9 @@ export default function ConversationList({
 
             <div className="conversations">
                 {loading ? (
-                    <div className="conversations-loading">
+                    <div className="residents-loading">
                         <i className="pi pi-spin pi-spinner"></i>
-                        <span>Loading...</span>
+                        <span>Loading conversations...</span>
                     </div>
                 ) : error ? (
                     <div className="conversations-error">{error}</div>

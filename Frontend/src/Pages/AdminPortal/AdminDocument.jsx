@@ -5,12 +5,11 @@ import { get, uploadDocument, deleteDocument, API_BASE_URL } from "../../service
 import "./css/AdminDocument.css";
 import "../Shared/css/residents.css";
 import "../Shared/css/document-shared.css";
-import searchIcon from "../../assets/icons/magnifying-glass.png";
 
 const ALLOWED_EXTENSIONS = ["pdf", "png", "jpg", "jpeg", "docx", "xlsx"];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
-export default function AdminDocuments({ sidebarOpen }) {
+export default function AdminDocuments() {
     const navigate = useNavigate();
     const toastRef = useRef(null);
     const [residents, setResidents] = useState([]);
@@ -218,19 +217,15 @@ export default function AdminDocuments({ sidebarOpen }) {
     };
 
     return (
-        <div className="dashboard-container">
+        <>
             <Toast ref={toastRef} />
-            <main
-                className={`admin-documents-content ${
-                    sidebarOpen ? "content-with-sidebar" : ""
-                }`}
-            >
                 <h2 className="dashboard-title">Documents</h2>
-                <div className="documents-search">
-                    <img src={searchIcon} alt="Search" className="search-icon" />
+                <div className="search-container">
+                    <i className="pi pi-search search-icon"></i>
                     <input
                         type="text"
-                        placeholder="Search Document Name or Code"
+                        className="search-input"
+                        placeholder="Search documents..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -240,7 +235,6 @@ export default function AdminDocuments({ sidebarOpen }) {
                     <div className="residents-section-label">All Residents</div>
                 )}
 
-                <div className="documents-box">
                     {error && <div className="error-message">{error}</div>}
 
                     {loading && (
@@ -250,6 +244,7 @@ export default function AdminDocuments({ sidebarOpen }) {
                         </div>
                     )}
 
+                <div className="residents-list">
                     {!selectedResident
                         ? filteredResidents.map((resident) => (
                             <button
@@ -270,8 +265,8 @@ export default function AdminDocuments({ sidebarOpen }) {
                         : !loading && !error && (
                             <>
                                 <div className="documents-header">
-                                    <button className="back-button" onClick={goBack} aria-label="Back">
-                                        <span className="back-arrow">&larr;</span>
+                                    <button className="doc-back-btn" onClick={goBack} aria-label="Back">
+                                        <i className="pi pi-arrow-left"></i>
                                     </button>
                                     <div className="resident-documents-title">
                                         {selectedResident.firstName} {selectedResident.lastName}
@@ -345,7 +340,6 @@ export default function AdminDocuments({ sidebarOpen }) {
                         +
                     </button>
                 )}
-            </main>
 
             {confirmDelete && (
                 <div className="document-viewer-overlay" onClick={() => setConfirmDelete(null)}>
@@ -381,6 +375,6 @@ export default function AdminDocuments({ sidebarOpen }) {
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 }

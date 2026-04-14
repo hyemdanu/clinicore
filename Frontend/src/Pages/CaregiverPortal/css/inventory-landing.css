@@ -1,120 +1,35 @@
-/* Inventory Landing Page Styles */
-/* Rendered inside .main-content — parent handles sidebar offset, header offset, and padding */
+/* Inventory — segmented toggle */
 
-.inventory-landing-container {
+.inventory-toggle {
     display: flex;
-    flex-direction: column;
-    min-height: 60vh;
+    gap: 0;
+    margin-bottom: var(--space-6);
+    background: var(--color-border-light);
+    border-radius: var(--radius-md);
+    padding: 4px;
+    width: fit-content;
 }
 
-.landing-content {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-6);
-}
-
-/* Cards Container */
-.inventory-cards-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-8);
-    max-width: 450px;
-    width: 100%;
-    justify-items: center;
-}
-
-/* Individual Card */
-.inventory-card {
-    background: var(--color-bg-white);
-    border-radius: var(--radius-lg);
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    gap: var(--space-8);
+.inventory-toggle-btn {
+    padding: var(--space-2) var(--space-5);
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: var(--text-sm);
+    font-weight: 500;
     cursor: pointer;
-    text-align: left;
     transition: all var(--transition-fast);
-
-    box-shadow: var(--shadow-md);
-
-    width: 100%;
-    max-width: 420px;
-    min-height: 300px;
-
-    padding: var(--space-8) var(--space-6);
+    white-space: nowrap;
 }
 
-.inventory-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
-}
-
-.inventory-card:active {
-    transform: translateY(-4px);
-}
-
-/* Card Icon Wrapper */
-.card-icon-wrapper {
-    width: 120px;
-    height: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--transition-fast);
-    flex-shrink: 0;
-}
-
-.inventory-card:hover .card-icon-wrapper {
-    transform: scale(1.1) rotate(5deg);
-}
-
-.card-icon {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
-}
-
-/* Card Title */
-.inventory-card .card-title {
-    font-size: var(--text-lg);
-    font-weight: 600;
+.inventory-toggle-btn.active {
+    background: var(--color-bg-white);
     color: var(--color-text);
-    text-align: center;
-    margin: 0;
-    margin-top: var(--space-2);
-    line-height: 1.3;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
 }
 
-/* Responsive Design */
-@media (min-width: 768px) {
-    .inventory-cards-container {
-        grid-template-columns: repeat(2, minmax(280px, 1fr));
-        gap: var(--space-12);
-        max-width: 1000px;
-    }
-
-    .inventory-card {
-        min-height: 420px;
-        padding: var(--space-12) var(--space-8);
-        gap: var(--space-10);
-    }
-
-    .card-icon-wrapper {
-        width: 180px;
-        height: 180px;
-    }
-
-    .card-icon {
-        width: 140px;
-        height: 140px;
-    }
-
-    .inventory-card .card-title {
-        font-size: var(--text-3xl);
-    }
+.inventory-toggle-btn:hover:not(.active) {
+    color: var(--color-text);
 }

@@ -13,8 +13,6 @@ import AccountRequests from './AccountRequests';
 import AdminProfile from './AdminProfile';
 import AdminDocuments from './AdminDocument';
 import InventoryLanding from '../Shared/InventoryLanding.jsx';
-import MedicationInventory from '../Shared/CaregiverMedicationInventory.jsx';
-import ConsumablesInventory from '../Shared/ConsumablesInventory.jsx';
 import 'primereact/resources/themes/lara-light-blue/theme.css';
 import 'primeicons/primeicons.css';
 import "./css/admin.css";
@@ -76,7 +74,23 @@ export default function AdminDashboard() {
     const handleNavigate = (tab) => {
         setActiveTab(tab);
         localStorage.setItem('adminActiveTab', tab);
+        window.history.pushState({ tab }, '', `#${tab}`);
     };
+
+    // Handle browser back/forward buttons
+    useEffect(() => {
+        const handlePopState = (e) => {
+            const tab = e.state?.tab || 'dashboard';
+            setActiveTab(tab);
+            localStorage.setItem('adminActiveTab', tab);
+        };
+        window.addEventListener('popstate', handlePopState);
+        // Set initial history state
+        if (!window.history.state?.tab) {
+            window.history.replaceState({ tab: activeTab }, '', `#${activeTab}`);
+        }
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, []);
 
     const tabTitles = {
         dashboard: 'Dashboard',
@@ -148,7 +162,6 @@ export default function AdminDashboard() {
                         </div>
                     </div>
                 </div>
-                )}
 
                 <section className="inventory-section">
                     <div className="inventory-header">
@@ -210,15 +223,11 @@ export default function AdminDashboard() {
             case 'user':
                 return <AdminProfile />;
             case 'documents':
-                return <AdminDocuments sidebarOpen={sidebarOpen} />;
+                return <AdminDocuments />;
             case 'messages':
                 return <MessagesTab />;
             case 'inventory':
-                return <InventoryLanding onNavigate={handleNavigate} />;
-            case 'medication-inventory':
-                return <MedicationInventory />;
-            case 'consumables-inventory':
-                return <ConsumablesInventory />;
+                return <InventoryLanding />;
             case 'dashboard':
             default:
                 return renderInventoryContent();

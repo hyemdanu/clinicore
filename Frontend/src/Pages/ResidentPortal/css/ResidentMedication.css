@@ -1,17 +1,14 @@
 @import "../../AdminPortal/css/admin.css";
 
-.dashboard-title {
+.resident-medication-component .dashboard-title {
     font-size: var(--text-2xl);
     font-weight: 700;
     color: var(--color-text);
-    margin: 0 0 var(--space-8) 0;
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
+    margin: 0 0 var(--space-6) 0;
 }
 
-/* Error message */
-.error-message {
+/* Error message — scoped */
+.resident-medication-component .error-message {
     background-color: var(--color-error-bg);
     color: var(--color-error-text);
     padding: var(--space-4) var(--space-5);
@@ -28,17 +25,17 @@
     flex-shrink: 0;
 }
 
-/* Inventory header */
-.inventory-header {
+/* Inventory header — scoped */
+.resident-medication-component .inventory-header {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    flex-wrap: wrap;
+    align-items: center;
     justify-content: space-between;
     margin-bottom: var(--space-5);
     gap: var(--space-3);
 }
 
-.inventory-header h3 {
+.resident-medication-component .inventory-header h3 {
     margin: 0;
     font-size: var(--text-lg);
     font-weight: 600;
@@ -60,28 +57,7 @@
     white-space: nowrap;
 }
 
-.sort-dropdown {
-    padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    background-color: var(--color-bg-white);
-    color: var(--color-text);
-    font-size: var(--text-sm);
-    min-width: unset;
-    flex: 1;
-    cursor: pointer;
-    transition: border-color var(--transition-fast);
-}
-
-.sort-dropdown:hover {
-    border-color: var(--color-primary);
-}
-
-.sort-dropdown:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.1);
-}
+/* select styling inherited from index.css */
 
 /* Refresh button */
 .refresh-button {
@@ -132,7 +108,6 @@
 .medications-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 1000px;
 }
 
 .medications-table thead {

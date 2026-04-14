@@ -290,7 +290,7 @@
         flex-direction: row;
     }
 
-    .search-container {
+    .table-header .search-container {
         max-width: 500px;
     }
 

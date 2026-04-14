@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { Dropdown } from 'primereact/dropdown';
 import { get } from "../../services/api";
 import Header from "../../Components/Header";
 import ResidentSidebar from "../../Components/ResidentSidebar";
@@ -24,10 +24,11 @@ export default function ResidentMedication() {
     const [sortField, setSortField] = useState("medication_name");
     const [sortOrder, setSortOrder] = useState("asc");
 
+    const [sortValue, setSortValue] = useState('name_asc');
     const sortOptions = [
-        { label: "Name (A-Z)", value: "medication_name", order: "asc" },
-        { label: "Name (Z-A)", value: "medication_name", order: "desc" },
-        { label: "Status", value: "intake_status", order: "asc" },
+        { label: "Name (A-Z)", value: "name_asc" },
+        { label: "Name (Z-A)", value: "name_desc" },
+        { label: "Status", value: "status_asc" },
     ];
 
     const fetchData = useCallback(async () => {
@@ -80,13 +81,16 @@ export default function ResidentMedication() {
         fetchData();
     }, [fetchData]);
 
-    const handleSortChange = (e) => {
-        const value = e.target.value;
-        const selectedOption = sortOptions.find((o) => `${o.value}_${o.order}` === value);
-        if (selectedOption) {
-            setSortField(selectedOption.value);
-            setSortOrder(selectedOption.order);
-        }
+    const handleSortChange = (val) => {
+        setSortValue(val);
+        const map = {
+            name_asc: { field: 'medication_name', order: 'asc' },
+            name_desc: { field: 'medication_name', order: 'desc' },
+            status_asc: { field: 'intake_status', order: 'asc' },
+        };
+        const s = map[val] || map.name_asc;
+        setSortField(s.field);
+        setSortOrder(s.order);
     };
 
     const getStatusBadge = (status) => {
@@ -150,20 +154,13 @@ export default function ResidentMedication() {
                         <div className="inventory-header">
                             <h3>Current Medications</h3>
                             <div className="sort-dropdown-wrapper">
-                                <label htmlFor="sort-dropdown">Sort by:</label>
-                                <select
-                                    id="sort-dropdown"
+                                <label>Sort by:</label>
+                                <Dropdown
+                                    value={sortValue}
+                                    options={sortOptions}
+                                    onChange={(e) => handleSortChange(e.value)}
                                     className="sort-dropdown"
-                                    onChange={handleSortChange}
-                                    value={`${sortField}_${sortOrder}`}
-                                >
-                                    {sortOptions.map((option, index) => (
-                                        <option key={index} value={`${option.value}_${option.order}`}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-
+                                />
                                 <button className="refresh-button" onClick={handleRefresh} disabled={loading}>
                                     {loading ? "Loading..." : "Refresh"}
                                 </button>
