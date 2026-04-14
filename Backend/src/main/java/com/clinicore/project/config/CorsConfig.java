@@ -22,7 +22,7 @@ public class CorsConfig {
 
         // which port origins are allowed to make requests to the API
         // we'll add our deployed frontend port here later...
-        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://clinicore.us-east-2.elasticbeanstalk.com", "http://clinicore-frontend-live.s3-website.us-east-2.amazonaws.com"));
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "https://clinicore-alem.com"));
 
 
         // OPTIONS for preflight means "can this request be made?"
