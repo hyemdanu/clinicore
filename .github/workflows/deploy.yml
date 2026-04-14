@@ -32,4 +32,4 @@ jobs:
           environment_name: Clinicore-env-1
           region: us-east-2
           version_label: ${{ github.sha }}
-          deployment_package: target/clinicore-0.0.1-SNAPSHOT.jar
+          deployment_package: Backend/target/clinicore-0.0.1-SNAPSHOT.jar
