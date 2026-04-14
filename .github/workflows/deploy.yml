@@ -1,4 +1,4 @@
-name: Deploy to Elastic Beanstalk
+name: Deploy to AWS
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  deploy:
+  deploy-backend:
     runs-on: ubuntu-latest
 
     steps:
@@ -39,3 +39,40 @@ jobs:
           deployment_package: Backend/target/clinicore-0.0.1-SNAPSHOT.jar
           use_existing_version_if_available: true
           wait_for_deployment: false
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: Frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: Frontend
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+
+      - name: Deploy to S3
+        run: aws s3 sync dist/ s3://clinicore-frontend-live --delete
+        working-directory: Frontend
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-2
+
+      - name: Invalidate CloudFront cache
+        run: aws cloudfront create-invalidation --distribution-id E2IRKC4XGHLYP6 --paths "/*"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-2
