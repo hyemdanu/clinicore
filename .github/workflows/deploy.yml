@@ -37,4 +37,4 @@ jobs:
           region: us-east-2
           version_label: ${{ github.sha }}
           deployment_package: Backend/target/clinicore-0.0.1-SNAPSHOT.jar
-          wait_for_recovery: 120
+          wait_for_environment_recovery: 120
