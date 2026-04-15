@@ -155,7 +155,7 @@ button.resident-item {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    z-index: 1000;
+    z-index: 1300;
 }
 
 /* Push main content left when sidebar is open - default for large screens */

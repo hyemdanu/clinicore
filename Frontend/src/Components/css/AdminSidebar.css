@@ -5,7 +5,7 @@
   height: calc(100vh - 56px);
   background-color: var(--color-bg-white);
   transition: width 0.3s ease;
-  z-index: 100;
+  z-index: 1400;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -95,6 +95,6 @@
     inset: 0;
     top: 56px;
     background: rgba(0, 0, 0, 0.4);
-    z-index: 99;
+    z-index: 1399;
   }
 }

@@ -59,26 +59,27 @@
     width: 100%;
 }
 
+/* Match the global .search-input pill style from residents.css */
 .search-container .search-input.p-inputtext {
     width: 100% !important;
-    height: 44px !important;
-    min-height: 44px !important;
-    max-height: 44px !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
     padding: 0 var(--space-4) 0 var(--space-10) !important;
-    border: 2px solid var(--color-border) !important;
-    border-radius: var(--radius-md) !important;
-    font-size: var(--text-base) !important;
-    line-height: 1 !important;
+    border: none !important;
+    border-radius: 12px !important;
     background-color: var(--color-bg-white) !important;
-    box-shadow: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    font-size: 15px !important;
+    line-height: 1 !important;
     box-sizing: border-box !important;
     margin: 0 !important;
-    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    transition: box-shadow var(--transition-base);
 }
 
-.search-input:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px var(--color-primary-light);
+.search-container .search-input.p-inputtext:focus {
+    outline: none;
+    box-shadow: 0 2px 12px rgba(54, 157, 247, 0.2) !important;
 }
 
 /* Adjust search icon position */
@@ -92,19 +93,21 @@
 
 .add-consumable-btn.p-button {
     background: var(--color-primary) !important;
-    border: 2px solid var(--color-primary) !important;
-    height: 44px !important;
-    min-height: 44px !important;
-    max-height: 44px !important;
+    border: none !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 48px !important;
     width: 100%;
     padding: 0 var(--space-6) !important;
     font-weight: 600 !important;
-    font-size: var(--text-base) !important;
+    font-size: 15px !important;
     line-height: 1 !important;
     color: var(--color-bg-white) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
     box-sizing: border-box !important;
     margin: 0 !important;
-    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+    transition: background-color var(--transition-fast);
 }
 
 .add-consumable-btn.p-button .p-button-label {
