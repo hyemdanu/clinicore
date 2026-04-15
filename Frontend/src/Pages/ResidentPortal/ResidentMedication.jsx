@@ -160,6 +160,7 @@ export default function ResidentMedication() {
                                     options={sortOptions}
                                     onChange={(e) => handleSortChange(e.value)}
                                     className="sort-dropdown"
+                                    appendTo="self"
                                 />
                                 <button className="refresh-button" onClick={handleRefresh} disabled={loading}>
                                     {loading ? "Loading..." : "Refresh"}

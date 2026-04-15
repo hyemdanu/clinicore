@@ -136,10 +136,6 @@ button.document-row:hover {
     background: #276dd1;
 }
 
-.back-button:active {
-    transform: scale(0.97);
-}
-
 .back-arrow {
     font-size: 16px;
     line-height: 1;

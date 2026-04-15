@@ -77,26 +77,132 @@ button.document-row:hover {
     text-overflow: ellipsis;
 }
 
-.documents-fab {
-    position: fixed;
-    bottom: var(--space-8);
-    right: var(--space-8);
-    width: 56px;
-    height: 56px;
-    border-radius: var(--radius-full);
+.header-upload-btn {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
     border: none;
-    background-color: var(--color-primary);
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
     color: var(--color-bg-white);
-    font-size: 28px;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    font-family: inherit;
     cursor: pointer;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-sm);
+    transition: background-color var(--transition-fast);
+}
+
+.header-upload-btn:hover {
+    background: var(--color-primary-hover);
+}
+
+.header-upload-btn i {
+    font-size: var(--text-sm);
+}
+
+.upload-modal {
+    background: var(--color-bg-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    width: 90vw;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.upload-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.upload-modal-header h3 {
+    margin: 0;
+    font-size: var(--text-md);
+    color: var(--color-text);
+}
+
+.upload-modal-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background-color var(--transition-fast);
 }
 
-.documents-fab:hover {
-    background-color: var(--color-bg-hover);
+.upload-modal-close:hover:not(:disabled) {
+    background: var(--color-border-light);
+}
+
+.upload-modal-close:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.upload-modal-body {
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.upload-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.upload-field-label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.upload-field input[type="text"],
+.upload-field input[type="file"] {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-white);
+    font-size: var(--text-sm);
+    font-family: inherit;
+    width: 100%;
+}
+
+.upload-field input[type="text"]:focus {
+    border-color: var(--color-primary);
+    outline: none;
+}
+
+.upload-hint {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+}
+
+.upload-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--color-border);
+    background: var(--color-bg);
+}
+
+.upload-modal-actions .upload-button,
+.upload-modal-actions .cancel-button {
+    margin: 0;
 }
 
 .admin-documents-content .dashboard-title {
@@ -130,10 +236,6 @@ button.document-row:hover {
 
 .back-button:hover {
     background: var(--color-primary-hover);
-}
-
-.back-button:active {
-    transform: scale(0.97);
 }
 
 .back-arrow {
@@ -203,11 +305,6 @@ button.document-row:hover {
 
 .cancel-button:hover {
     background: var(--color-bg-hover);
-}
-
-.upload-button:active,
-.cancel-button:active {
-    transform: scale(0.98);
 }
 
 .doc-row-icon {

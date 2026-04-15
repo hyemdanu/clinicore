@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { get, put } from "../../services/api";
-import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
@@ -300,6 +299,7 @@ export default function CaregiverProfile() {
                                     onChange={(e) => setEditedData({...editedData, gender: e.value})}
                                     placeholder="Select Gender"
                                     className="edit-input"
+                                    appendTo="self"
                                 />
                             ) : (
                                 <span className="info-value">{gender}</span>
@@ -316,16 +316,9 @@ export default function CaregiverProfile() {
 
                 {/* edit mode buttons */}
                 {editMode && (
-                    <div className="edit-actions">
-                        <Button
-                            label="Cancel"
-                            className="p-button-outlined"
-                            onClick={handleCancel}
-                        />
-                        <Button
-                            label="Save"
-                            onClick={handleSave}
-                        />
+                    <div className="dialog-footer-actions">
+                        <button className="btn btn-secondary" onClick={handleCancel}>Cancel</button>
+                        <button className="btn btn-primary" onClick={handleSave}>Save</button>
                     </div>
                 )}
             </div>

@@ -184,7 +184,6 @@ export default function ConsumablesInventory() {
             </div>
             <Button
                 label="Add Consumable"
-                icon="pi pi-plus"
                 className="add-consumable-btn"
                 onClick={() => { setAddFormData({ name: '', quantity: '' }); setAddDialogVisible(true); }}
             />
@@ -235,9 +234,9 @@ export default function ConsumablesInventory() {
                 className="consumable-dialog"
                 onHide={() => { setAddDialogVisible(false); setAddFormData({ name: '', quantity: '' }); }}
                 footer={
-                    <div>
-                        <Button label="Cancel" icon="pi pi-times" onClick={() => { setAddDialogVisible(false); setAddFormData({ name: '', quantity: '' }); }} className="p-button-text" />
-                        <Button label="Add" icon="pi pi-check" onClick={handleAddConsumable} autoFocus />
+                    <div className="dialog-footer-actions">
+                        <button className="btn btn-secondary" onClick={() => { setAddDialogVisible(false); setAddFormData({ name: '', quantity: '' }); }}>Cancel</button>
+                        <button className="btn btn-primary" onClick={handleAddConsumable} autoFocus>Add</button>
                     </div>
                 }
             >
@@ -259,9 +258,9 @@ export default function ConsumablesInventory() {
                 className="consumable-dialog"
                 onHide={() => { setEditDialogVisible(false); setSelectedConsumable(null); setEditFormData({ name: '', quantity: '' }); }}
                 footer={
-                    <div>
-                        <Button label="Cancel" icon="pi pi-times" onClick={() => { setEditDialogVisible(false); setSelectedConsumable(null); setEditFormData({ name: '', quantity: '' }); }} className="p-button-text" />
-                        <Button label="Save" icon="pi pi-check" onClick={handleSaveEdit} autoFocus />
+                    <div className="dialog-footer-actions">
+                        <button className="btn btn-secondary" onClick={() => { setEditDialogVisible(false); setSelectedConsumable(null); setEditFormData({ name: '', quantity: '' }); }}>Cancel</button>
+                        <button className="btn btn-primary" onClick={handleSaveEdit} autoFocus>Save</button>
                     </div>
                 }
             >

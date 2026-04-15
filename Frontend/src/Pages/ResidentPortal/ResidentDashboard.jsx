@@ -167,7 +167,7 @@ export default function ResidentDashboard() {
                                     <li
                                         key={d.id || d.title}
                                         className="rd-doc-item"
-                                        onClick={() => navigate(`/resident/documents/${d.id}`)}
+                                        onClick={() => navigate("/resident/documents", { state: { openDocId: d.id } })}
                                     >
                                         <span className="pi pi-file rd-doc-icon" aria-hidden />
                                         <div className="rd-doc-meta">

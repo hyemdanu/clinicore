@@ -26,6 +26,15 @@
     overflow: hidden;
 }
 
+/* Allow table to scroll horizontally on narrow screens instead of squishing */
+.inventory-table-wrapper .p-datatable-wrapper {
+    overflow-x: auto;
+}
+
+.inventory-table-wrapper .p-datatable-table {
+    min-width: 560px;
+}
+
 /* Table Header */
 .table-header {
     display: flex;
@@ -37,18 +46,34 @@
     border-bottom: 2px solid var(--color-bg);
 }
 
-.search-container {
+.table-header .search-container {
     flex: 1;
     max-width: 100%;
+    margin: 0 !important;
+    position: relative;
 }
 
-.search-input {
+.search-container .p-input-icon-left {
+    display: block;
+    position: relative;
     width: 100%;
-    padding: var(--space-3) var(--space-4) var(--space-3) var(--space-10);
-    border: 2px solid var(--color-border);
-    border-radius: var(--radius-md);
-    font-size: var(--text-base);
-    transition: all var(--transition-fast);
+}
+
+.search-container .search-input.p-inputtext {
+    width: 100% !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    padding: 0 var(--space-4) 0 var(--space-10) !important;
+    border: 2px solid var(--color-border) !important;
+    border-radius: var(--radius-md) !important;
+    font-size: var(--text-base) !important;
+    line-height: 1 !important;
+    background-color: var(--color-bg-white) !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .search-input:focus {
@@ -60,30 +85,42 @@
 .search-container .p-input-icon-left > i {
     position: absolute;
     left: var(--space-4);
-    top: var(--space-4);
-    transform: none;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-muted);
 }
 
-.add-medication-btn {
-    background: var(--color-purple);
-    border: none;
-    padding: var(--space-3) var(--space-6);
-    font-weight: 600;
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition-fast);
-    color: var(--color-bg-white);
+.add-medication-btn.p-button {
+    background: var(--color-primary) !important;
+    border: 2px solid var(--color-primary) !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
     width: 100%;
+    padding: 0 var(--space-6) !important;
+    font-weight: 600 !important;
+    font-size: var(--text-base) !important;
+    line-height: 1 !important;
+    color: var(--color-bg-white) !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
 
-.add-medication-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    background: var(--color-purple);
-    filter: brightness(0.9);
+.add-medication-btn.p-button .p-button-label {
+    line-height: 1;
+    font-weight: 600;
 }
 
-.add-medication-btn:focus {
-    box-shadow: 0 0 0 3px var(--color-purple-light);
+.add-medication-btn.p-button:hover {
+    background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+}
+
+.add-medication-btn.p-button:enabled:hover {
+    background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+    color: var(--color-bg-white);
 }
 
 /* Medication Table */
@@ -155,15 +192,20 @@
 }
 
 .action-buttons .btn {
-    padding: var(--space-2) var(--space-5);
+    padding: 0;
     border: none;
     border-radius: var(--radius-sm);
     font-size: var(--text-md);
     font-weight: bold;
     cursor: pointer;
     transition: all var(--transition-fast);
-    width: var(--space-8);
-    height: var(--space-8);
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    flex-shrink: 0;
 }
 
 .action-buttons .btn-add {
@@ -174,11 +216,6 @@
 .action-buttons .btn-add:hover {
     background-color: var(--color-success);
     filter: brightness(0.85);
-    transform: translateY(-1px);
-}
-
-.action-buttons .btn-add:active {
-    transform: translateY(0);
 }
 
 .action-buttons .btn-remove {
@@ -188,11 +225,7 @@
 
 .action-buttons .btn-remove:hover {
     background-color: var(--color-error);
-    transform: translateY(-1px);
-}
-
-.action-buttons .btn-remove:active {
-    transform: translateY(0);
+    filter: brightness(0.9);
 }
 
 .action-buttons .btn-remove:disabled {
@@ -214,12 +247,11 @@
     font-size: var(--text-lg);
     cursor: pointer;
     padding: var(--space-1) var(--space-2);
-    transition: transform var(--transition-fast);
+    transition: background-color var(--transition-fast);
     border-radius: var(--radius-sm);
 }
 
 .menu-buttons .menu-button:hover {
-    transform: scale(1.2);
     background-color: var(--color-border-light);
 }
 
@@ -284,7 +316,34 @@
     color: var(--color-bg-white);
 }
 
-/* Responsive Design */
+/* Mobile: tighter padding so table fits without awkward overflow */
+@media (max-width: 767px) {
+    .table-header {
+        padding: var(--space-4);
+    }
+
+    .medication-table .p-datatable-thead > tr > th,
+    .medication-table .p-datatable-tbody > tr > td {
+        padding: var(--space-3);
+        font-size: var(--text-sm);
+    }
+
+    .menu-buttons .menu-button {
+        padding: var(--space-1);
+        font-size: var(--text-base);
+    }
+
+    .medication-table .p-paginator {
+        padding: var(--space-2);
+    }
+
+    .medication-table .p-paginator .p-paginator-pages .p-paginator-page {
+        min-width: var(--space-8);
+        height: var(--space-8);
+    }
+}
+
+/* Tablet + desktop */
 @media (min-width: 768px) {
     .table-header {
         flex-direction: row;
@@ -294,7 +353,7 @@
         max-width: 500px;
     }
 
-    .add-medication-btn {
+    .add-medication-btn.p-button {
         width: auto;
     }
 
@@ -303,9 +362,8 @@
     }
 
     .action-buttons .btn {
-        width: auto;
-        min-width: var(--space-12);
-        height: var(--space-10);
+        width: 40px;
+        height: 40px;
     }
 }
 
@@ -316,7 +374,7 @@
 
 /* PrimeReact Dialog Override */
 .p-dialog .p-dialog-header {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+    background: var(--color-primary);
     color: var(--color-bg-white);
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     padding: var(--space-5) var(--space-6);
@@ -347,4 +405,28 @@
 /* Dialog Width */
 .medication-dialog {
     width: 450px;
+    max-width: 92vw;
+}
+
+/* Mobile dialog adjustments */
+@media (max-width: 767px) {
+    .medication-dialog .p-dialog-header {
+        padding: var(--space-4);
+    }
+
+    .medication-dialog .p-dialog-header .p-dialog-title {
+        font-size: var(--text-md);
+    }
+
+    .medication-dialog .p-dialog-content {
+        padding: var(--space-4);
+    }
+
+    .medication-dialog .p-dialog-footer {
+        padding: var(--space-3) var(--space-4);
+    }
+
+    .medication-dialog .dialog-content .p-inputtext {
+        font-size: 16px;
+    }
 }
