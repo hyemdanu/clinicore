@@ -172,7 +172,6 @@ export default function MedicationInventory() {
             </div>
             <Button
                 label="Add Medication"
-                icon="pi pi-plus"
                 className="add-medication-btn"
                 onClick={() => { setAddFormData({ name: '', quantity: '' }); setAddDialogVisible(true); }}
             />
@@ -223,9 +222,9 @@ export default function MedicationInventory() {
                 className="medication-dialog"
                 onHide={() => { setAddDialogVisible(false); setAddFormData({ name: '', quantity: '' }); }}
                 footer={
-                    <div>
-                        <Button label="Cancel" icon="pi pi-times" onClick={() => { setAddDialogVisible(false); setAddFormData({ name: '', quantity: '' }); }} className="p-button-text" />
-                        <Button label="Add" icon="pi pi-check" onClick={handleAddMedication} autoFocus />
+                    <div className="dialog-footer-actions">
+                        <button className="btn btn-secondary" onClick={() => { setAddDialogVisible(false); setAddFormData({ name: '', quantity: '' }); }}>Cancel</button>
+                        <button className="btn btn-primary" onClick={handleAddMedication} autoFocus>Add</button>
                     </div>
                 }
             >
@@ -247,9 +246,9 @@ export default function MedicationInventory() {
                 className="medication-dialog"
                 onHide={() => { setEditDialogVisible(false); setSelectedMedication(null); setEditFormData({ name: '', quantity: '' }); }}
                 footer={
-                    <div>
-                        <Button label="Cancel" icon="pi pi-times" onClick={() => { setEditDialogVisible(false); setSelectedMedication(null); setEditFormData({ name: '', quantity: '' }); }} className="p-button-text" />
-                        <Button label="Save" icon="pi pi-check" onClick={handleSaveEdit} autoFocus />
+                    <div className="dialog-footer-actions">
+                        <button className="btn btn-secondary" onClick={() => { setEditDialogVisible(false); setSelectedMedication(null); setEditFormData({ name: '', quantity: '' }); }}>Cancel</button>
+                        <button className="btn btn-primary" onClick={handleSaveEdit} autoFocus>Save</button>
                     </div>
                 }
             >

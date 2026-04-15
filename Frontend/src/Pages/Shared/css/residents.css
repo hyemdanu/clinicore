@@ -32,8 +32,6 @@
 .action-btn:hover {
     background-color: rgba(0, 122, 255, 0.04);
     border-color: rgba(0, 122, 255, 0.3);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .action-btn i {
@@ -145,10 +143,10 @@ button.resident-item {
     font-size: 16px;
 }
 
-/* Resident Detail Sidebar - Pushes Content */
+/* Resident Detail Sidebar - Pushes Content. Starts below the 56px fixed topbar. */
 .resident-detail-sidebar {
     position: fixed;
-    top: 0;
+    top: 56px;
     right: 0;
     bottom: 0;
     width: 750px; /* Default for large screens */
@@ -662,7 +660,6 @@ body.sidebar-open .dashboard-content {
 .medication-item:hover {
     border-color: rgba(0, 0, 0, 0.1);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-    transform: translateY(-1px);
 }
 
 .med-header {
@@ -1088,30 +1085,31 @@ body.sidebar-open .dashboard-content {
 }
 
 .form-group input,
-.form-group select,
 .form-group textarea {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 8px;
     font-size: 14px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: inherit;
     transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     background-color: white;
 }
 
+.form-group select {
+    width: 100%;
+}
+
 .form-group input:hover,
-.form-group select:hover,
 .form-group textarea:hover {
     border-color: rgba(0, 0, 0, 0.25);
 }
 
 .form-group input:focus,
-.form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #007AFF;
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.1);
 }
 
 .form-group textarea {
@@ -1127,6 +1125,12 @@ body.sidebar-open .dashboard-content {
     font-weight: 600;
     cursor: pointer;
     transition: all var(--transition-base);
+    font-family: inherit;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .btn-primary {
@@ -1177,13 +1181,6 @@ body.sidebar-open .dashboard-content {
 
 .p-button.p-button-primary:hover {
     background-color: #2b7ecf;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(54, 157, 247, 0.25);
-}
-
-.p-button.p-button-primary:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(0, 122, 255, 0.2);
 }
 
 .p-button.p-button-secondary {
@@ -1198,12 +1195,6 @@ body.sidebar-open .dashboard-content {
 
 .p-button.p-button-secondary:hover {
     background-color: rgba(120, 120, 128, 0.12);
-    transform: translateY(-1px);
-}
-
-.p-button.p-button-secondary:active {
-    transform: translateY(0);
-    background-color: rgba(120, 120, 128, 0.16);
 }
 
 
@@ -1241,9 +1232,9 @@ body.sidebar-open .dashboard-content {
     font-weight: 500;
 }
 
-/* Fix dropdown panel positioning */
+/* Dropdown panel — z-index below the fixed topbar (1500) but above page content */
 .p-dropdown-panel {
-    z-index: 9999 !important;
+    z-index: 1100 !important;
 }
 
 /* Force dropdown to align consistently */
@@ -1467,14 +1458,18 @@ body.sidebar-open .dashboard-content {
     }
 }
 
-/* Tablets (768px - 1024px) */
+/* Tablets (768px - 1024px) — full-width overlay so it doesn't squish the main content + main sidebar */
 @media (max-width: 1024px) and (min-width: 768px) {
     .resident-detail-sidebar {
-        width: 550px;
+        width: 100vw;
+        max-width: 100vw;
+        left: 0;
+        right: 0;
     }
 
+    /* Don't push content — sidebar overlays */
     body.sidebar-open .dashboard-content {
-        margin-right: 550px;
+        margin-right: 0;
     }
 
     .medical-columns {
@@ -1971,7 +1966,6 @@ button.caregiver-card-header {
 .react-datepicker__day:hover {
     background-color: #e3f2fd;
     color: var(--color-primary);
-    transform: scale(1.1);
 }
 
 .react-datepicker__day--selected,
@@ -1979,7 +1973,6 @@ button.caregiver-card-header {
     background-color: var(--color-primary);
     color: white;
     font-weight: 600;
-    transform: scale(1.05);
 }
 
 .react-datepicker__day--selected:hover {
@@ -2017,7 +2010,6 @@ button.caregiver-card-header {
 
 .react-datepicker__navigation:hover {
     background: rgba(255, 255, 255, 0.3);
-    transform: scale(1.1);
 }
 
 .react-datepicker__navigation-icon::before {
@@ -2336,21 +2328,119 @@ button.caregiver-card-header {
 }
 
 .edit-form-grid .form-group input,
-.edit-form-grid .form-group select,
 .edit-form-grid .form-group textarea {
     width: 100%;
     padding: 8px 10px;
     border: 1px solid #cbd5e0;
     border-radius: 6px;
     font-size: 14px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: inherit;
     transition: all 0.15s ease;
 }
 
 .edit-form-grid .form-group input:focus,
-.edit-form-grid .form-group select:focus,
 .edit-form-grid .form-group textarea:focus {
     outline: none;
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.1);
+}
+
+/* Caregiver list + modal mobile responsiveness */
+@media (max-width: 767px) {
+    /* Caregiver card header: tighter spacing, allow wrapping */
+    button.caregiver-card-header {
+        gap: 12px;
+        padding: 14px 16px;
+        flex-wrap: wrap;
+    }
+
+    .caregiver-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .caregiver-email {
+        font-size: 12px;
+        word-break: break-word;
+    }
+
+    .caregiver-item-pills {
+        width: 100%;
+        order: 3;
+    }
+
+    /* Panel padding down-sized */
+    .caregiver-residents-panel {
+        padding: 10px 14px 12px 14px;
+    }
+
+    .caregiver-panel-header {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    /* Resident row stacks on mobile so switch/remove buttons don't overflow */
+    .caregiver-resident-row {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 10px 12px;
+    }
+
+    .caregiver-resident-name {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .caregiver-assigned-at {
+        width: 100%;
+        order: 3;
+        font-size: 11px;
+    }
+
+    .resident-row-actions {
+        width: 100%;
+        margin-left: 0;
+        justify-content: flex-end;
+        order: 4;
+    }
+
+    .resident-action-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 6px 10px;
+    }
+
+    /* Modal fills the viewport better on small screens */
+    .edit-modal-backdrop {
+        padding: 12px;
+    }
+
+    .edit-modal {
+        max-height: 90vh;
+    }
+
+    .edit-modal-header {
+        padding: 16px;
+    }
+
+    .edit-modal-header h3 {
+        font-size: 16px;
+        padding-right: 32px;
+    }
+
+    .edit-modal-content {
+        padding: 16px;
+    }
+
+    .edit-modal-footer {
+        padding: 12px 16px;
+    }
+
+    /* Dropdowns inside modals always full-width */
+    .edit-modal-content select,
+    .form-group select {
+        width: 100%;
+        font-size: 16px; /* prevents iOS zoom */
+    }
 }

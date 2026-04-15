@@ -122,6 +122,14 @@ body {
 
 /* utility classes — use these instead of inline styles */
 
+/* shared right-aligned footer for Cancel/Action button pairs in modal dialogs */
+.dialog-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
 .form-error {
   color: var(--color-error);
   margin-top: var(--space-2);

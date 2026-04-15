@@ -499,6 +499,7 @@ export default function AccountRequests({ embedded = false }) {
                             // Update state when user selects a status
                             onChange={(e) => setSelectedStatus(e.value)}
                             className="sort-dropdown"
+                            appendTo="self"
                         />
                     </div>
                 </div>
@@ -599,18 +600,9 @@ export default function AccountRequests({ embedded = false }) {
                     </div>
 
                     {/* Cancel and Save buttons */}
-                    <div className="dialog-actions--right">
-                        <Button
-                            label="Cancel"
-                            onClick={() => handleEditRequest(null, true)}
-                            className="p-button-secondary"
-                        />
-
-                        <Button
-                            label="Save Changes"
-                            onClick={handleSaveEditedRequest}
-                            className="p-button-success"
-                        />
+                    <div className="dialog-footer-actions">
+                        <button className="btn btn-secondary" onClick={() => handleEditRequest(null, true)}>Cancel</button>
+                        <button className="btn btn-primary" onClick={handleSaveEditedRequest}>Save Changes</button>
                     </div>
 
                 </div>
@@ -637,18 +629,9 @@ export default function AccountRequests({ embedded = false }) {
                     </p>
 
                     {/* Cancel and Deny buttons */}
-                    <div className="dialog-actions--right">
-                        <Button
-                            label="Cancel"
-                            onClick={handleCloseDenyDialog}
-                            className="p-button-secondary"
-                        />
-
-                        <Button
-                            label="Deny Request"
-                            onClick={handleDenyRequest}
-                            className="p-button-danger"
-                        />
+                    <div className="dialog-footer-actions">
+                        <button className="btn btn-secondary" onClick={handleCloseDenyDialog}>Cancel</button>
+                        <button className="btn btn-danger" onClick={handleDenyRequest}>Deny Request</button>
                     </div>
                 </div>
             </Dialog>

@@ -145,10 +145,6 @@ button.document-row:hover {
     background: var(--color-primary-hover);
 }
 
-.back-button:active {
-    transform: scale(0.97);
-}
-
 .back-arrow {
     font-size: var(--text-base);
     line-height: 1;
@@ -214,11 +210,6 @@ button.document-row:hover {
     background: var(--color-bg-hover);
 }
 
-.upload-button:active,
-.cancel-button:active {
-    transform: scale(0.98);
-}
-
 /* Upload hint text */
 .upload-hint {
     font-size: var(--text-xs);
@@ -247,12 +238,12 @@ button.document-row:hover {
     background: var(--color-error-bg);
 }
 
-/* Document viewer overlay */
+/* Document viewer overlay — must sit above the fixed topbar (z-index: 1500) */
 .document-viewer-overlay {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
+    z-index: 1600;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -366,7 +357,7 @@ button.document-row:hover {
     max-width: 400px;
     width: 90vw;
     text-align: center;
-    z-index: 1001;
+    z-index: 1601;
 }
 
 .confirm-dialog p {
@@ -395,10 +386,6 @@ button.document-row:hover {
 
 .delete-confirm-button:hover {
     opacity: 0.9;
-}
-
-.delete-confirm-button:active {
-    transform: scale(0.98);
 }
 
 /* Back button — matches messages chat-back-btn style */

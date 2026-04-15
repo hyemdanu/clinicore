@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { Toast } from "primereact/toast";
 import Header from "../../Components/Header";
 import ResidentSidebar from "../../Components/ResidentSidebar";
@@ -10,6 +11,7 @@ import "../Shared/css/document-shared.css";
 
 
 export default function ResidentDocuments() {
+  const location = useLocation();
   const toastRef = useRef(null);
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
   const [documents, setDocuments] = useState([]);
@@ -21,6 +23,7 @@ export default function ResidentDocuments() {
   const [viewerUrl, setViewerUrl] = useState(null);
   const [viewerType, setViewerType] = useState(null);
   const [viewerTitle, setViewerTitle] = useState("");
+  const autoOpenedRef = useRef(false);
 
   const toggleSidebar = () => setSidebarOpen((s) => !s);
 
@@ -54,6 +57,17 @@ export default function ResidentDocuments() {
   const filteredDocuments = documents.filter((doc) =>
     doc.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // auto-open a document if one was passed via navigation state (e.g. from dashboard recents)
+  useEffect(() => {
+    const openDocId = location.state?.openDocId;
+    if (!openDocId || autoOpenedRef.current || documents.length === 0) return;
+    const doc = documents.find((d) => d.id === openDocId);
+    if (doc) {
+      autoOpenedRef.current = true;
+      openDocument(doc);
+    }
+  }, [documents, location.state]);
 
   const detectMime = (bytes) => {
     if (bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46) return "application/pdf";

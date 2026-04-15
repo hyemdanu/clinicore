@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { get, post } from "../../services/api.js";
 import "../Shared/css/residents.css";
@@ -161,6 +160,7 @@ export default function AddMedicationForm({ residentId, onCancel, onMedicationAd
                         placeholder="Select medication"
                         filter
                         className="w-full"
+                        appendTo="self"
                     />
                 </div>
 
@@ -182,6 +182,7 @@ export default function AddMedicationForm({ residentId, onCancel, onMedicationAd
                         onChange={(e) => handleChange('schedule', e.value)}
                         placeholder="Select schedule"
                         className="w-full"
+                        appendTo="self"
                     />
                 </div>
 
@@ -195,21 +196,9 @@ export default function AddMedicationForm({ residentId, onCancel, onMedicationAd
                     />
                 </div>
 
-                <div className="form-actions">
-                    <Button
-                        type="button"
-                        label="Cancel"
-                        className="p-button-secondary p-button-sm"
-                        onClick={onCancel}
-                        disabled={loading}
-                    />
-                    <Button
-                        type="submit"
-                        label={loading ? "Adding..." : "Add Medication"}
-                        className="p-button-primary p-button-sm"
-                        disabled={loading}
-                        icon={loading ? "pi pi-spin pi-spinner" : "pi pi-check"}
-                    />
+                <div className="dialog-footer-actions">
+                    <button type="button" className="btn btn-secondary" onClick={onCancel} disabled={loading}>Cancel</button>
+                    <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? "Adding..." : "Add Medication"}</button>
                 </div>
             </form>
         </div>

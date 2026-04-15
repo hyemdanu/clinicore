@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Toast } from 'primereact/toast';
+import { Dropdown } from 'primereact/dropdown';
 import { get, post, del, put } from '../../services/api';
 import '../Shared/css/residents.css';
 
@@ -370,17 +371,17 @@ export default function CaregiverResidentList() {
                             {addError && <div className="error-message form-error">{addError}</div>}
                             <div className="form-group">
                                 <label>Select Resident <span className="required">*</span></label>
-                                <select
+                                <Dropdown
                                     value={selectedResidentId}
-                                    onChange={(e) => setSelectedResidentId(e.target.value)}
-                                >
-                                    <option value="">-- Choose a resident --</option>
-                                    {unassignedResidents.map(r => (
-                                        <option key={r.id} value={r.id}>
-                                            {r.firstName} {r.lastName}
-                                        </option>
-                                    ))}
-                                </select>
+                                    onChange={(e) => setSelectedResidentId(e.value)}
+                                    options={unassignedResidents.map(r => ({
+                                        label: `${r.firstName} ${r.lastName}`,
+                                        value: r.id
+                                    }))}
+                                    placeholder="-- Choose a resident --"
+                                    className="w-full"
+                                    appendTo="self"
+                                />
                                 {unassignedResidents.length === 0 && (
                                     <p className="form-info">
                                         All residents are already assigned to this caregiver.
@@ -425,17 +426,17 @@ export default function CaregiverResidentList() {
                                     {switchTargetCaregiver?.firstName} {switchTargetCaregiver?.lastName}
                                 </p>
                                 <label>Move to <span className="required">*</span></label>
-                                <select
+                                <Dropdown
                                     value={selectedCaregiverId}
-                                    onChange={(e) => setSelectedCaregiverId(e.target.value)}
-                                >
-                                    <option value="">-- Choose a caregiver --</option>
-                                    {otherCaregivers.map(c => (
-                                        <option key={c.id} value={c.id}>
-                                            {c.firstName} {c.lastName}
-                                        </option>
-                                    ))}
-                                </select>
+                                    onChange={(e) => setSelectedCaregiverId(e.value)}
+                                    options={otherCaregivers.map(c => ({
+                                        label: `${c.firstName} ${c.lastName}`,
+                                        value: c.id
+                                    }))}
+                                    placeholder="-- Choose a caregiver --"
+                                    className="w-full"
+                                    appendTo="self"
+                                />
                             </div>
                         </div>
                         <div className="edit-modal-footer">

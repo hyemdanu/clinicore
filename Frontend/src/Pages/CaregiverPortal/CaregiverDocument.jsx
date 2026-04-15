@@ -249,12 +249,8 @@ export default function CaregiverDocument() {
                                             onChange={(e) => setDocTitle(e.target.value)}
                                         />
                                         <span className="upload-hint">PDF, PNG, JPG, DOCX, XLSX — Max 10MB</span>
-                                        <button className="upload-button" onClick={handleUpload} disabled={uploading}>
-                                            {uploading ? "Uploading..." : "Upload"}
-                                        </button>
-                                        <button className="cancel-button" onClick={() => setShowUploadForm(false)}>
-                                            Cancel
-                                        </button>
+                                        <button className="btn btn-secondary" onClick={() => setShowUploadForm(false)}>Cancel</button>
+                                        <button className="btn btn-primary" onClick={handleUpload} disabled={uploading}>{uploading ? "Uploading..." : "Upload"}</button>
                                     </div>
                                 )}
 

@@ -76,8 +76,6 @@ export default function ResidentDetailModal({ resident, onClose, onResidentUpdat
         return null;
     }
 
-    const allergies = resident.medicalRecord?.allergies || [];
-    const diagnoses = resident.medicalRecord?.diagnoses || [];
     const allergyDetails = resident.medicalRecord?.allergyDetails || [];
     const diagnosisDetails = resident.medicalRecord?.diagnosisDetails || [];
     const services = resident.medicalServices || {};
@@ -466,8 +464,8 @@ function MedicalTab({ services, capability, allergyDetails, diagnosisDetails, me
                                     placeholder="Insurance provider"
                                 />
                                 <div className="form-actions">
-                                    <Button label="Cancel" onClick={() => setEditingInsurance(false)} className="p-button-secondary p-button-sm" />
-                                    <Button label="Save" onClick={handleSaveInsurance} disabled={isSubmitting} className="p-button-primary p-button-sm" />
+                                    <button className="btn btn-secondary" onClick={() => setEditingInsurance(false)}>Cancel</button>
+                                    <button className="btn btn-primary" onClick={handleSaveInsurance} disabled={isSubmitting}>Save</button>
                                 </div>
                             </div>
                         ) : (
@@ -495,8 +493,8 @@ function MedicalTab({ services, capability, allergyDetails, diagnosisDetails, me
                                     rows="4"
                                 />
                                 <div className="form-actions">
-                                    <Button label="Cancel" onClick={() => setEditingMedicalNotes(false)} className="p-button-secondary p-button-sm" />
-                                    <Button label="Save" onClick={handleSaveMedicalNotes} disabled={isSubmitting} className="p-button-primary p-button-sm" />
+                                    <button className="btn btn-secondary" onClick={() => setEditingMedicalNotes(false)}>Cancel</button>
+                                    <button className="btn btn-primary" onClick={handleSaveMedicalNotes} disabled={isSubmitting}>Save</button>
                                 </div>
                             </div>
                         ) : (
@@ -589,8 +587,8 @@ function MedicalTab({ services, capability, allergyDetails, diagnosisDetails, me
                                     />
                                 </div>
                                 <div className="form-actions" style={{gridColumn: '1 / -1'}}>
-                                    <Button label="Cancel" onClick={() => setEditingServices(false)} className="p-button-secondary p-button-sm" />
-                                    <Button label="Save" onClick={handleSaveServices} disabled={isSubmitting} className="p-button-primary p-button-sm" />
+                                    <button className="btn btn-secondary" onClick={() => setEditingServices(false)}>Cancel</button>
+                                    <button className="btn btn-primary" onClick={handleSaveServices} disabled={isSubmitting}>Save</button>
                                 </div>
                             </div>
                         ) : (
@@ -670,8 +668,8 @@ function MedicalTab({ services, capability, allergyDetails, diagnosisDetails, me
                                     </select>
                                 </div>
                                 <div className="form-actions" style={{gridColumn: '1 / -1'}}>
-                                    <Button label="Cancel" onClick={() => setEditingCapabilities(false)} className="p-button-secondary p-button-sm" />
-                                    <Button label="Save" onClick={handleSaveCapabilities} disabled={isSubmitting} className="p-button-primary p-button-sm" />
+                                    <button className="btn btn-secondary" onClick={() => setEditingCapabilities(false)}>Cancel</button>
+                                    <button className="btn btn-primary" onClick={handleSaveCapabilities} disabled={isSubmitting}>Save</button>
                                 </div>
                             </div>
                         ) : (
@@ -710,8 +708,8 @@ function MedicalTab({ services, capability, allergyDetails, diagnosisDetails, me
                                     rows="2"
                                 />
                                 <div className="form-actions">
-                                    <Button label="Cancel" onClick={() => setShowAddDiagnosis(false)} className="p-button-secondary p-button-sm" />
-                                    <Button label="Add" onClick={handleAddDiagnosis} disabled={isSubmitting} className="p-button-primary p-button-sm" />
+                                    <button className="btn btn-secondary" onClick={() => setShowAddDiagnosis(false)}>Cancel</button>
+                                    <button className="btn btn-primary" onClick={handleAddDiagnosis} disabled={isSubmitting}>Add</button>
                                 </div>
                             </div>
                         )}
@@ -752,8 +750,8 @@ function MedicalTab({ services, capability, allergyDetails, diagnosisDetails, me
                                     rows="2"
                                 />
                                 <div className="form-actions">
-                                    <Button label="Cancel" onClick={() => setShowAddAllergy(false)} className="p-button-secondary p-button-sm" />
-                                    <Button label="Add" onClick={handleAddAllergy} disabled={isSubmitting} className="p-button-primary p-button-sm" />
+                                    <button className="btn btn-secondary" onClick={() => setShowAddAllergy(false)}>Cancel</button>
+                                    <button className="btn btn-primary" onClick={handleAddAllergy} disabled={isSubmitting}>Add</button>
                                 </div>
                             </div>
                         )}
@@ -792,7 +790,6 @@ function MedicationTab({ medications, residentId, showAddForm, onAddMedication, 
                         label="Add Medication"
                         onClick={onAddMedication}
                         className="p-button-primary p-button-sm"
-                        icon="pi pi-plus"
                     />
                 )}
             </div>
@@ -849,6 +846,7 @@ function MedicationTab({ medications, residentId, showAddForm, onAddMedication, 
                                                 options={scheduleOptions}
                                                 onChange={(e) => setEditForm({...editForm, schedule: e.value})}
                                                 className="w-full"
+                                                appendTo="self"
                                             />
                                         </div>
                                         <div className="form-group">
@@ -860,8 +858,8 @@ function MedicationTab({ medications, residentId, showAddForm, onAddMedication, 
                                             />
                                         </div>
                                         <div className="edit-actions">
-                                            <Button label="Cancel" onClick={onCancelEdit} className="p-button-secondary p-button-sm" />
-                                            <Button label="Save" onClick={() => onSaveEdit(med.id)} className="p-button-primary p-button-sm" />
+                                            <button className="btn btn-secondary" onClick={onCancelEdit}>Cancel</button>
+                                            <button className="btn btn-primary" onClick={() => onSaveEdit(med.id)}>Save</button>
                                         </div>
                                     </div>
                                 ) : (
@@ -909,6 +907,7 @@ function MedicationTab({ medications, residentId, showAddForm, onAddMedication, 
                                                 placeholder="Other"
                                                 panelClassName="status-dropdown-panel"
                                                 showClear={false}
+                                                appendTo="self"
                                             />
                                             <span className={`current-status-text status-${(med.intakeStatus || 'Pending').toLowerCase()}`}>
                                                 {med.intakeStatus || 'Pending'}

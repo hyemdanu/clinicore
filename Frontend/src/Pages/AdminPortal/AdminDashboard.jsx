@@ -173,6 +173,7 @@ export default function AdminDashboard() {
                                 options={sortOptions}
                                 onChange={(e) => setMedicationSort(e.value)}
                                 className="sort-dropdown"
+                                appendTo="self"
                             />
                         </div>
                     </div>
@@ -196,6 +197,7 @@ export default function AdminDashboard() {
                                 options={sortOptions}
                                 onChange={(e) => setConsumablesSort(e.value)}
                                 className="sort-dropdown"
+                                appendTo="self"
                             />
                         </div>
                     </div>

@@ -271,30 +271,15 @@ export default function AdminDocuments() {
                                     <div className="resident-documents-title">
                                         {selectedResident.firstName} {selectedResident.lastName}
                                     </div>
+                                    <button
+                                        className="header-upload-btn"
+                                        onClick={() => setShowUploadForm(true)}
+                                        aria-label="Upload document"
+                                    >
+                                        <i className="pi pi-upload"></i>
+                                        <span>Upload</span>
+                                    </button>
                                 </div>
-
-                                {showUploadForm && (
-                                    <div className="upload-section">
-                                        <input
-                                            type="file"
-                                            accept=".pdf,.png,.jpg,.jpeg,.docx,.xlsx"
-                                            onChange={(e) => setSelectedFile(e.target.files[0])}
-                                        />
-                                        <input
-                                            type="text"
-                                            placeholder="Document Title"
-                                            value={docTitle}
-                                            onChange={(e) => setDocTitle(e.target.value)}
-                                        />
-                                        <span className="upload-hint">PDF, PNG, JPG, DOCX, XLSX — Max 10MB</span>
-                                        <button className="upload-button" onClick={handleUpload} disabled={uploading}>
-                                            <span>{uploading ? "Uploading..." : "Upload"}</span>
-                                        </button>
-                                        <button className="cancel-button" onClick={() => setShowUploadForm(false)}>
-                                            <span>Cancel</span>
-                                        </button>
-                                    </div>
-                                )}
 
                                 {filteredDocuments.length > 0 ? (
                                     filteredDocuments.map((doc) => (
@@ -331,23 +316,55 @@ export default function AdminDocuments() {
                         )}
                 </div>
 
-                {selectedResident && (
-                    <button
-                        className="documents-fab"
-                        onClick={() => setShowUploadForm(true)}
-                        aria-label="Add new document"
-                    >
-                        +
-                    </button>
+                {showUploadForm && (
+                    <div className="document-viewer-overlay" onClick={() => !uploading && setShowUploadForm(false)}>
+                        <div className="upload-modal" onClick={(e) => e.stopPropagation()}>
+                            <div className="upload-modal-header">
+                                <h3>Upload Document</h3>
+                                <button
+                                    className="upload-modal-close"
+                                    onClick={() => setShowUploadForm(false)}
+                                    disabled={uploading}
+                                    aria-label="Close"
+                                >
+                                    <i className="pi pi-times"></i>
+                                </button>
+                            </div>
+                            <div className="upload-modal-body">
+                                <label className="upload-field">
+                                    <span className="upload-field-label">Document Title</span>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. Intake Form"
+                                        value={docTitle}
+                                        onChange={(e) => setDocTitle(e.target.value)}
+                                    />
+                                </label>
+                                <label className="upload-field">
+                                    <span className="upload-field-label">File</span>
+                                    <input
+                                        type="file"
+                                        accept=".pdf,.png,.jpg,.jpeg,.docx,.xlsx"
+                                        onChange={(e) => setSelectedFile(e.target.files[0])}
+                                    />
+                                    <span className="upload-hint">PDF, PNG, JPG, DOCX, XLSX — Max 10MB</span>
+                                </label>
+                            </div>
+                            <div className="dialog-footer-actions upload-modal-actions">
+                                <button className="btn btn-secondary" onClick={() => setShowUploadForm(false)} disabled={uploading}>Cancel</button>
+                                <button className="btn btn-primary" onClick={handleUpload} disabled={uploading}>{uploading ? "Uploading..." : "Upload"}</button>
+                            </div>
+                        </div>
+                    </div>
                 )}
 
             {confirmDelete && (
                 <div className="document-viewer-overlay" onClick={() => setConfirmDelete(null)}>
                     <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>
                         <p>Delete "<strong>{confirmDelete.title}</strong>"?</p>
-                        <div className="confirm-dialog-actions">
-                            <button className="cancel-button" onClick={() => setConfirmDelete(null)}>Cancel</button>
-                            <button className="delete-confirm-button" onClick={() => handleDelete(confirmDelete)}>Delete</button>
+                        <div className="dialog-footer-actions">
+                            <button className="btn btn-secondary" onClick={() => setConfirmDelete(null)}>Cancel</button>
+                            <button className="btn btn-danger" onClick={() => handleDelete(confirmDelete)}>Delete</button>
                         </div>
                     </div>
                 </div>
