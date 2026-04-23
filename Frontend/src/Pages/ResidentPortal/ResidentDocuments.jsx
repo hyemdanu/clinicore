@@ -58,7 +58,6 @@ export default function ResidentDocuments() {
     doc.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // auto-open a document if one was passed via navigation state (e.g. from dashboard recents)
   useEffect(() => {
     const openDocId = location.state?.openDocId;
     if (!openDocId || autoOpenedRef.current || documents.length === 0) return;

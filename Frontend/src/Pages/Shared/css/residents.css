@@ -143,7 +143,7 @@ button.resident-item {
     font-size: 16px;
 }
 
-/* Resident Detail Sidebar - Pushes Content. Starts below the 56px fixed topbar. */
+/* Resident Detail Sidebar - Pushes Content */
 .resident-detail-sidebar {
     position: fixed;
     top: 56px;
@@ -271,6 +271,305 @@ body.sidebar-open .dashboard-content {
     padding-bottom: 20px;
     border-bottom: 2px solid #e8edf5;
     margin-bottom: 24px;
+}
+
+.general-header-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.general-edit-btn {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #8b92a7;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.general-edit-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--color-primary);
+}
+
+.general-grid .info-row.editable {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.general-grid .info-row.editable label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #8b92a7;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.general-grid .info-row.editable input {
+    padding: 10px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.general-grid .info-row.editable input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.1);
+}
+
+.general-notes textarea {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-family: inherit;
+    line-height: 1.6;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    resize: vertical;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.general-notes textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.1);
+}
+
+.general-card .dialog-footer-actions {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #e8edf5;
+}
+
+/* People-picker modal (used by Add Resident / Switch Caregiver) */
+.picker-modal {
+    background: #fff;
+    width: 100%;
+    max-width: 480px;
+    height: 560px;
+    max-height: 85vh;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.picker-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px 20px 16px 20px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.picker-modal-title h3 {
+    margin: 0 0 2px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.picker-modal-title p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+.picker-modal-close {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease;
+    flex-shrink: 0;
+}
+
+.picker-modal-close:hover {
+    background-color: var(--color-bg-hover);
+    color: var(--color-text);
+}
+
+.picker-search {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.picker-search-inner {
+    position: relative;
+}
+
+.picker-search i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-muted);
+    font-size: 13px;
+}
+
+.picker-search input {
+    width: 100%;
+    height: 36px;
+    padding: 0 12px 0 34px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fff;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.picker-search input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.12);
+}
+
+.picker-error {
+    padding: 10px 20px;
+    background: var(--color-error-bg);
+    color: var(--color-error-text);
+    font-size: 13px;
+    border-bottom: 1px solid var(--color-error-border);
+}
+
+.picker-list {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.picker-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 20px;
+    color: var(--color-text-secondary);
+    text-align: center;
+    gap: 6px;
+    height: 100%;
+}
+
+.picker-empty i {
+    font-size: 28px;
+    color: var(--color-text-muted);
+    opacity: 0.5;
+}
+
+.picker-empty p {
+    margin: 0;
+    font-size: 13px;
+}
+
+button.picker-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 14px 20px;
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+    border: 0;
+    border-bottom: 1px solid var(--color-border-light);
+    text-align: left;
+    background: #fff;
+    font: inherit;
+    color: inherit;
+}
+
+button.picker-item:last-child {
+    border-bottom: none;
+}
+
+button.picker-item:hover {
+    background-color: var(--color-bg);
+}
+
+button.picker-item.selected {
+    background-color: var(--color-primary-light);
+    box-shadow: inset 3px 0 0 var(--color-primary);
+}
+
+.picker-item-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.picker-item-name {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.picker-item-sub {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.picker-item-check {
+    color: var(--color-primary);
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.picker-modal-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-bg);
+}
+
+@media (max-width: 767px) {
+    .picker-modal {
+        max-width: 100%;
+        height: 92vh;
+        max-height: 92vh;
+        border-radius: 0;
+    }
+
+    .picker-modal-header,
+    .picker-search,
+    .picker-modal-footer {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .picker-item {
+        padding: 12px 16px;
+    }
 }
 
 .avatar-large {
@@ -1028,7 +1327,8 @@ body.sidebar-open .dashboard-content {
     background-color: white;
     width: 100%;
     max-width: 600px;
-    max-height: 80vh;
+    min-height: 360px;
+    max-height: 85vh;
     border-radius: 12px;
     overflow: hidden;
     display: flex;
@@ -1232,7 +1532,6 @@ body.sidebar-open .dashboard-content {
     font-weight: 500;
 }
 
-/* Dropdown panel — z-index below the fixed topbar (1500) but above page content */
 .p-dropdown-panel {
     z-index: 1100 !important;
 }
@@ -1458,7 +1757,7 @@ body.sidebar-open .dashboard-content {
     }
 }
 
-/* Tablets (768px - 1024px) — full-width overlay so it doesn't squish the main content + main sidebar */
+/* Tablets (768px - 1024px) */
 @media (max-width: 1024px) and (min-width: 768px) {
     .resident-detail-sidebar {
         width: 100vw;
@@ -2345,7 +2644,6 @@ button.caregiver-card-header {
     box-shadow: 0 0 0 3px rgba(54, 157, 247, 0.1);
 }
 
-/* Caregiver list + modal mobile responsiveness */
 @media (max-width: 767px) {
     /* Caregiver card header: tighter spacing, allow wrapping */
     button.caregiver-card-header {

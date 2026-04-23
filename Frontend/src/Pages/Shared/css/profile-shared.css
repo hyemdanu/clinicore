@@ -187,11 +187,12 @@
     box-shadow: 0 0 0 0.2rem rgba(54, 157, 247, 0.25);
 }
 
-.edit-actions {
+.edit-actions,
+.user-profile-page .dialog-footer-actions {
     display: flex;
     justify-content: flex-end;
-    gap: var(--space-2);
-    padding: var(--space-4);
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
     border-top: 2px solid var(--color-border);
     background-color: var(--color-bg);
     flex-wrap: wrap;

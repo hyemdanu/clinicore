@@ -29,6 +29,7 @@ export default function CaregiverResidentList() {
     const [selectedResidentId, setSelectedResidentId] = useState('');
     const [addLoading, setAddLoading] = useState(false);
     const [addError, setAddError] = useState(null);
+    const [addSearch, setAddSearch] = useState('');
 
     // switch modal state
     const [showSwitchModal, setShowSwitchModal] = useState(false);
@@ -136,6 +137,7 @@ export default function CaregiverResidentList() {
         setAddTargetCaregiver(caregiver);
         setSelectedResidentId('');
         setAddError(null);
+        setAddSearch('');
         setShowAddModal(true);
     };
 
@@ -143,6 +145,7 @@ export default function CaregiverResidentList() {
         setShowAddModal(false);
         setAddTargetCaregiver(null);
         setAddError(null);
+        setAddSearch('');
     };
 
     const handleConfirmAdd = async () => {
@@ -352,56 +355,92 @@ export default function CaregiverResidentList() {
                 </div>
             )}
 
-            {/* ── Add Resident Modal ─────────────────────────────────────────── */}
-            {showAddModal && (
-                <div
-                    className="edit-modal-backdrop"
-                    onClick={handleCloseAddModal}
-                    role="presentation"
-                    onKeyDown={(e) => handleModalKeyDown(e, handleCloseAddModal)}
-                >
-                    <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="edit-modal-header">
-                            <h3>Add Resident to {addTargetCaregiver?.firstName} {addTargetCaregiver?.lastName}</h3>
-                            <button className="sidebar-close-btn" onClick={handleCloseAddModal} aria-label="Close modal">
-                                <i className="pi pi-times"></i>
-                            </button>
-                        </div>
-                        <div className="edit-modal-content">
-                            {addError && <div className="error-message form-error">{addError}</div>}
-                            <div className="form-group">
-                                <label>Select Resident <span className="required">*</span></label>
-                                <Dropdown
-                                    value={selectedResidentId}
-                                    onChange={(e) => setSelectedResidentId(e.value)}
-                                    options={unassignedResidents.map(r => ({
-                                        label: `${r.firstName} ${r.lastName}`,
-                                        value: r.id
-                                    }))}
-                                    placeholder="-- Choose a resident --"
-                                    className="w-full"
-                                    appendTo="self"
-                                />
-                                {unassignedResidents.length === 0 && (
-                                    <p className="form-info">
-                                        All residents are already assigned to this caregiver.
-                                    </p>
+            {showAddModal && (() => {
+                const filtered = addSearch.trim()
+                    ? unassignedResidents.filter(r =>
+                        `${r.firstName} ${r.lastName}`.toLowerCase().includes(addSearch.toLowerCase())
+                    )
+                    : unassignedResidents;
+                return (
+                    <div
+                        className="edit-modal-backdrop"
+                        onClick={handleCloseAddModal}
+                        role="presentation"
+                        onKeyDown={(e) => handleModalKeyDown(e, handleCloseAddModal)}
+                    >
+                        <div className="picker-modal" onClick={(e) => e.stopPropagation()}>
+                            <div className="picker-modal-header">
+                                <div className="picker-modal-title">
+                                    <h3>Assign Resident</h3>
+                                    <p>To {addTargetCaregiver?.firstName} {addTargetCaregiver?.lastName}</p>
+                                </div>
+                                <button className="picker-modal-close" onClick={handleCloseAddModal} aria-label="Close">
+                                    <i className="pi pi-times"></i>
+                                </button>
+                            </div>
+
+                            {unassignedResidents.length > 0 && (
+                                <div className="picker-search">
+                                    <div className="picker-search-inner">
+                                        <i className="pi pi-search"></i>
+                                        <input
+                                            type="text"
+                                            placeholder="Search residents..."
+                                            value={addSearch}
+                                            onChange={(e) => setAddSearch(e.target.value)}
+                                            autoFocus
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            {addError && <div className="picker-error">{addError}</div>}
+
+                            <div className="picker-list">
+                                {unassignedResidents.length === 0 ? (
+                                    <div className="picker-empty">
+                                        <i className="pi pi-check-circle"></i>
+                                        <p>All residents are already assigned to this caregiver.</p>
+                                    </div>
+                                ) : filtered.length === 0 ? (
+                                    <div className="picker-empty">
+                                        <i className="pi pi-search"></i>
+                                        <p>No residents match &ldquo;{addSearch}&rdquo;</p>
+                                    </div>
+                                ) : (
+                                    filtered.map(r => (
+                                        <button
+                                            key={r.id}
+                                            type="button"
+                                            className={`picker-item ${selectedResidentId === String(r.id) ? 'selected' : ''}`}
+                                            onClick={() => setSelectedResidentId(String(r.id))}
+                                        >
+                                            <div className="picker-item-info">
+                                                <span className="picker-item-name">{r.firstName} {r.lastName}</span>
+                                                {r.email && <span className="picker-item-sub">{r.email}</span>}
+                                            </div>
+                                            {selectedResidentId === String(r.id) && (
+                                                <i className="pi pi-check picker-item-check"></i>
+                                            )}
+                                        </button>
+                                    ))
                                 )}
                             </div>
-                        </div>
-                        <div className="edit-modal-footer">
-                            <button className="btn btn-secondary" onClick={handleCloseAddModal}>Cancel</button>
-                            <button
-                                className="btn btn-primary"
-                                onClick={handleConfirmAdd}
-                                disabled={addLoading || !selectedResidentId}
-                            >
-                                {addLoading ? 'Assigning...' : 'Assign'}
-                            </button>
+
+                            <div className="dialog-footer-actions picker-modal-footer">
+                                <button className="btn btn-secondary" onClick={handleCloseAddModal}>Cancel</button>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={handleConfirmAdd}
+                                    disabled={addLoading || !selectedResidentId}
+                                >
+                                    {addLoading ? 'Assigning...' : 'Assign'}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                );
+            })()}
 
             {/* ── Switch Caregiver Modal ─────────────────────────────────────── */}
             {showSwitchModal && (

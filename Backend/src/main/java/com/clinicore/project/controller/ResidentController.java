@@ -377,6 +377,26 @@ public class ResidentController {
     }
 
     /**
+     * PATCH /api/residents/{residentId}/info
+     * updates resident basic info: contact number, emergency contact name/number, notes
+     */
+    @PatchMapping("/{residentId}/info")
+    public ResponseEntity<?> updateResidentInfo(
+            @PathVariable Long residentId,
+            @RequestParam Long currentUserId,
+            @RequestBody Map<String, String> updates) {
+        try {
+            residentService.updateResidentInfo(residentId, updates);
+            return ResponseEntity.ok(Map.of("message", "Resident info updated successfully"));
+        } catch (RuntimeException e) {
+            return createErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage(), currentUserId);
+        } catch (Exception e) {
+            return createErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Error updating resident info: " + e.getMessage(), currentUserId);
+        }
+    }
+
+    /**
      * PATCH /api/residents/{residentId}/medical-profile
      * updates medical profile (insurance and notes)
      */
