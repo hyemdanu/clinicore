@@ -26,7 +26,6 @@
     overflow: hidden;
 }
 
-/* Allow table to scroll horizontally on narrow screens instead of squishing */
 .inventory-table-wrapper .p-datatable-wrapper {
     overflow-x: auto;
 }
@@ -59,7 +58,6 @@
     width: 100%;
 }
 
-/* Match the global .search-input pill style from residents.css */
 .search-container .search-input.p-inputtext {
     width: 100% !important;
     height: 48px !important;
@@ -82,7 +80,6 @@
     box-shadow: 0 2px 12px rgba(54, 157, 247, 0.2) !important;
 }
 
-/* Adjust search icon position */
 .search-container .p-input-icon-left > i {
     position: absolute;
     left: var(--space-4);
@@ -319,7 +316,6 @@
     color: var(--color-bg-white);
 }
 
-/* Mobile: tighter padding so table fits without awkward overflow */
 @media (max-width: 767px) {
     .table-header {
         padding: var(--space-4);
@@ -411,7 +407,6 @@
     max-width: 92vw;
 }
 
-/* Mobile dialog adjustments */
 @media (max-width: 767px) {
     .medication-dialog .p-dialog-header {
         padding: var(--space-4);

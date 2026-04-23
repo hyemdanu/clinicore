@@ -191,7 +191,9 @@ export default function ResidentDetailModal({ resident, onClose, onResidentUpdat
             </div>
 
             <div className="sidebar-content">
-                {activeTab === "general" && <GeneralTab details={resident} />}
+                {activeTab === "general" && (
+                    <GeneralTab details={resident} onResidentUpdated={onResidentUpdated} />
+                )}
                 {activeTab === "medical" && (
                     <MedicalTab
                         services={services}
@@ -227,32 +229,136 @@ export default function ResidentDetailModal({ resident, onClose, onResidentUpdat
     );
 }
 
-function GeneralTab({ details }) {
+function GeneralTab({ details, onResidentUpdated }) {
+    const toastRef = useRef(null);
+    const [editing, setEditing] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [form, setForm] = useState({
+        contactNumber: details.contactNumber || '',
+        emergencyContactName: details.emergencyContactName || '',
+        emergencyContactNumber: details.emergencyContactNumber || '',
+        residentNotes: details.residentNotes || ''
+    });
+
+    const handleCancel = () => {
+        setEditing(false);
+        setForm({
+            contactNumber: details.contactNumber || '',
+            emergencyContactName: details.emergencyContactName || '',
+            emergencyContactNumber: details.emergencyContactNumber || '',
+            residentNotes: details.residentNotes || ''
+        });
+    };
+
+    const handleSave = async () => {
+        if (!form.contactNumber.trim() || !form.emergencyContactName.trim() || !form.emergencyContactNumber.trim()) {
+            toastRef.current?.show({ severity: 'warn', summary: 'Missing Fields', detail: 'Contact info cannot be empty' });
+            return;
+        }
+        setSaving(true);
+        try {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            await patch(`/residents/${details.id}/info?currentUserId=${currentUser.id}`, {
+                contactNumber: form.contactNumber.trim(),
+                emergencyContactName: form.emergencyContactName.trim(),
+                emergencyContactNumber: form.emergencyContactNumber.trim(),
+                residentNotes: form.residentNotes
+            });
+            toastRef.current?.show({ severity: 'success', summary: 'Saved', detail: 'Resident info updated' });
+            setEditing(false);
+            if (onResidentUpdated) onResidentUpdated();
+        } catch (err) {
+            toastRef.current?.show({ severity: 'error', summary: 'Error', detail: err.message || 'Failed to update' });
+        } finally {
+            setSaving(false);
+        }
+    };
+
     return (
         <div className="tab-content">
+            <Toast ref={toastRef} />
             <div className="general-card">
                 <div className="general-header">
                     <div className="avatar-large">
                         {details.firstName?.[0]}
                     </div>
-                    <div>
+                    <div className="general-header-info">
                         <h3>{details.firstName} {details.lastName}</h3>
                         <p className="muted">{details.email}</p>
                     </div>
+                    {!editing && (
+                        <button
+                            className="edit-btn general-edit-btn"
+                            onClick={() => setEditing(true)}
+                            aria-label="Edit resident info"
+                            title="Edit"
+                        >
+                            <i className="pi pi-pencil"></i>
+                        </button>
+                    )}
                 </div>
 
                 <div className="general-grid">
                     <InfoRow label="Birthday" value={details.birthday ? dayjs(details.birthday).format("MMM D, YYYY") : "N/A"} />
                     <InfoRow label="Gender" value={details.gender || "N/A"} />
-                    <InfoRow label="Contact Number" value={details.contactNumber || "N/A"} />
-                    <InfoRow label="Emergency Contact" value={details.emergencyContactName || "N/A"} />
-                    <InfoRow label="Emergency Number" value={details.emergencyContactNumber || "N/A"} />
+                    {editing ? (
+                        <>
+                            <div className="info-row editable">
+                                <label>Contact Number</label>
+                                <input
+                                    type="text"
+                                    value={form.contactNumber}
+                                    onChange={(e) => setForm({ ...form, contactNumber: e.target.value })}
+                                />
+                            </div>
+                            <div className="info-row editable">
+                                <label>Emergency Contact</label>
+                                <input
+                                    type="text"
+                                    value={form.emergencyContactName}
+                                    onChange={(e) => setForm({ ...form, emergencyContactName: e.target.value })}
+                                />
+                            </div>
+                            <div className="info-row editable">
+                                <label>Emergency Number</label>
+                                <input
+                                    type="text"
+                                    value={form.emergencyContactNumber}
+                                    onChange={(e) => setForm({ ...form, emergencyContactNumber: e.target.value })}
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <InfoRow label="Contact Number" value={details.contactNumber || "N/A"} />
+                            <InfoRow label="Emergency Contact" value={details.emergencyContactName || "N/A"} />
+                            <InfoRow label="Emergency Number" value={details.emergencyContactNumber || "N/A"} />
+                        </>
+                    )}
                 </div>
 
                 <div className="general-notes">
                     <label>Notes</label>
-                    <p>{details.residentNotes || "No notes yet."}</p>
+                    {editing ? (
+                        <textarea
+                            value={form.residentNotes}
+                            onChange={(e) => setForm({ ...form, residentNotes: e.target.value })}
+                            rows="3"
+                            placeholder="Add notes..."
+                        />
+                    ) : (
+                        <p>{details.residentNotes || "No notes yet."}</p>
+                    )}
                 </div>
+
+                {editing && (
+                    <div className="dialog-footer-actions">
+                        <button className="btn btn-secondary" onClick={handleCancel} disabled={saving}>Cancel</button>
+                        <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
+                            {saving ? 'Saving...' : 'Save'}
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -238,7 +238,7 @@ button.document-row:hover {
     background: var(--color-error-bg);
 }
 
-/* Document viewer overlay — must sit above the fixed topbar (z-index: 1500) */
+/* Document viewer overlay */
 .document-viewer-overlay {
     position: fixed;
     inset: 0;

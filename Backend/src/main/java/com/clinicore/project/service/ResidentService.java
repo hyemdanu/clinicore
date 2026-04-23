@@ -492,6 +492,54 @@ public class ResidentService {
     }
 
     /**
+     * update resident's basic info: contact number, emergency contact, notes
+     */
+    @Transactional
+    public void updateResidentInfo(Long residentId, Map<String, String> updates) {
+        if (updates == null || updates.isEmpty()) {
+            throw new RuntimeException("No updates provided");
+        }
+
+        UserProfile userProfile = userProfileRepository.findById(residentId)
+                .orElseThrow(() -> new RuntimeException("Resident not found"));
+        if (userProfile.getRole() != UserProfile.Role.RESIDENT) {
+            throw new RuntimeException("User is not a resident");
+        }
+
+        Resident resident = residentGeneralRepository.findById(residentId)
+                .orElseThrow(() -> new RuntimeException("Resident record not found"));
+
+        if (updates.containsKey("contactNumber")) {
+            String v = updates.get("contactNumber");
+            if (v == null || v.trim().isEmpty()) {
+                throw new RuntimeException("Contact number cannot be empty");
+            }
+            userProfile.setContactNumber(v.trim());
+        }
+        if (updates.containsKey("emergencyContactName")) {
+            String v = updates.get("emergencyContactName");
+            if (v == null || v.trim().isEmpty()) {
+                throw new RuntimeException("Emergency contact name cannot be empty");
+            }
+            resident.setEmergencyContactName(v.trim());
+        }
+        if (updates.containsKey("emergencyContactNumber")) {
+            String v = updates.get("emergencyContactNumber");
+            if (v == null || v.trim().isEmpty()) {
+                throw new RuntimeException("Emergency contact number cannot be empty");
+            }
+            resident.setEmergencyContactNumber(v.trim());
+        }
+        if (updates.containsKey("residentNotes")) {
+            String v = updates.get("residentNotes");
+            resident.setNotes(v != null && !v.trim().isEmpty() ? v.trim() : null);
+        }
+
+        userProfileRepository.save(userProfile);
+        residentGeneralRepository.save(resident);
+    }
+
+    /**
      * update resident medical profile
      */
     @Transactional
