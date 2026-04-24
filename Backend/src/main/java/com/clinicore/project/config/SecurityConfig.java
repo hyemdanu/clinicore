@@ -55,7 +55,6 @@ public class SecurityConfig {
                     // any authenticated user
                     .requestMatchers("/api/messages/**").authenticated()
                     .requestMatchers("/api/documents/**").authenticated()
-                    .requestMatchers("/api/upload/**").authenticated()
                     .requestMatchers("/api/user/**").authenticated()
 
                     // deny everything else

@@ -2,12 +2,17 @@ package com.clinicore.project.controller;
 
 import com.clinicore.project.dto.ConversationDTO;
 import com.clinicore.project.dto.MessageDTO;
-import com.clinicore.project.entity.CommunicationPortal;
 import com.clinicore.project.entity.UserProfile;
+import com.clinicore.project.repository.MessagesRepository;
 import com.clinicore.project.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -67,28 +72,62 @@ public class MessagesController {
         }
     }
 
-    @PostMapping("/chat/send-with-attachment")
-    public ResponseEntity<?> sendMessageWithAttachment(@RequestBody Map<String, Object> request) {
+    @PostMapping(value = "/chat/send-with-attachment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> sendMessageWithAttachment(
+            @RequestParam Long senderId,
+            @RequestParam Long recipientId,
+            @RequestParam(required = false) String message,
+            @RequestParam("file") MultipartFile file) {
         try {
-            Long senderId = Long.valueOf(request.get("senderId").toString());
-            Long recipientId = Long.valueOf(request.get("recipientId").toString());
-            String messageText = (String) request.get("message");
-            String messageTypeStr = (String) request.get("messageType");
-            String attachmentUrl = (String) request.get("attachmentUrl");
-            String attachmentName = (String) request.get("attachmentName");
-
-            CommunicationPortal.MessageType messageType = CommunicationPortal.MessageType.FILE;
-            if (messageTypeStr != null) {
-                messageType = CommunicationPortal.MessageType.valueOf(messageTypeStr.toUpperCase());
+            if (file == null || file.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "File is required"));
             }
 
             MessageDTO sent = messageService.sendMessageWithAttachment(
-                    senderId, recipientId, messageText, messageType, attachmentUrl, attachmentName
+                    senderId,
+                    recipientId,
+                    message,
+                    file.getBytes(),
+                    file.getOriginalFilename(),
+                    file.getContentType()
             );
             return ResponseEntity.ok(sent);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body(Map.of("error", "Failed to send message: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/chat/attachment/{messageId}")
+    public ResponseEntity<byte[]> getAttachment(@PathVariable Long messageId) {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || auth.getName() == null) {
+                return ResponseEntity.status(401).build();
+            }
+            Long userId = Long.parseLong(auth.getName());
+
+            MessagesRepository.AttachmentView view = messageService.getAttachment(messageId, userId);
+            if (view == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            String contentType = view.getAttachmentType() != null
+                    ? view.getAttachmentType()
+                    : MediaType.APPLICATION_OCTET_STREAM_VALUE;
+
+            String filename = view.getAttachmentName() != null ? view.getAttachmentName() : "attachment";
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, contentType)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                    .body(view.getAttachmentData());
+        } catch (SecurityException e) {
+            return ResponseEntity.status(403).build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 

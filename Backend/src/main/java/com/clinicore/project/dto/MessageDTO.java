@@ -44,7 +44,10 @@ public class MessageDTO {
         dto.setMessage(msg.getMessage());
         dto.setMessageType(msg.getMessageType() != null ? msg.getMessageType().name() : "TEXT");
         dto.setConversationId(msg.getConversationId());
-        dto.setAttachmentUrl(msg.getAttachmentUrl());
+        // attachments are streamed from /api/messages/chat/attachment/{id}
+        if (msg.getAttachmentName() != null && msg.getId() != null) {
+            dto.setAttachmentUrl("/api/messages/chat/attachment/" + msg.getId());
+        }
         dto.setAttachmentName(msg.getAttachmentName());
         dto.setSentAt(msg.getSentAt());
         dto.setReadAt(msg.getReadAt());

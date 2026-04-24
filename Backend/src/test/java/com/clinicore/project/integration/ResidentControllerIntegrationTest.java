@@ -217,18 +217,89 @@ class ResidentControllerIntegrationTest {
         System.out.println("PASSED TEST 9");
     }
 
-    // ==================== AVAILABLE MEDICATIONS ====================
+    // ==================== RESIDENT INFO (contact + emergency contact + notes) ====================
 
     @Test
     @Order(10)
-    @DisplayName("TEST 10: GET /medications/available returns medication inventory list")
+    @DisplayName("TEST 10: PATCH /{residentId}/info updates contact, emergency contact, and notes")
+    void testUpdateResidentInfo() throws Exception {
+        System.out.println("\n=== TEST 10: Update Resident Info ===");
+
+        String before = mockMvc.perform(get("/api/residents/full/" + RESIDENT_ID)
+                        .param("currentUserId", ADMIN_ID.toString()))
+                .andReturn().getResponse().getContentAsString();
+        var beforeJson = objectMapper.readTree(before);
+        String originalContact = beforeJson.path("contactNumber").asText("");
+        String originalEmName = beforeJson.path("emergencyContactName").asText("");
+        String originalEmNumber = beforeJson.path("emergencyContactNumber").asText("");
+        String originalNotes = beforeJson.path("residentNotes").asText("");
+
+        Map<String, String> updates = new LinkedHashMap<>();
+        updates.put("contactNumber", "555-0100");
+        updates.put("emergencyContactName", "Integration Test Contact");
+        updates.put("emergencyContactNumber", "555-0199");
+        updates.put("residentNotes", "Updated by integration test");
+
+        mockMvc.perform(patch("/api/residents/" + RESIDENT_ID + "/info")
+                        .param("currentUserId", ADMIN_ID.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updates)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").exists());
+
+        mockMvc.perform(get("/api/residents/full/" + RESIDENT_ID)
+                        .param("currentUserId", ADMIN_ID.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.contactNumber").value("555-0100"))
+                .andExpect(jsonPath("$.emergencyContactName").value("Integration Test Contact"))
+                .andExpect(jsonPath("$.emergencyContactNumber").value("555-0199"))
+                .andExpect(jsonPath("$.residentNotes").value("Updated by integration test"));
+
+        Map<String, String> restore = new LinkedHashMap<>();
+        restore.put("contactNumber", originalContact);
+        restore.put("emergencyContactName", originalEmName);
+        restore.put("emergencyContactNumber", originalEmNumber);
+        restore.put("residentNotes", originalNotes);
+
+        mockMvc.perform(patch("/api/residents/" + RESIDENT_ID + "/info")
+                        .param("currentUserId", ADMIN_ID.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(restore)))
+                .andExpect(status().isOk());
+
+        System.out.println("PASSED TEST 10");
+    }
+
+    @Test
+    @Order(11)
+    @DisplayName("TEST 11: PATCH /{residentId}/info with blank required field returns 400")
+    void testUpdateResidentInfoValidation() throws Exception {
+        System.out.println("\n=== TEST 11: Update Resident Info Validation ===");
+
+        Map<String, String> updates = new LinkedHashMap<>();
+        updates.put("contactNumber", "   ");
+
+        mockMvc.perform(patch("/api/residents/" + RESIDENT_ID + "/info")
+                        .param("currentUserId", ADMIN_ID.toString())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updates)))
+                .andExpect(status().isBadRequest());
+
+        System.out.println("PASSED TEST 11");
+    }
+
+    // ==================== AVAILABLE MEDICATIONS ====================
+
+    @Test
+    @Order(12)
+    @DisplayName("TEST 12: GET /medications/available returns medication inventory list")
     void testGetAvailableMedications() throws Exception {
-        System.out.println("\n=== TEST 10: Get Available Medications ===");
+        System.out.println("\n=== TEST 12: Get Available Medications ===");
 
         mockMvc.perform(get("/api/residents/medications/available"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
 
-        System.out.println("PASSED TEST 10");
+        System.out.println("PASSED TEST 12");
     }
 }

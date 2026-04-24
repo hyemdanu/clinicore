@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { get, post, patch, uploadFile, API_BASE_URL } from '../../services/api';
+import { get, post, patch, API_BASE_URL } from '../../services/api';
 import './css/messages.css';
-
-const SERVER_BASE_URL = API_BASE_URL.replace(/\/api$/, '');
 
 export default function ChatWindow({ conversation, currentUser, onMessageSent, onBack }) {
     const [messages, setMessages] = useState([]);
@@ -111,22 +109,28 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
         setUploading(true);
         lastSentAt.current = Date.now();
         try {
-            const uploadResult = await uploadFile('/upload/chat', file);
+            const formData = new FormData();
+            formData.append('senderId', currentUser.id);
+            formData.append('recipientId', conversation.otherUserId);
+            formData.append('message', '');
+            formData.append('file', file);
 
-            if (uploadResult.success) {
-                const sentMessage = await post('/messages/chat/send-with-attachment', {
-                    senderId: currentUser.id,
-                    recipientId: conversation.otherUserId,
-                    message: '',
-                    messageType: uploadResult.type,
-                    attachmentUrl: uploadResult.url,
-                    attachmentName: uploadResult.originalName
-                });
+            const response = await fetch(`${API_BASE_URL}/messages/chat/send-with-attachment`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${currentUser.token}` },
+                body: formData,
+            });
 
-                setMessages(prev => [...prev, sentMessage]);
-                lastSentAt.current = Date.now();
-                onMessageSent?.();
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error('Error uploading file:', errorData.error || `Upload failed (${response.status})`);
+                return;
             }
+
+            const sentMessage = await response.json();
+            setMessages(prev => [...prev, sentMessage]);
+            lastSentAt.current = Date.now();
+            onMessageSent?.();
         } catch (err) {
             console.error('Error uploading file:', err);
         } finally {
@@ -178,41 +182,44 @@ export default function ChatWindow({ conversation, currentUser, onMessageSent, o
         })),
     [messages]);
 
-    // builds a safe attachment URL — only allows paths starting with /
-    // blocks javascript:, data:, and other dangerous URL schemes
-    const getSafeAttachmentUrl = (attachmentUrl) => {
-        if (!attachmentUrl || !attachmentUrl.startsWith('/')) return null;
-        return `${SERVER_BASE_URL}${attachmentUrl}`;
+    const downloadAttachment = async (message) => {
+        if (message.messageType !== 'IMAGE' && message.messageType !== 'FILE') return;
+        try {
+            const response = await fetch(`${API_BASE_URL}/messages/chat/attachment/${message.id}`, {
+                headers: { Authorization: `Bearer ${currentUser.token}` },
+            });
+            if (!response.ok) {
+                console.error('Error downloading attachment:', `fetch failed (${response.status})`);
+                return;
+            }
+
+            const blob = await response.blob();
+            const objectUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = objectUrl;
+            a.download = message.attachmentName || 'attachment';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(objectUrl);
+        } catch (err) {
+            console.error('Error downloading attachment:', err);
+        }
     };
 
     const renderAttachment = (message) => {
-        const url = getSafeAttachmentUrl(message.attachmentUrl);
-        if (!url) return null;
-
-        if (message.messageType === 'IMAGE') {
-            return (
-                <div className="message-image">
-                    <img
-                        src={url}
-                        alt={message.attachmentName || 'Image'}
-                        onClick={() => window.open(url, '_blank')}
-                    />
-                </div>
-            );
-        } else if (message.messageType === 'FILE') {
-            return (
-                <a
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="message-file"
-                >
-                    <i className="pi pi-file"></i>
-                    <span>{message.attachmentName || 'Download file'}</span>
-                </a>
-            );
-        }
-        return null;
+        if (message.messageType !== 'IMAGE' && message.messageType !== 'FILE') return null;
+        const iconClass = message.messageType === 'IMAGE' ? 'pi pi-image' : 'pi pi-file';
+        return (
+            <button
+                type="button"
+                className="message-file"
+                onClick={() => downloadAttachment(message)}
+            >
+                <i className={iconClass}></i>
+                <span>{message.attachmentName || 'Download attachment'}</span>
+            </button>
+        );
     };
 
     if (!conversation) {
