@@ -57,11 +57,15 @@ public class CommunicationPortal {
     @Column(name = "conversation_id")
     private String conversationId;
 
-    @Column(name = "attachment_url")
-    private String attachmentUrl;
-
     @Column(name = "attachment_name")
     private String attachmentName;
+
+    @Column(name = "attachment_type")
+    private String attachmentType;
+
+    @Lob
+    @Column(name = "attachment_data", columnDefinition = "LONGBLOB")
+    private byte[] attachmentData;
 
     @PrePersist
     protected void onCreate() {

@@ -16,6 +16,20 @@ import java.util.stream.Collectors;
 @Service
 public class MessageService {
 
+    private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
+            "image/jpeg", "image/png", "image/gif", "image/webp"
+    );
+
+    private static final Set<String> ALLOWED_FILE_TYPES = Set.of(
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "text/plain",
+            "text/csv"
+    );
+
     private final MessagesRepository messagesRepository;
     private final UserProfileRepository userProfileRepository;
     private final EncryptionService encryptionService;
@@ -139,29 +153,69 @@ public class MessageService {
     @Transactional
     public MessageDTO sendMessageWithAttachment(Long senderId, Long recipientId,
                                                  String messageText,
-                                                 CommunicationPortal.MessageType messageType,
-                                                 String attachmentUrl,
-                                                 String attachmentName) {
+                                                 byte[] attachmentData,
+                                                 String attachmentName,
+                                                 String contentType) {
+        if (attachmentData == null || attachmentData.length == 0) {
+            throw new IllegalArgumentException("Attachment is empty");
+        }
+
+        // validateAndDetectType throws if contentType is null, so it's safe to dereference below
+        CommunicationPortal.MessageType messageType = validateAndDetectType(contentType);
+        String normalizedType = contentType.split(";")[0].trim().toLowerCase();
+
         UserProfile[] users = loadSenderAndRecipient(senderId, recipientId);
         UserProfile sender = users[0];
         UserProfile recipient = users[1];
+
+        String plaintext = messageText == null ? "" : messageText;
 
         CommunicationPortal message = new CommunicationPortal();
         message.setSenderId(senderId);
         message.setSenderRole(convertRole(sender.getRole()));
         message.setRecipientId(recipientId);
         message.setRecipientRole(convertRole(recipient.getRole()));
-        message.setMessage(encryptionService.encrypt(messageText));
+        message.setMessage(encryptionService.encrypt(plaintext));
         message.setMessageType(messageType);
-        message.setAttachmentUrl(attachmentUrl);
         message.setAttachmentName(attachmentName);
+        message.setAttachmentType(normalizedType);
+        message.setAttachmentData(attachmentData);
 
         CommunicationPortal saved = messagesRepository.save(message);
 
         String senderName = sender.getFirstName() + " " + sender.getLastName();
         String recipientName = recipient.getFirstName() + " " + recipient.getLastName();
 
-        return MessageDTO.fromEntityWithNames(saved, senderName, recipientName);
+        // return plaintext in DTO — empty string encrypts to non-empty Base64 and would render as gibberish
+        return MessageDTO.fromEntityWithNames(saved, senderName, recipientName, plaintext);
+    }
+
+    @Transactional(readOnly = true)
+    public MessagesRepository.AttachmentView getAttachment(Long messageId, Long requestingUserId) {
+        MessagesRepository.AttachmentView view = messagesRepository.findAttachmentById(messageId);
+        if (view == null || view.getAttachmentData() == null) {
+            return null;
+        }
+        // only sender or recipient may fetch the binary
+        if (!Objects.equals(view.getSenderId(), requestingUserId)
+                && !Objects.equals(view.getRecipientId(), requestingUserId)) {
+            throw new SecurityException("Not authorized to access this attachment");
+        }
+        return view;
+    }
+
+    private CommunicationPortal.MessageType validateAndDetectType(String contentType) {
+        if (contentType == null) {
+            throw new IllegalArgumentException("Missing content type");
+        }
+        String baseType = contentType.split(";")[0].trim().toLowerCase();
+        if (ALLOWED_IMAGE_TYPES.contains(baseType)) {
+            return CommunicationPortal.MessageType.IMAGE;
+        }
+        if (ALLOWED_FILE_TYPES.contains(baseType)) {
+            return CommunicationPortal.MessageType.FILE;
+        }
+        throw new IllegalArgumentException("File type not allowed: " + baseType);
     }
 
     // batch-load sender and recipient in one query instead of two

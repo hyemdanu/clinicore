@@ -12,27 +12,6 @@ import java.util.List;
 @Repository
 public interface MessagesRepository extends JpaRepository<CommunicationPortal, Long> {
 
-    List<CommunicationPortal> findBySenderId(Long senderId);
-
-    List<CommunicationPortal> findByRecipientId(Long recipientId);
-
-    List<CommunicationPortal> findBySenderRole(CommunicationPortal.UserRole senderRole);
-
-    List<CommunicationPortal> findBySenderIdAndRecipientId(Long senderId, Long recipientId);
-
-    List<CommunicationPortal> findByRecipientIdAndRecipientRole(Long recipientId, CommunicationPortal.UserRole recipientRole);
-
-    @Query("SELECT cp FROM CommunicationPortal cp WHERE " +
-            "(cp.senderId = :user1Id AND cp.recipientId = :user2Id) OR " +
-            "(cp.senderId = :user2Id AND cp.recipientId = :user1Id) " +
-            "ORDER BY cp.sentAt ASC")
-    List<CommunicationPortal> findConversation(@Param("user1Id") Long user1Id,
-                                               @Param("user2Id") Long user2Id);
-
-    List<CommunicationPortal> findByRecipientIdAndIsRead(Long recipientId, Boolean isRead);
-
-    List<CommunicationPortal> findByRecipientIdAndIsReadOrderBySentAtDesc(Long recipientId, Boolean isRead);
-
     List<CommunicationPortal> findByConversationIdOrderBySentAtAsc(String conversationId);
 
     @Query("SELECT cp FROM CommunicationPortal cp WHERE cp.id IN " +
@@ -57,4 +36,20 @@ public interface MessagesRepository extends JpaRepository<CommunicationPortal, L
     @Query("UPDATE CommunicationPortal cp SET cp.isRead = true, cp.readAt = CURRENT_TIMESTAMP " +
             "WHERE cp.conversationId = :conversationId AND cp.recipientId = :userId AND cp.isRead = false")
     void bulkMarkAsRead(@Param("conversationId") String conversationId, @Param("userId") Long userId);
+
+    // attachment-only projection: avoids loading the full entity (including other BLOB columns) when streaming
+    interface AttachmentView {
+        Long getId();
+        Long getSenderId();
+        Long getRecipientId();
+        String getAttachmentName();
+        String getAttachmentType();
+        byte[] getAttachmentData();
+    }
+
+    @Query("SELECT cp.id AS id, cp.senderId AS senderId, cp.recipientId AS recipientId, " +
+            "cp.attachmentName AS attachmentName, cp.attachmentType AS attachmentType, " +
+            "cp.attachmentData AS attachmentData " +
+            "FROM CommunicationPortal cp WHERE cp.id = :id")
+    AttachmentView findAttachmentById(@Param("id") Long id);
 }

@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,7 +77,7 @@ class MessageEncryptionIntegrationTest {
                 messagesRepository.findByConversationIdOrderBySentAtAsc(CONVERSATION_ID);
         assertThat(stored).isNotEmpty();
 
-        CommunicationPortal last = stored.get(stored.size() - 1);
+        CommunicationPortal last = stored.getLast();
         assertThat(last.getMessage())
                 .isNotNull()
                 .isNotEqualTo(plaintext);
@@ -164,33 +165,34 @@ class MessageEncryptionIntegrationTest {
     @Test
     @DisplayName("sendMessageWithAttachment also encrypts the message field")
     void messageWithAttachmentIsEncrypted() throws Exception {
-        // NOTE: if this test fails, encryption may not be wired for the attachment endpoint — flag in PR
-        mockMvc.perform(post("/api/messages/chat/send-with-attachment")
-                        .header(HttpHeaders.AUTHORIZATION, authHeader)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                            {
-                                "senderId": 1,
-                                "recipientId": 2,
-                                "message": "",
-                                "messageType": "IMAGE",
-                                "attachmentUrl": "/uploads/test-encrypt.png",
-                                "attachmentName": "test-encrypt.png"
-                            }
-                            """))
+        // minimal PNG signature — enough to pass content-type detection
+        byte[] pngBytes = new byte[]{(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "test-encrypt.png", "image/png", pngBytes);
+
+        mockMvc.perform(multipart("/api/messages/chat/send-with-attachment")
+                        .file(file)
+                        .param("senderId", "1")
+                        .param("recipientId", "2")
+                        .param("message", "")
+                        .header(HttpHeaders.AUTHORIZATION, authHeader))
                 .andExpect(status().isOk());
 
         List<CommunicationPortal> stored =
                 messagesRepository.findByConversationIdOrderBySentAtAsc(CONVERSATION_ID);
         assertThat(stored).isNotEmpty();
 
-        CommunicationPortal last = stored.get(stored.size() - 1);
+        CommunicationPortal last = stored.getLast();
         // Encrypted empty string is NOT empty — it's IV + GCM auth tag encoded as base64
         assertThat(last.getMessage())
                 .isNotNull()
                 .isNotEmpty();
         // And it must decrypt back cleanly
         assertThat(encryptionService.decrypt(last.getMessage())).isEqualTo("");
+        // And the binary payload landed in the DB
+        assertThat(last.getAttachmentData()).isNotNull().isNotEmpty();
+        assertThat(last.getAttachmentName()).isEqualTo("test-encrypt.png");
+        assertThat(last.getAttachmentType()).isEqualTo("image/png");
     }
 
     // --- Scenario 6 ---

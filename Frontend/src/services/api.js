@@ -105,36 +105,3 @@ export const deleteDocument = async (documentId) => {
     return response.json();
 };
 
-// file upload - uses FormData instead of JSON
-// used for chat image/file uploads
-export const uploadFile = async (endpoint, file) => {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const headers = {};
-    const user = JSON.parse(localStorage.getItem('currentUser'));
-    if (user?.token) {
-        headers['Authorization'] = `Bearer ${user.token}`;
-    }
-
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: 'POST',
-        credentials: 'include',
-        headers,
-        body: formData,
-        // don't set Content-Type header - browser will set it with boundary
-    });
-
-    if (!response.ok) {
-        let errorMessage = `Upload Error: ${response.status}`;
-        try {
-            const errorData = await response.json();
-            errorMessage = errorData.error || errorMessage;
-        } catch {
-            errorMessage = `${errorMessage} - ${response.statusText}`;
-        }
-        throw new Error(errorMessage);
-    }
-
-    return response.json();
-};
