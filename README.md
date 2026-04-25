@@ -181,28 +181,28 @@ mvn test -Dtest=ResidentMedicationManagementIntegrationTest
   <tr>
     <td align="center">
       <a href="https://github.com/aimsngn">
-        <img src="https://github.com/identicons/oleian.png" width="80px" alt="Olei Amelie Mae Ngan"/><br/>
+        <img src="https://github.com/aimsngn.png" width="80px" alt="Olei Amelie Mae Ngan"/><br/>
         <sub><b>Olei Amelie Mae Ngan</b></sub>
       </a><br/>
       <sub>Developer</sub>
     </td>
     <td align="center">
       <a href="https://github.com/OniiSean">
-        <img src="https://github.com/identicons/seanbombay.png" width="80px" alt="Sean Bombay"/><br/>
+        <img src="https://github.com/OniiSean.png" width="80px" alt="Sean Bombay"/><br/>
         <sub><b>Sean Bombay</b></sub>
       </a><br/>
       <sub>Developer</sub>
     </td>
     <td align="center">
       <a href="https://github.com/anhminh34">
-        <img src="https://github.com/identicons/minhnguyen.png" width="80px" alt="Minh Nguyen"/><br/>
+        <img src="https://github.com/anhminh34.png" width="80px" alt="Minh Nguyen"/><br/>
         <sub><b>Minh Nguyen</b></sub>
       </a><br/>
       <sub>Developer</sub>
     </td>
     <td align="center">
       <a href="https://github.com/mileslle">
-        <img src="https://github.com/identicons/milesle.png" width="80px" alt="Miles Le"/><br/>
+        <img src="https://github.com/mileslle.png" width="80px" alt="Miles Le"/><br/>
         <sub><b>Miles Le</b></sub>
       </a><br/>
       <sub>Developer</sub>
@@ -211,28 +211,28 @@ mvn test -Dtest=ResidentMedicationManagementIntegrationTest
   <tr>
     <td align="center">
       <a href="https://github.com/rushabhpatell">
-        <img src="https://github.com/identicons/rushabhpatel.png" width="80px" alt="Rushabh Patel"/><br/>
+        <img src="https://github.com/rushabhpatell.png" width="80px" alt="Rushabh Patel"/><br/>
         <sub><b>Rushabh Patel</b></sub>
       </a><br/>
       <sub>Developer · rushabhpatel109@gmail.com</sub>
     </td>
     <td align="center">
       <a href="https://github.com/adrianpxrez">
-        <img src="https://github.com/identicons/adrianperez.png" width="80px" alt="Adrian Perez"/><br/>
+        <img src="https://github.com/adrianpxrez.png" width="80px" alt="Adrian Perez"/><br/>
         <sub><b>Adrian Perez</b></sub>
       </a><br/>
       <sub>Developer</sub>
     </td>
     <td align="center">
       <a href="https://github.com/winniwu07">
-        <img src="https://github.com/identicons/winniwu.png" width="80px" alt="Winni Wu"/><br/>
+        <img src="https://github.com/winniwu07.png" width="80px" alt="Winni Wu"/><br/>
         <sub><b>Winni Wu</b></sub>
       </a><br/>
       <sub>Developer</sub>
     </td>
     <td align="center">
       <a href="https://github.com/hyemdanu">
-        <img src="https://github.com/identicons/edisonho.png" width="80px" alt="Edison Ho"/><br/>
+        <img src="https://github.com/hyemdanu.png" width="80px" alt="Edison Ho"/><br/>
         <sub><b>Edison Ho</b></sub>
       </a><br/>
       <sub>Developer</sub>
