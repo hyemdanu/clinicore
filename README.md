@@ -108,7 +108,29 @@ git clone https://github.com/your-org/clinicore.git
 cd clinicore
 ```
 
+### 2. Database Setup
 
+Create a MySQL database and user, then run any provided seed scripts:
+
+```sql
+CREATE DATABASE clinicore;
+CREATE USER 'clinicore_user'@'localhost' IDENTIFIED BY 'ourpassword';
+GRANT ALL PRIVILEGES ON clinicore.* TO 'clinicore_user'@'localhost';
+```
+
+### 3. Backend Environment Variables
+
+Create a `.env` file or set the following environment variables before starting the backend:
+
+| Variable | Description |
+|---|---|
+| `DB_URL` | JDBC connection string (e.g. `jdbc:mysql://localhost:3306/clinicore`) |
+| `DB_USERNAME` | MySQL username |
+| `DB_PASSWORD` | MySQL password |
+| `JWT_SECRET` | Secret key for JWT signing (32+ characters) |
+| `ENCRYPTION_KEY` | AES-256 key for message encryption (32 bytes) |
+| `MAIL_USERNAME` | SMTP email address for account recovery |
+| `MAIL_PASSWORD` | SMTP email password |
 
 ### 4. Start the Backend
 
