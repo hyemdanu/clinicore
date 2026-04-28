@@ -206,28 +206,29 @@ mvn test -Dtest=ResidentMedicationManagementIntegrationTest
         <img src="https://github.com/aimsngn.png" width="80px" alt="Olei Amelie Mae Ngan"/><br/>
         <sub><b>Olei Amelie Mae Ngan</b></sub>
       </a><br/>
-      <sub>Developer</sub>
+      <sub>Developer · oleiameliev.ngan@gmail.com
+</sub>
     </td>
     <td align="center">
       <a href="https://github.com/OniiSean">
         <img src="https://github.com/OniiSean.png" width="80px" alt="Sean Bombay"/><br/>
         <sub><b>Sean Bombay</b></sub>
       </a><br/>
-      <sub>Developer</sub>
+      <sub>Developer  ·  subombay@csus.edu</sub>
     </td>
     <td align="center">
       <a href="https://github.com/anhminh34">
         <img src="https://github.com/anhminh34.png" width="80px" alt="Minh Nguyen"/><br/>
         <sub><b>Minh Nguyen</b></sub>
       </a><br/>
-      <sub>Developer</sub>
+      <sub>Developer  · minhanguyen@csus.edu</sub>
     </td>
     <td align="center">
       <a href="https://github.com/mileslle">
         <img src="https://github.com/mileslle.png" width="80px" alt="Miles Le"/><br/>
         <sub><b>Miles Le</b></sub>
       </a><br/>
-      <sub>Developer</sub>
+      <sub>Developer  · milesle@csus.edu</sub>
     </td>
   </tr>
   <tr>
@@ -243,21 +244,21 @@ mvn test -Dtest=ResidentMedicationManagementIntegrationTest
         <img src="https://github.com/adrianpxrez.png" width="80px" alt="Adrian Perez"/><br/>
         <sub><b>Adrian Perez</b></sub>
       </a><br/>
-      <sub>Developer</sub>
+      <sub>Developer  · adrianperez3@csus.edu</sub>
     </td>
     <td align="center">
       <a href="https://github.com/winniwu07">
         <img src="https://github.com/winniwu07.png" width="80px" alt="Winni Wu"/><br/>
         <sub><b>Winni Wu</b></sub>
       </a><br/>
-      <sub>Developer</sub>
+      <sub>Developer · winniwu@csus.edu</sub>
     </td>
     <td align="center">
       <a href="https://github.com/hyemdanu">
         <img src="https://github.com/hyemdanu.png" width="80px" alt="Edison Ho"/><br/>
         <sub><b>Edison Ho</b></sub>
       </a><br/>
-      <sub>Developer</sub>
+      <sub>Developer · eho3@csus.edu</sub>
     </td>
   </tr>
 </table>
