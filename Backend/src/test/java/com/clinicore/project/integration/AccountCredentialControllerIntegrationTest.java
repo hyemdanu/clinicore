@@ -45,7 +45,7 @@ class AccountCredentialControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    // ==================== LOGIN TESTS ====================
+    // ==================== LOGIN TESTS FIX ====================
 
     @Test
     @Order(1)
